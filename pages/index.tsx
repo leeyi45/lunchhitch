@@ -1,14 +1,41 @@
-import { NextPage } from "next";
-import { signIn, useSession } from "next-auth/react";
+import { Button, Menu, MenuItem } from "@blueprintjs/core";
+import { Popover2 } from "@blueprintjs/popover2";
+import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { useState } from "react";
+import NavBar from "../common/navbar";
 
-const HomePage: NextPage = () => {
-    const { data: session } = useSession();
+export default function HomePage(props: { locations: string[] }) {
+    const [user, setUser] = useState<User | null>(null);
+    const [locInputValue, setLocInputValue] = useState('');
+
+    const menu = <Menu>
+        {props.locations.map((x, i) => (
+        <MenuItem key={i} text={x} onClick={() => setLocInputValue(x)}/>))}
+    </Menu>
     
-    if (!session) signIn();
+    onAuthStateChanged(getAuth(), user => {
+        if (user) setUser(user);
+    });
 
     return <div>
-        <h1>Lunchhitch landing page</h1>
+        <NavBar user={user} />
+        <div>
+            <p>Select Your Location:</p>
+            <Popover2 className='bp4-menu' content={menu} >
+                <input value={locInputValue} />
+                <Button icon='arrow-down' />
+            </Popover2>
+        </div>
     </div>
 };
 
-export default HomePage;
+export async function getServerSideProps() {
+    const res = await fetch('http://localhost:3000/api/locations')
+    const locations = (await res.json()).locations
+
+    return {
+        props: {
+            locations,
+        }
+    }
+}
