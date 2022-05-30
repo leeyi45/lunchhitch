@@ -20,10 +20,13 @@
     "@material-ui/styles": "^4.11.5",
     "dotenv": "^16.0.1",
     "firebase": "^9.8.2",
+    "firebaseui": "^6.0.1",
     "next": "12.1.6",
     "next-auth": "^4.3.4",
+    "prettier": "^2.6.2",
     "react": "18.1.0",
-    "react-dom": "18.1.0"
+    "react-dom": "18.1.0",
+    "react-router": "^6.3.0"
   },
   "devDependencies": {
     "@types/node": "17.0.33",

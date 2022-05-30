@@ -1,6 +1,7 @@
 import { Button, Menu, MenuItem } from "@blueprintjs/core";
 import { Popover2 } from "@blueprintjs/popover2";
-import { getAuth, onAuthStateChanged, User } from "firebase/auth";
+import { User } from "firebase/auth";
+import { FIREBASE_AUTH } from '../firebase/auth'
 import { useState } from "react";
 import NavBar from "../common/navbar";
 
@@ -13,7 +14,7 @@ export default function HomePage(props: { locations: string[] }) {
         <MenuItem key={i} text={x} onClick={() => setLocInputValue(x)}/>))}
     </Menu>
     
-    onAuthStateChanged(getAuth(), user => {
+    FIREBASE_AUTH.onAuthStateChanged(user => {
         if (user) setUser(user);
     });
 

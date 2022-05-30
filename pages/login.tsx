@@ -1,41 +1,96 @@
 import React from 'react';
-import { useSession } from 'next-auth/react';
 
 import { Button } from '@blueprintjs/core';
+import { signInWithEmailAndPassword, User } from '@firebase/auth';
+import { FIREBASE_AUTH } from '../firebase/auth';
+import { Typography } from '@material-ui/core';
 
-const LoginPage = (provider: any) => {
-   const { data: session } = useSession();
-   const [wrongCreds, setWrongCreds] = React.useState(false);
+export default function LoginPage() {
+   const [loginError, setLoginError] = React.useState<string | null>(null);
 
-   if (session) {
-       // user is logged in
-       return <></>
-   } else {
-    return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '70%',
-            alignContent: 'center',
-            justifyContent: 'center',
-        }}>
-            {wrongCreds ? <text style={{
-                marginBottom: '10px',
-            }}>No such username or password</text>: undefined}
-            <text style={{
-                marginBottom: '10px'
-            }}>Username:</text>
-            <input type='text' />
-            <text style={{
-                marginBottom: '10px',
-            }}>Password:</text>
-            <input type='password' />
-            <Button style={{
-                marginTop: '10px',
-            }}>Sign In</Button>
-        </div>);
+   const usernameRef = React.useRef<HTMLInputElement | null>(null);
+   const passwordRef = React.useRef<HTMLInputElement | null>(null);
+
+   FIREBASE_AUTH.onAuthStateChanged(user => {
+        if (user) alert('Successfully signed in as ' + user.displayName);
+   });
+
+   const submitCallback = () => {
+    if (!usernameRef.current || !passwordRef.current) return;
+
+    const username = usernameRef.current.value.trim();
+    const password = usernameRef.current.value.trim();
+
+    if (!username || !password) return;
+
+    signInWithEmailAndPassword(FIREBASE_AUTH, username, password)
+        .catch(error => {
+            switch (error.code) {
+                case 'auth/invalid-email': {
+                    setLoginError('Enter a valid email address');
+                    break;
+                }
+                case 'auth/wrong-password': {
+                    setLoginError('Invalid email or password');
+                    break;
+                }
+                default: {
+                    console.error(error);
+                    setLoginError('Unknown error')
+                    break;
+                }
+            }
+        });
    }
+
+    return (
+        <>
+            <div style={{background: '#454B1B'}}>
+                <Typography
+                    variant="h6"
+                    component="div"
+                    style={{ 
+                        flexGrow: 1, 
+                        textAlign: "left",
+                        fontFamily: 'Raleway',
+                        color: 'white'
+                    }}
+                >
+                    Log In to Lunch Hitch
+                </Typography>
+            </div>
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column',
+                width: '70%',
+                alignContent: 'center',
+                justifyContent: 'center',
+            }}>
+                {
+                    loginError === null
+                    ? null
+                    : <text fontStyle='color red'
+                    >{loginError}</text>
+                }
+                <text
+                style={{
+                    marginBottom: '10px'
+                }}>Username:</text>
+                <input type='text' 
+                ref={usernameRef}
+                onSubmit={submitCallback}/>
+                <text 
+                style={{
+                    marginBottom: '10px',
+                }}>Password:</text>
+                <input type='password' 
+                ref={passwordRef}
+                onSubmit={submitCallback}/>
+                <Button 
+                onClick={submitCallback}
+                style={{
+                    marginTop: '10px',
+                }}>Sign In</Button>
+            </div>
+        </>);
 };
-
-
-export default LoginPage;

@@ -6,14 +6,22 @@ import IconButton from "@material-ui/core/IconButton";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import MenuItem from "@material-ui/core/MenuItem";
 import Menu from "@material-ui/core/Menu";
-import { signOut } from "next-auth/react";
+import { User } from 'firebase/auth';
+import Link from "next/link";
 
-export default function NavBar({user}: any) {
+export type NavbarProps = {
+  user: User | null;
+};
+
+/**
+ * Navigation Bar component
+ */
+export default function NavBar({user}: NavbarProps) {
     const [anchorEl, setAnchorEl] = useState(null);
     
     const handleLogout = () => {
         handleClose();
-        signOut();
+        // signOut();
   };
 
   const handleMenu = (event: any) => {
@@ -23,6 +31,7 @@ export default function NavBar({user}: any) {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
     return (
     <AppBar position="static" style = {{background: '#454B1B'}}>
       <Toolbar>
@@ -44,7 +53,9 @@ export default function NavBar({user}: any) {
               color="inherit"
             >
               <AccountCircle />
-              <text>{user?.name ? user.name : 'Test User'}</text>
+              <text style={{
+                paddingLeft: '5px',
+              }}>{user !== null ? user.displayName : 'Login'}</text>
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -63,7 +74,12 @@ export default function NavBar({user}: any) {
             >
               <MenuItem onClick={handleClose}>Profile</MenuItem>
               <MenuItem onClick={handleClose}>My account</MenuItem>
-              <MenuItem onClick={handleLogout}>Log out</MenuItem>
+              { user !== null 
+                ? <MenuItem onClick={handleLogout}>Log out</MenuItem>
+                : <MenuItem>
+                  <Link href='/login' >Log In</Link>
+                </MenuItem>
+              }
             </Menu>
           </div>
         )}
