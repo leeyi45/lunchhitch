@@ -38,6 +38,7 @@ module.exports = {
     'react/destructuring-assignment': 0,
     'react/jsx-filename-extension': 0,
     'react/no-array-index-key': 0,
+    'max-len': [0, { code: 100 }],
   },
   settings: {
     'import/resolver': {
