@@ -1,55 +1,47 @@
-import { EmailAuthProvider } from 'firebase/auth';
-import firebaseui from 'firebaseui';
+import { Button } from '@material-ui/core';
+import { signIn } from 'next-auth/react';
 import React from 'react';
-import FIREBASE_AUTH from '../firebase/auth';
+import { SignInException } from '../pages/api/auth/[...nextauth]';
 
-export type AuthenticationUIProps = {
-    onSignIn: (() => void) | undefined;
-};
+export default function AuthenticationUI() {
+  const [signinError, setSiginError] = React.useState<string | undefined>(undefined);
+  const usernameBox = React.useRef<HTMLInputElement | null>(null);
+  const passwordBox = React.useRef<HTMLInputElement | null>(null);
 
-/**
- * Sign In prompt
- */
-export default function AuthenticationUI(props: AuthenticationUIProps) {
-  React.useEffect(() => {
+  const onSignIn = () => {
     (async () => {
-      // Need to use this style of importing firebaseui because NextJS utilizes server side
-      // rendering. We need to wait until the window has loaded before trying to display
-      // the login UI
-      const firebaseUI = await import('firebaseui');
-      const ui = firebaseUI.auth.AuthUI.getInstance() || new firebaseUI.auth.AuthUI(FIREBASE_AUTH);
-      ui.start('#firebase-login', {
-        callbacks: {
-          signInSuccessWithAuthResult: () => {
-            if (props.onSignIn) props.onSignIn();
-            return true;
-          },
-          signInFailure(authError: firebaseui.auth.AuthUIError) {
-            switch (authError.code) {
-              case 'auth/invalid-email': {
-                alert('Invalid email!');
-                break;
-              }
-              default: {
-                alert('Unknown error');
-                console.error(authError);
-                break;
-              }
-            }
-          },
-          // uiShown: () => document.getElementById('loader')!.style.display = 'none'
-        },
-        signInFlow: 'redirect',
-        signInSuccessUrl: '/',
-        signInOptions: [
-          {
-            provider: EmailAuthProvider.PROVIDER_ID,
-            requireDisplayName: true,
-          },
-        ],
-      });
+      try {
+        signIn('credentials', { redirect: false });
+      } catch (error) {
+        if (error instanceof SignInException) {
+          setSiginError(error.errorCode);
+        } else {
+          // TODO: make error page
+        }
+      }
     })();
-  }, []);
+  };
 
-  return <div id="firebase-login" />;
+  const processError = () => {
+    switch (signinError) {
+      case 'EMAIL_NOT_FOUND':
+      case 'INVALID_PASSWORD': return 'Incorrect username or password';
+      default: return undefined;
+    }
+  };
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignContent: 'center',
+    }}
+    >
+      {processError()}
+      <input ref={usernameBox} type="text" />
+      <input ref={passwordBox} type="password" />
+      <Button onClick={onSignIn}>Sign In</Button>
+    </div>
+  );
 }

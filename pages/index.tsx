@@ -1,8 +1,7 @@
 import React from 'react';
 import { Menu, MenuItem } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
-import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-// import FIREBASE_AUTH from '../firebase/auth';
+import { useSession } from 'next-auth/react';
 import NavBar from '../common/navbar';
 
 type Location = {
@@ -11,8 +10,8 @@ type Location = {
 }
 
 export default function HomePage(props: { locations: Location[] }) {
-  const [user, setUser] = React.useState<User | null>(null);
   const [locInputValue, setLocInputValue] = React.useState<string>('');
+  const { data: session } = useSession();
 
   const menu = (
     <Menu>
@@ -26,22 +25,11 @@ export default function HomePage(props: { locations: Location[] }) {
     </Menu>
   );
 
-  // eslint-disable-next-line no-shadow
-  onAuthStateChanged(getAuth(), (user) => {
-    console.log('auth state changed');
-    if (user) {
-      console.log(`${user?.displayName} has signed in!`);
-      setUser(user);
-    } else {
-      console.log('User is undefined');
-    }
-  });
-
   const selectedLocation = props.locations.find((x) => x.name === locInputValue);
 
   return (
     <div>
-      <NavBar user={user} />
+      <NavBar user={session?.user} />
       <div style={{
         display: 'flex',
         flexDirection: 'row',

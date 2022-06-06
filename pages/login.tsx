@@ -1,19 +1,24 @@
 import React from 'react';
 
 import { Button } from '@blueprintjs/core';
-import { signInWithEmailAndPassword } from '@firebase/auth';
 import { Typography } from '@material-ui/core';
-import FIREBASE_AUTH from '../firebase/auth';
+import { signIn, useSession } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { data: session } = useSession();
+
+  // If the user is logged in already redirect them to the
+  // main page
+  if (session && session.user) {
+    router.push('.');
+  }
+
   const [loginError, setLoginError] = React.useState<string | null>(null);
 
   const usernameRef = React.useRef<HTMLInputElement | null>(null);
   const passwordRef = React.useRef<HTMLInputElement | null>(null);
-
-  FIREBASE_AUTH.onAuthStateChanged((user) => {
-    if (user) alert(`Successfully signed in as ${user.displayName}`);
-  });
 
   const submitCallback = () => {
     if (!usernameRef.current || !passwordRef.current) return;
@@ -23,28 +28,31 @@ export default function LoginPage() {
 
     if (!username || !password) return;
 
-    signInWithEmailAndPassword(FIREBASE_AUTH, username, password)
-      .catch((error) => {
-        switch (error.code) {
-          case 'auth/invalid-email': {
-            setLoginError('Enter a valid email address');
-            break;
-          }
-          case 'auth/wrong-password': {
-            setLoginError('Invalid email or password');
-            break;
-          }
-          case 'auth/too-many-requests': {
-            setLoginError('Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later');
-            break;
-          }
-          default: {
-            console.error(error);
-            setLoginError('Unknown error');
-            break;
+    (async () => {
+      try {
+        await signIn('credentials', {
+          redirect: false,
+          email: username,
+          password,
+        });
+        router.push('.');
+      } catch (error: any) {
+        if (error.errorCode) {
+          switch (error.errorCode) {
+            case 'EMAIL_NOT_FOUND':
+            case 'INVALID_PASSWORD': {
+              setLoginError('Incorrect username or password');
+              break;
+            }
+            // eslint-disable-next-line no-lone-blocks
+            default: {
+              // TODO go to error page
+              break;
+            }
           }
         }
-      });
+      }
+    })();
   };
 
   return (
@@ -76,14 +84,14 @@ export default function LoginPage() {
       }}
       >
         {
-                    loginError === null
-                      ? null
-                      : (
-                        <text fontStyle="color red">
-                          {loginError}
-                        </text>
-                      )
-                }
+          loginError === null
+            ? null
+            : (
+              <text fontStyle="color red">
+                {loginError}
+              </text>
+            )
+        }
         <text
           style={{
             marginBottom: '10px',

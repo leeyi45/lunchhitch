@@ -2,6 +2,7 @@
  * firebase/index.ts
  * Configuration information for firebase integrations
  */
+import { initializeAuth } from '@firebase/auth';
 import { initializeApp } from 'firebase/app';
 
 const firebaseConfig = {
@@ -14,5 +15,5 @@ const firebaseConfig = {
   measurementId: 'G-QHNWEVTCH0',
 };
 
-const FIREBASE_APP = initializeApp(firebaseConfig);
-export default FIREBASE_APP;
+export const FIREBASE_APP = initializeApp(firebaseConfig);
+export const FIREBASE_AUTH = initializeAuth(FIREBASE_APP);

@@ -6,12 +6,15 @@ import IconButton from '@material-ui/core/IconButton';
 import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import { User } from 'firebase/auth';
-import AuthenticationUI from './auth_ui';
-import FIREBASE_AUTH from '../firebase/auth';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
 
 export type NavbarProps = {
-  user: User | null;
+  user?: {
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  } | null;
 };
 
 /**
@@ -19,21 +22,14 @@ export type NavbarProps = {
  */
 export default function NavBar({ user }: NavbarProps) {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [displayLogIn, setDisplayLogIn] = React.useState(false);
   const [usernameText, setUsernameText] = React.useState('Login');
 
   React.useEffect(() => {
-    setUsernameText(user ? user.displayName! : 'Login');
-    setDisplayLogIn(user === undefined);
+    setUsernameText(user ? user.name! : 'Login');
   }, [user]);
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleLogout = () => {
-    handleClose();
-    FIREBASE_AUTH.signOut();
   };
 
   const handleMenu = (event: any) => {
@@ -84,13 +80,20 @@ export default function NavBar({ user }: NavbarProps) {
           >
             <MenuItem onClick={handleClose}>Profile</MenuItem>
             <MenuItem onClick={handleClose}>My account</MenuItem>
-            { user !== null
-              ? <MenuItem onClick={handleLogout}>Log out</MenuItem>
-              : <MenuItem onClick={() => setDisplayLogIn(true)}>Log In</MenuItem>}
+            { user
+              ? <MenuItem onClick={() => signOut()}>Log out</MenuItem>
+              : (
+                <MenuItem>
+                  <Link href="./login">Log In</Link>
+                </MenuItem>
+              )}
           </Menu>
         </div>
-        {displayLogIn ? <AuthenticationUI onSignIn={() => setDisplayLogIn(false)} /> : undefined}
       </Toolbar>
     </AppBar>
   );
 }
+
+NavBar.defaultProps = {
+  user: undefined,
+};
