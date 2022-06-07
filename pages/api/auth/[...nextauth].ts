@@ -39,6 +39,22 @@ export class SignInException extends Error {
 }
 
 export default NextAuth({
+  callbacks: {
+    // eslint-disable-next-line no-unused-vars
+    async session({ session, token, user }) {
+      // eslint-disable-next-line no-param-reassign
+      session.accessToken = token.accessToken;
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        // eslint-disable-next-line no-param-reassign
+        token.accessToken = user.token;
+      }
+
+      return token;
+    },
+  },
   providers: [
     CredentialsProvider({
       name: 'Lunch Hitch',

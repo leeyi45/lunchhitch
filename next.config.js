@@ -6,7 +6,7 @@ const nextConfig = {
   env: {
     PORT: process.env.PORT || 3000,
     FIREBASE_API_KEY: process.env.FIREBASE_API_KEY,
-  }
-}
+  },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
