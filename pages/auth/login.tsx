@@ -24,7 +24,7 @@ export default function LoginPage() {
     if (!usernameRef.current || !passwordRef.current) return;
 
     const username = usernameRef.current.value.trim();
-    const password = usernameRef.current.value.trim();
+    const password = passwordRef.current.value.trim();
 
     if (!username || !password) return;
 
@@ -32,10 +32,10 @@ export default function LoginPage() {
       try {
         await signIn('credentials', {
           redirect: false,
-          email: username,
+          username,
           password,
         });
-        router.push('.');
+        router.push('/');
       } catch (error: any) {
         if (error.errorCode) {
           switch (error.errorCode) {

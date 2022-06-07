@@ -13,11 +13,6 @@ export default function HomePage(props: { locations: Location[] }) {
   const [locInputValue, setLocInputValue] = React.useState<string>('');
   const { data: session } = useSession();
 
-  React.useEffect(() => {
-    if (!session) console.log('Session is null');
-    else console.log(session);
-  }, [session]);
-
   const menu = (
     <Menu>
       {props.locations.map((x, i) => (
