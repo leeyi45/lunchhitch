@@ -45,23 +45,23 @@ export default function SignUpPage() {
   return (
     <AuthRequired>
       {
-          signUpSuccess
-            ? <p>Sign Up Succcessful! Refresh the page to login!</p>
-            : (
-              <>
-                <p>Name:</p>
-                <input type="text" ref={nameRef} />
-                <p>Email:</p>
-                <input type="text" ref={usernameRef} />
-                <p>Password:</p>
-                <input type="password" ref={passwordRef} />
-                <p>Repeat Password:</p>
-                <input type="password" ref={repeatPassRef} />
-                {signUpError !== '' ? <p>{signUpError}</p>
-                  : undefined}
-                <Button onClick={signUpCallback} />
-              </>
-            )
+        signUpSuccess
+          ? <p>Sign Up Succcessful! Refresh the page to login!</p>
+          : (
+            <>
+              <p>Name:</p>
+              <input type="text" ref={nameRef} />
+              <p>Email:</p>
+              <input type="text" ref={usernameRef} />
+              <p>Password:</p>
+              <input type="password" ref={passwordRef} />
+              <p>Repeat Password:</p>
+              <input type="password" ref={repeatPassRef} />
+              {signUpError !== '' ? <p>{signUpError}</p>
+                : undefined}
+              <Button onClick={signUpCallback} />
+            </>
+          )
       }
     </AuthRequired>
   );
