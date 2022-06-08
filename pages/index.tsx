@@ -2,14 +2,10 @@ import React from 'react';
 import { Menu, MenuItem } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
 import { useSession } from 'next-auth/react';
+import { location, PrismaClient } from '@prisma/client';
 import NavBar from '../common/navbar';
 
-type Location = {
-    name: string;
-    locations: string[];
-}
-
-export default function HomePage(props: { locations: Location[] }) {
+export default function HomePage(props: { locations: location[] }) {
   const [locInputValue, setLocInputValue] = React.useState<string>('');
   const { data: session } = useSession();
 
@@ -45,7 +41,7 @@ export default function HomePage(props: { locations: Location[] }) {
           {selectedLocation !== undefined
             ? (
               <ol>
-                {selectedLocation.locations.map((x) => <li>{x}</li>)}
+                {selectedLocation.stores.map((x) => <li>{x}</li>)}
               </ol>
             )
             : undefined}
@@ -56,8 +52,8 @@ export default function HomePage(props: { locations: Location[] }) {
 }
 
 export async function getServerSideProps() {
-  const res = await fetch('http://localhost:3000/api/locations');
-  const { locations } = await res.json();
+  const prisma = new PrismaClient();
+  const locations = await prisma.location.findMany();
 
   return {
     props: {

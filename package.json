@@ -4,10 +4,12 @@
   "private": true,
   "scripts-info": {
     "clean": "Delete cached files",
+    "db:update": "Run this command after changes to the database have been made to update prisma",
     "dev": "Run the development server"
   },
   "scripts": {
     "clean": "rm -rf .next && yarn cache clean",
+    "db:update": "prisma db pull --force && prisma generate",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -20,13 +22,14 @@
     "@material-ui/core": "^4.12.4",
     "@material-ui/icons": "^4.11.3",
     "@material-ui/styles": "^4.11.5",
+    "@prisma/client": "^3.15.0",
     "dotenv": "^16.0.1",
     "firebase": "^9.8.2",
     "next": "12.1.6",
     "next-auth": "^4.3.4",
     "prettier": "^2.6.2",
     "prettier-eslint": "^15.0.1",
-    "prisma": "^3.14.0",
+    "prisma": "^3.15.0",
     "react": "18.1.0",
     "react-dom": "18.1.0"
   },
