@@ -4,6 +4,7 @@
  */
 import { initializeAuth } from '@firebase/auth';
 import { initializeApp } from 'firebase/app';
+import { initializeFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -17,3 +18,4 @@ const firebaseConfig = {
 
 export const FIREBASE_APP = initializeApp(firebaseConfig);
 export const FIREBASE_AUTH = initializeAuth(FIREBASE_APP);
+export const FIRESTORE = initializeFirestore(FIREBASE_APP, {});

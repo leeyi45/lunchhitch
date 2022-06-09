@@ -2,18 +2,21 @@ import React from 'react';
 
 import { Button } from '@blueprintjs/core';
 import { Typography } from '@material-ui/core';
-import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { onAuthStateChanged } from '@firebase/auth';
+import { FIREBASE_AUTH } from '../../firebase';
+import { signIn } from '../../firebase/auth';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { data: session } = useSession();
 
   // If the user is logged in already redirect them to the
   // main page
-  if (session && session.user) {
-    router.push('.');
-  }
+  onAuthStateChanged(FIREBASE_AUTH, (user) => {
+    if (user) {
+      router.push('..');
+    }
+  });
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
 
@@ -24,35 +27,27 @@ export default function LoginPage() {
     if (!usernameRef.current || !passwordRef.current) return;
 
     const username = usernameRef.current.value.trim();
-    const password = passwordRef.current.value.trim();
+    const password = passwordRef.current.value;
 
     if (!username || !password) return;
 
-    (async () => {
-      try {
-        await signIn('credentials', {
-          redirect: false,
-          username,
-          password,
-        });
-        router.push('/');
-      } catch (error: any) {
-        if (error.errorCode) {
-          switch (error.errorCode) {
-            case 'EMAIL_NOT_FOUND':
-            case 'INVALID_PASSWORD': {
-              setLoginError('Incorrect username or password');
-              break;
-            }
-            // eslint-disable-next-line no-lone-blocks
-            default: {
-              // TODO go to error page
-              break;
-            }
+    signIn(username, password)
+      .catch((error) => {
+        console.log(error.code);
+        switch (error.code) {
+          case 'auth/user-not-found':
+          case 'auth/wrong-password': {
+            passwordRef.current!.value = '';
+            setLoginError('Incorrect username or password');
+            break;
+          }
+          // eslint-disable-next-line no-lone-blocks
+          default: {
+            // TODO go to error page
+            break;
           }
         }
-      }
-    })();
+      });
   };
 
   return (

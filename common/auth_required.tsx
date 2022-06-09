@@ -1,6 +1,6 @@
-import React from 'react';
-import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import { onAuthStateChanged } from '@firebase/auth';
+import { FIREBASE_AUTH } from '../firebase';
 
 type Props = {
     children: any;
@@ -11,12 +11,10 @@ type Props = {
  * Unauthenticated users are redirected to the login page automatically
  */
 export default function AuthRequired({ children }: Props) {
-  const { data: session } = useSession();
   const router = useRouter();
-
-  React.useEffect(() => {
-    if (!session || !session.user) router.push('/auth/login');
-  }, [session]);
+  onAuthStateChanged(FIREBASE_AUTH, (user) => {
+    if (user) router.push('/auth/login');
+  });
 
   return children;
 }

@@ -13,7 +13,8 @@ export default function SignUpPage() {
   const [signUpSuccess, setSignUpSuccess] = React.useState(false);
 
   const signUpCallback = () => {
-    if (!usernameRef.current || !passwordRef.current || !repeatPassRef.current) return;
+    if (!usernameRef.current || !passwordRef.current
+        || !repeatPassRef.current || !nameRef.current) return;
 
     const username = usernameRef.current.value?.trim();
     if (!username) {
@@ -35,10 +36,15 @@ export default function SignUpPage() {
 
     if (password !== repeatPass) setSignupError('Passwords do not match!');
 
-    signUp({ username, password })
+    signUp(username, password, nameRef.current.value.trim())
       .then(() => setSignUpSuccess(true))
       .catch((error) => {
-        setSignupError(error);
+        if (error.code === 'auth/email-already-exists') {
+          setSignupError('An account with this username already exists');
+        } else {
+          // TODO redirect to error page
+
+        }
       });
   };
 

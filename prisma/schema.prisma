@@ -7,14 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model location {
+model Location {
   id     String   @id @default(auto()) @map("_id") @db.ObjectId
   name   String
   stores String[]
 }
 
-model user {
-  id    String @id @default(auto()) @map("_id") @db.ObjectId
-  email String
-  name  String
+model User {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  name     String
+  username String
 }

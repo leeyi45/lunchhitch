@@ -1,13 +1,17 @@
 import React from 'react';
 import { Menu, MenuItem } from '@blueprintjs/core';
 import { Popover2 } from '@blueprintjs/popover2';
-import { useSession } from 'next-auth/react';
-import { location, PrismaClient } from '@prisma/client';
+import { Location } from '@prisma/client';
+import { onAuthStateChanged, User } from '@firebase/auth';
 import NavBar from '../common/navbar';
+import { FIREBASE_AUTH } from '../firebase';
+import prisma from '../prisma';
 
-export default function HomePage(props: { locations: location[] }) {
+export default function HomePage(props: { locations: Location[] }) {
   const [locInputValue, setLocInputValue] = React.useState<string>('');
-  const { data: session } = useSession();
+  const [user, setUser] = React.useState<User | null>(null);
+
+  onAuthStateChanged(FIREBASE_AUTH, setUser);
 
   const menu = (
     <Menu>
@@ -25,7 +29,7 @@ export default function HomePage(props: { locations: location[] }) {
 
   return (
     <div>
-      <NavBar user={session?.user} />
+      <NavBar user={user} />
       <div style={{
         display: 'flex',
         flexDirection: 'row',
@@ -52,7 +56,6 @@ export default function HomePage(props: { locations: location[] }) {
 }
 
 export async function getServerSideProps() {
-  const prisma = new PrismaClient();
   const locations = await prisma.location.findMany();
 
   return {
