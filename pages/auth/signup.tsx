@@ -1,13 +1,12 @@
 import { Button } from '@material-ui/core';
 import React from 'react';
+import { useTextRef } from '../../common';
 import AuthRequired from '../../common/auth_required';
+import Redirecter from '../../common/redirecter';
 import { signUp } from '../../firebase/auth';
 
 export default function SignUpPage() {
-  const usernameRef = React.useRef<HTMLInputElement | null>(null);
-  const passwordRef = React.useRef<HTMLInputElement | null>(null);
-  const repeatPassRef = React.useRef<HTMLInputElement | null>(null);
-  const nameRef = React.useRef<HTMLInputElement | null>(null);
+  const [usernameRef, passwordRef, repeatPassRef, nameRef] = useTextRef(4);
 
   const [signUpError, setSignupError] = React.useState('');
   const [signUpSuccess, setSignUpSuccess] = React.useState(false);
@@ -34,7 +33,10 @@ export default function SignUpPage() {
       return;
     }
 
-    if (password !== repeatPass) setSignupError('Passwords do not match!');
+    if (password !== repeatPass) {
+      setSignupError('Passwords do not match!');
+      return;
+    }
 
     signUp(username, password, nameRef.current.value.trim())
       .then(() => setSignUpSuccess(true))
@@ -52,7 +54,11 @@ export default function SignUpPage() {
     <AuthRequired>
       {
         signUpSuccess
-          ? <p>Sign Up Succcessful! Refresh the page to login!</p>
+          ? (
+            <Redirecter redirect="/index" duration={5}>
+              <p>Sign up successful! Redirecting you to the login page</p>
+            </Redirecter>
+          )
           : (
             <>
               <p>Name:</p>

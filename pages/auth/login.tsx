@@ -4,8 +4,10 @@ import { Button } from '@blueprintjs/core';
 import { Typography } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import { onAuthStateChanged } from '@firebase/auth';
+import Link from 'next/link';
 import { FIREBASE_AUTH } from '../../firebase';
 import { signIn } from '../../firebase/auth';
+import { useTextRef } from '../../common';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -20,8 +22,7 @@ export default function LoginPage() {
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
 
-  const usernameRef = React.useRef<HTMLInputElement | null>(null);
-  const passwordRef = React.useRef<HTMLInputElement | null>(null);
+  const [usernameRef, passwordRef] = useTextRef(2);
 
   const submitCallback = () => {
     if (!usernameRef.current || !passwordRef.current) return;
@@ -119,6 +120,7 @@ export default function LoginPage() {
         >
           Sign In
         </Button>
+        <Link href="/auth/reset">Forgot your password?</Link>
       </div>
     </div>
   );

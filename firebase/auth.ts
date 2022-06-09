@@ -1,5 +1,5 @@
 import {
-  createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile, User,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, User,
 } from '@firebase/auth';
 import { FIREBASE_AUTH } from '.';
 
@@ -18,10 +18,14 @@ export async function signIn(username: string, password: string): Promise<User> 
 
 /**
  * Ask the Firebase API to create a new account
- * @param creds Credentials to create the new user account with
+ * @param username Username of the new user
+ * @param password Password of the new user
+ * @param displayName Display name of the new user
+ * @returns Created user
  */
 export async function signUp(username: string, password: string, displayName: string): Promise<User> {
   const result = await createUserWithEmailAndPassword(FIREBASE_AUTH, `${username}@${DEFAULT_DOMAIN}`, password);
   await updateProfile(result.user, { displayName });
+  await signOut(FIREBASE_AUTH); // Disable automatic sign in
   return result.user;
 }
