@@ -2,11 +2,12 @@ import { Button } from '@material-ui/core';
 import React from 'react';
 import { useTextRef } from '../../common';
 import AuthRequired from '../../common/auth_required';
+import LabelledInput from '../../common/labelled_input';
 import Redirecter from '../../common/redirecter';
 import { signUp } from '../../firebase/auth';
 
 export default function SignUpPage() {
-  const [usernameRef, passwordRef, repeatPassRef, nameRef] = useTextRef(4);
+  const [usernameRef, passwordRef, repeatPassRef, nameRef, emailRef] = useTextRef(5);
 
   const [signUpError, setSignupError] = React.useState('');
   const [signUpSuccess, setSignUpSuccess] = React.useState(false);
@@ -38,16 +39,19 @@ export default function SignUpPage() {
       return;
     }
 
-    signUp(username, password, nameRef.current.value.trim())
-      .then(() => setSignUpSuccess(true))
-      .catch((error) => {
+    (async () => {
+      try {
+        await signUp(username, password, nameRef.current!.value.trim());
+        setSignUpSuccess(true);
+      } catch (error: any) {
         if (error.code === 'auth/email-already-exists') {
           setSignupError('An account with this username already exists');
         } else {
           // TODO redirect to error page
 
         }
-      });
+      }
+    })();
   };
 
   return (
@@ -63,7 +67,8 @@ export default function SignUpPage() {
             <>
               <p>Name:</p>
               <input type="text" ref={nameRef} />
-              <p>Email:</p>
+              <LabelledInput type="text" ref={emailRef} />
+              <p>Username:</p>
               <input type="text" ref={usernameRef} />
               <p>Password:</p>
               <input type="password" ref={passwordRef} />

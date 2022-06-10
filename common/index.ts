@@ -1,3 +1,4 @@
+/* eslint-disable no-redeclare */
 import { useRef } from 'react';
 
 type TextRef = {
@@ -5,6 +6,7 @@ type TextRef = {
 };
 
 export function useTextRef(): TextRef;
+// eslint-disable-next-line no-unused-vars
 export function useTextRef(count: number): TextRef[];
 export function useTextRef(count?: number): TextRef[] | TextRef {
   if (count) {

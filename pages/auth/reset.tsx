@@ -3,7 +3,6 @@ import {
   reauthenticateWithCredential, sendPasswordResetEmail, updatePassword, User,
 } from '@firebase/auth';
 import { Button } from '@material-ui/core';
-import { useRouter } from 'next/router';
 import React from 'react';
 import { useTextRef } from '../../common';
 import LabelledInput from '../../common/labelled_input';
@@ -27,6 +26,9 @@ function NoUserResetPage() {
       .then(() => setEmailSent(true))
       .catch((error) => {
         // TODO Error handling
+
+        // Do nothing if the email wasn't registered
+        if (error.code === 'auth/user-not-found') return;
       });
   };
 
@@ -45,18 +47,9 @@ function NoUserResetPage() {
 
 function UserResetPage({ user }: { user: User }) {
   const [oldPassRef, passwordRef, repeatPassRef] = useTextRef(3);
-  const router = useRouter();
 
   const [resetDone, setResetDone] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
-
-  React.useEffect(() => {
-    if (resetDone) {
-      // Automatically redirect the user to their home page
-      // 5 seconds after successfull reset
-      setTimeout(() => router.push('./index'), 5000);
-    }
-  }, [resetDone]);
 
   const resetCallback = () => {
     if (!oldPassRef.current || !passwordRef.current || !repeatPassRef.current) return;
@@ -76,10 +69,15 @@ function UserResetPage({ user }: { user: User }) {
       try {
         await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email!, oldPass));
         await updatePassword(user, newPass);
-      } catch (error) {
+        setResetDone(true);
+      } catch (error: any) {
         // TODO Error handling
+        if (error.code === 'auth/wrong-password') {
+          oldPassRef.current!.value = '';
+          setResetError('Incorrect password');
+        }
       }
-    })().then(() => setResetDone(true));
+    })();
   };
 
   return resetDone ? <p>Password successfully changed!</p>
@@ -88,7 +86,7 @@ function UserResetPage({ user }: { user: User }) {
         {resetError}
         <LabelledInput type="password" ref={oldPassRef} label="Existing Password" />
         <LabelledInput type="password" ref={passwordRef} label="New Password" />
-        <LabelledInput type="password" ref={repeatPassRef} label="New Password" />
+        <LabelledInput type="password" ref={repeatPassRef} label="Repeat Password" />
         <Button onClick={resetCallback}>Reset my password</Button>
       </>
     );

@@ -5,7 +5,7 @@ import { Location } from '@prisma/client';
 import { onAuthStateChanged, User } from '@firebase/auth';
 import NavBar from '../common/navbar';
 import { FIREBASE_AUTH } from '../firebase';
-import prisma from '../prisma';
+import getPrisma from '../prisma';
 
 export default function HomePage(props: { locations: Location[] }) {
   const [locInputValue, setLocInputValue] = React.useState<string>('');
@@ -56,7 +56,7 @@ export default function HomePage(props: { locations: Location[] }) {
 }
 
 export async function getServerSideProps() {
-  const locations = await prisma.location.findMany();
+  const locations = await getPrisma().location.findMany();
 
   return {
     props: {
