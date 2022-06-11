@@ -1,13 +1,15 @@
 import React from 'react';
 
-import { Button } from '@blueprintjs/core';
 import { Typography } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import { onAuthStateChanged } from '@firebase/auth';
 import Link from 'next/link';
+import {
+  FormikHelpers,
+} from 'formik';
 import { FIREBASE_AUTH } from '../../firebase';
-import { signIn } from '../../firebase/auth';
-import { useTextRef } from '../../common';
+import { Credential, signIn } from '../../auth';
+import FormikWrapper from '../../common/formik_wrapper';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -16,39 +18,40 @@ export default function LoginPage() {
   // main page
   onAuthStateChanged(FIREBASE_AUTH, (user) => {
     if (user) {
-      router.push('..');
+      router.push('./index');
     }
   });
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
 
-  const [usernameRef, passwordRef] = useTextRef(2);
+  const validateCallback = ({ username, password }: Credential) => {
+    const errors: { username?: string, password?: string} = {};
 
-  const submitCallback = () => {
-    if (!usernameRef.current || !passwordRef.current) return;
+    if (!username.trim()) errors.username = 'Username field cannot be blank';
+    if (!password.trim()) errors.password = 'Password field cannot be blank';
 
-    const username = usernameRef.current.value.trim();
-    const password = passwordRef.current.value;
+    return errors;
+  };
 
-    if (!username || !password) return;
-
-    signIn(username, password)
-      .catch((error) => {
-        console.log(error.code);
-        switch (error.code) {
-          case 'auth/user-not-found':
-          case 'auth/wrong-password': {
-            passwordRef.current!.value = '';
-            setLoginError('Incorrect username or password');
-            break;
-          }
-          // eslint-disable-next-line no-lone-blocks
-          default: {
-            // TODO go to error page
-            break;
-          }
+  const submitCallback = async ({ username, password }: Credential, actions: FormikHelpers<Credential>) => {
+    try {
+      await signIn(username, password);
+    } catch (error: any) {
+      console.log(error.code);
+      switch (error.code) {
+        case 'auth/user-not-found':
+        case 'auth/wrong-password': {
+          actions.setFieldValue('password', '', false);
+          setLoginError('Incorrect username or password');
+          break;
         }
-      });
+        // eslint-disable-next-line no-lone-blocks
+        default: {
+          setLoginError('An unexpected error occured');
+          break;
+        }
+      }
+    }
   };
 
   return (
@@ -88,38 +91,20 @@ export default function LoginPage() {
               </text>
             )
         }
-        <text
-          style={{
-            marginBottom: '10px',
+        <FormikWrapper
+          fields={{
+            username: {
+              type: 'text', labelText: 'Username', required: true, initialValue: '',
+            },
+            password: {
+              type: 'text', labelText: 'Password', required: true, initialValue: '',
+            },
           }}
-        >
-          Username:
-        </text>
-        <input
-          type="text"
-          ref={usernameRef}
+          preValidate={validateCallback}
           onSubmit={submitCallback}
+          buttonText="Sign In"
+          resetButton={false}
         />
-        <text
-          style={{
-            marginBottom: '10px',
-          }}
-        >
-          Password:
-        </text>
-        <input
-          type="password"
-          ref={passwordRef}
-          onSubmit={submitCallback}
-        />
-        <Button
-          onClick={submitCallback}
-          style={{
-            marginTop: '10px',
-          }}
-        >
-          Sign In
-        </Button>
         <Link href="/auth/reset">Forgot your password?</Link>
       </div>
     </div>

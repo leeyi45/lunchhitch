@@ -1,9 +1,19 @@
+/**
+ * auth.ts
+ * Functions for managing users
+ */
 import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, User,
 } from '@firebase/auth';
-import { FIREBASE_AUTH } from '.';
+import { FIREBASE_AUTH } from './firebase';
+import getPrisma from './prisma';
 
 const DEFAULT_DOMAIN = 'lunchhitch.firebaseapp.com';
+
+export type Credential = {
+  username: string;
+  password: string;
+};
 
 /**
  * Query the Firebase API to sign in a user
@@ -21,11 +31,20 @@ export async function signIn(username: string, password: string): Promise<User> 
  * @param username Username of the new user
  * @param password Password of the new user
  * @param displayName Display name of the new user
+ * @param email Email to be associated with the account
  * @returns Created user
  */
-export async function signUp(username: string, password: string, displayName: string): Promise<User> {
+export async function signUp(username: string, password: string, displayName: string, email: string): Promise<User> {
   const result = await createUserWithEmailAndPassword(FIREBASE_AUTH, `${username}@${DEFAULT_DOMAIN}`, password);
   await updateProfile(result.user, { displayName });
-  await signOut(FIREBASE_AUTH); // Disable automatic sign in
+
+  // Update our db containing userinfo
+  const dbtask = getPrisma().userInfo.create({
+    data: {
+      username,
+      email,
+    },
+  }); // and update our own db
+  await Promise.resolve([signOut(FIREBASE_AUTH), dbtask]);
   return result.user;
 }

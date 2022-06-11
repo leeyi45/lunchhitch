@@ -1,85 +1,82 @@
-import { Button } from '@material-ui/core';
 import React from 'react';
-import { useTextRef } from '../../common';
-import AuthRequired from '../../common/auth_required';
-import LabelledInput from '../../common/labelled_input';
+import {
+  FormikHelpers,
+} from 'formik';
+import { RedirectOnAuth } from '../../common/auth_wrappers';
 import Redirecter from '../../common/redirecter';
-import { signUp } from '../../firebase/auth';
+import { signUp } from '../../auth';
+import FormikWrapper from '../../common/formik_wrapper';
+
+type SignUpFormValues = {
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+  repeatPass: string;
+};
 
 export default function SignUpPage() {
-  const [usernameRef, passwordRef, repeatPassRef, nameRef, emailRef] = useTextRef(5);
-
   const [signUpError, setSignupError] = React.useState('');
   const [signUpSuccess, setSignUpSuccess] = React.useState(false);
 
-  const signUpCallback = () => {
-    if (!usernameRef.current || !passwordRef.current
-        || !repeatPassRef.current || !nameRef.current) return;
+  const submitCallback = async (values : SignUpFormValues, actions: FormikHelpers<SignUpFormValues>) => {
+    actions.setSubmitting(true);
+    try {
+      await signUp(values.username, values.password, values.name, values.email); // sign up to the firebaseapi
+    } catch (error: any) {
+      if (error.code === 'auth/email-already-exists') {
+        setSignupError('An account with this username already exists');
+      } else {
+        // TODO redirect to error page
 
-    const username = usernameRef.current.value?.trim();
-    if (!username) {
-      setSignupError('Username cannot be blank!');
-      return;
-    }
-
-    const password = passwordRef.current.value;
-    if (!password) {
-      setSignupError('Password cannot be blank!');
-      return;
-    }
-
-    const repeatPass = repeatPassRef.current.value;
-    if (!repeatPass) {
-      setSignupError('Password cannot be blank!');
-      return;
-    }
-
-    if (password !== repeatPass) {
-      setSignupError('Passwords do not match!');
-      return;
-    }
-
-    (async () => {
-      try {
-        await signUp(username, password, nameRef.current!.value.trim());
-        setSignUpSuccess(true);
-      } catch (error: any) {
-        if (error.code === 'auth/email-already-exists') {
-          setSignupError('An account with this username already exists');
-        } else {
-          // TODO redirect to error page
-
-        }
       }
-    })();
+      return;
+    }
+    setSignUpSuccess(true);
   };
 
   return (
-    <AuthRequired>
+    <RedirectOnAuth redirect="./profile">
       {
         signUpSuccess
           ? (
-            <Redirecter redirect="/index" duration={5}>
+            <Redirecter redirect="/auth/login" duration={5}>
               <p>Sign up successful! Redirecting you to the login page</p>
             </Redirecter>
           )
           : (
             <>
-              <p>Name:</p>
-              <input type="text" ref={nameRef} />
-              <LabelledInput type="text" ref={emailRef} />
-              <p>Username:</p>
-              <input type="text" ref={usernameRef} />
-              <p>Password:</p>
-              <input type="password" ref={passwordRef} />
-              <p>Repeat Password:</p>
-              <input type="password" ref={repeatPassRef} />
-              {signUpError !== '' ? <p>{signUpError}</p>
-                : undefined}
-              <Button onClick={signUpCallback} />
+              {signUpError}
+              <FormikWrapper
+                fields={{
+                  name: {
+                    initialValue: '', type: 'text', labelText: 'Name', required: true,
+                  },
+                  email: {
+                    initialValue: '', type: 'text', labelText: 'Email', required: true,
+                  },
+                  username: {
+                    initialValue: '', type: 'text', labelText: 'Username', required: true,
+                  },
+                  password: {
+                    initialValue: '', type: 'text', labelText: 'Password', required: true,
+                  },
+                  repeatPass: {
+                    initialValue: '', type: 'text', labelText: 'Repeat Password', required: true,
+                  },
+                }}
+                onSubmit={submitCallback}
+                preValidate={(values: any) => {
+                  if (values.password !== values.repeatPass) {
+                    return { password: 'Passwords did not match!' };
+                  }
+                  return {};
+                }}
+                buttonText="Sign Up"
+              />
             </>
           )
       }
-    </AuthRequired>
+    </RedirectOnAuth>
   );
 }

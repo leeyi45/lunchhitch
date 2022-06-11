@@ -13,8 +13,8 @@ model Location {
   stores String[]
 }
 
-model User {
+model UserInfo {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
+  email    String
   username String
 }

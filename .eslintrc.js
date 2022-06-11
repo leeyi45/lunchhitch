@@ -35,6 +35,13 @@ module.exports = {
         tsx: 'never',
       },
     ],
+    'jsx-a11y/label-has-associated-control': [
+      'error', {
+        required: {
+          some: ['nesting', 'id '],
+        },
+      },
+    ],
     'react/destructuring-assignment': 0,
     'react/jsx-filename-extension': 0,
     'react/no-array-index-key': 0,

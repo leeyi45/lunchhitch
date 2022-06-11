@@ -1,22 +1,16 @@
 import {
   EmailAuthProvider,
+  onAuthStateChanged,
   reauthenticateWithCredential, sendPasswordResetEmail, updatePassword, User,
 } from '@firebase/auth';
+import { Button } from '@material-ui/core';
 import {
-  ErrorMessage, Field, Form, Formik,
+  Form, Formik, FormikHelpers,
 } from 'formik';
 import React from 'react';
+import FormikWrapper, { FieldWrapper } from '../../common/formik_wrapper';
 import { FIREBASE_AUTH } from '../../firebase';
-
-function PasswordField({ label }: { label: string;}) {
-  return (
-    <>
-      <label htmlFor={label}>Current Password</label>
-      <Field name={label} type="password" />
-      <ErrorMessage name={label} />
-    </>
-  );
-}
+import getPrisma from '../../prisma';
 
 function NoUserResetPage() {
   const [emailSent, setEmailSent] = React.useState(false);
@@ -30,7 +24,13 @@ function NoUserResetPage() {
   };
   const emailCallback = async ({ email }: { email: string }) => {
     try {
-      await sendPasswordResetEmail(FIREBASE_AUTH, email);
+      // Check with the database if the email is stored in it
+      const userResult = await getPrisma().userInfo.findFirst({
+        where: {
+          email,
+        },
+      });
+      if (userResult) await sendPasswordResetEmail(FIREBASE_AUTH, email);
       setEmailSent(true);
     } catch (error: any) {
       if (error.code !== 'auth/user-not-found') setResetError(`Unknown error occurred: ${error.code}`);
@@ -48,11 +48,12 @@ function NoUserResetPage() {
           onSubmit={emailCallback}
           validate={validateCallback}
         >
-          <Form>
-            <label>Email</label>
-            <Field name="email" type="text" />
-            <ErrorMessage name="email" />
-          </Form>
+          {({ isSubmitting }) => (
+            <Form>
+              <FieldWrapper fieldName="email" type="text" labelText="Email" />
+              <Button disabled={isSubmitting} type="submit">Send Reset Email</Button>
+            </Form>
+          )}
         </Formik>
       </>
     );
@@ -70,16 +71,15 @@ type UserResetFormErrors = {
     repeatPass?: string;
 }
 
+/**
+ * Password reset page displayed to logged in users
+ */
 function UserResetPage({ user }: { user: User }) {
   const [resetDone, setResetDone] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
 
-  const validateCallback = ({ oldPass, newPass, repeatPass }: UserResetFormValues) => {
+  const validateCallback = ({ newPass, repeatPass }: UserResetFormValues) => {
     const errors: UserResetFormErrors = {};
-
-    if (!oldPass) errors.oldPass = 'Required';
-    if (!newPass) errors.newPass = 'Required';
-    if (!repeatPass) errors.repeatPass = 'Required';
 
     if (newPass !== repeatPass) {
       errors.repeatPass = 'Password does not match';
@@ -87,7 +87,7 @@ function UserResetPage({ user }: { user: User }) {
     return errors;
   };
 
-  const submitCallback = async ({ oldPass, newPass, repeatPass }: UserResetFormValues) => {
+  const submitCallback = async ({ oldPass, newPass }: UserResetFormValues, actions: FormikHelpers<UserResetFormValues>) => {
     try {
       await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email!, oldPass));
       await updatePassword(user, newPass);
@@ -95,6 +95,7 @@ function UserResetPage({ user }: { user: User }) {
     } catch (error: any) {
       // TODO Error handling
       if (error.code === 'auth/wrong-password') {
+        actions.resetForm();
         setResetError('Incorrect password');
       }
     }
@@ -104,21 +105,31 @@ function UserResetPage({ user }: { user: User }) {
     : (
       <>
         {resetError}
-        <Formik
-          initialValues={{ oldPass: '', newPass: '', repeatPass: '' }}
-          validate={validateCallback}
+        <FormikWrapper
+          fields={{
+            oldPass: {
+              labelText: 'Current Password', initialValue: '', required: true, type: 'text',
+            },
+            newPass: {
+              labelText: 'New Password', initialValue: '', required: true, type: 'text',
+            },
+            repeatPass: {
+              labelText: 'Repeat New Password', initialValue: '', required: true, type: 'text',
+            },
+          }}
+          preValidate={validateCallback}
           onSubmit={submitCallback}
-        >
-          <Form>
-            <PasswordField label="oldPass" />
-            <PasswordField label="newPass" />
-            <PasswordField label="repeatPass" />
-          </Form>
-        </Formik>
+        />
       </>
     );
 }
 
-// eslint-disable-next-line react/function-component-definition
-const ResetPage = () => (FIREBASE_AUTH.currentUser ? <NoUserResetPage /> : <UserResetPage user={FIREBASE_AUTH.currentUser!} />);
-export default ResetPage;
+/**
+ * Password reset page
+ */
+export default function ResetPage() {
+  const [user, setUser] = React.useState<User | null>(null);
+  onAuthStateChanged(FIREBASE_AUTH, setUser);
+
+  return user ? <UserResetPage user={user} /> : <NoUserResetPage />;
+}

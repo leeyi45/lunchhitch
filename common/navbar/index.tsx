@@ -8,7 +8,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import Link from 'next/link';
 import { signOut, User } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../firebase';
+import { FIREBASE_AUTH } from '../../firebase';
 
 export type NavbarProps = {
   user?: User | null;
@@ -75,10 +75,24 @@ export default function NavBar({ user }: NavbarProps) {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleClose}>My account</MenuItem>
             { user
-              ? <MenuItem onClick={() => signOut(FIREBASE_AUTH)}>Log out</MenuItem>
+              ? (
+                <>
+                  <MenuItem onClick={handleClose}>
+                    <Link href="./profile">Profile</Link>
+                  </MenuItem>
+                  <MenuItem onClick={() => {
+                  // TODO Fix signing out
+                    signOut(FIREBASE_AUTH).then(() => {
+                      console.log('finished signing out');
+                      handleClose();
+                    });
+                  }}
+                  >
+                    Log out
+                  </MenuItem>
+                </>
+              )
               : (
                 <MenuItem>
                   <Link href="./auth/login">Log In</Link>
