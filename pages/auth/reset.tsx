@@ -2,34 +2,39 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential, sendPasswordResetEmail, updatePassword, User,
 } from '@firebase/auth';
-import { Button } from '@material-ui/core';
+import {
+  ErrorMessage, Field, Form, Formik,
+} from 'formik';
 import React from 'react';
-import { useTextRef } from '../../common';
-import LabelledInput from '../../common/labelled_input';
 import { FIREBASE_AUTH } from '../../firebase';
+
+function PasswordField({ label }: { label: string;}) {
+  return (
+    <>
+      <label htmlFor={label}>Current Password</label>
+      <Field name={label} type="password" />
+      <ErrorMessage name={label} />
+    </>
+  );
+}
 
 function NoUserResetPage() {
   const [emailSent, setEmailSent] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
-  const emailRef = useTextRef();
 
-  const emailCallback = () => {
-    if (!emailRef.current) return;
-
-    const email = emailRef.current.value.trim();
+  const validateCallback = ({ email }: { email?: string }) => {
     if (!email) {
-      setResetError('Email field cannot be blank');
-      return;
+      return { email: 'Required' };
     }
-
-    sendPasswordResetEmail(FIREBASE_AUTH, email)
-      .then(() => setEmailSent(true))
-      .catch((error) => {
-        // TODO Error handling
-
-        // Do nothing if the email wasn't registered
-        if (error.code === 'auth/user-not-found') return;
-      });
+    return {};
+  };
+  const emailCallback = async ({ email }: { email: string }) => {
+    try {
+      await sendPasswordResetEmail(FIREBASE_AUTH, email);
+      setEmailSent(true);
+    } catch (error: any) {
+      if (error.code !== 'auth/user-not-found') setResetError(`Unknown error occurred: ${error.code}`);
+    }
   };
 
   return emailSent ? (
@@ -37,57 +42,79 @@ function NoUserResetPage() {
   )
     : (
       <>
-        <p>Enter your email</p>
-        <input type="text" />
-        <Button onClick={emailCallback}>Confirm</Button>
         {resetError}
+        <Formik
+          initialValues={{ email: '' }}
+          onSubmit={emailCallback}
+          validate={validateCallback}
+        >
+          <Form>
+            <label>Email</label>
+            <Field name="email" type="text" />
+            <ErrorMessage name="email" />
+          </Form>
+        </Formik>
       </>
     );
 }
 
-function UserResetPage({ user }: { user: User }) {
-  const [oldPassRef, passwordRef, repeatPassRef] = useTextRef(3);
+type UserResetFormValues = {
+    oldPass: string;
+    newPass: string;
+    repeatPass: string;
+};
 
+type UserResetFormErrors = {
+    oldPass?: string;
+    newPass?: string;
+    repeatPass?: string;
+}
+
+function UserResetPage({ user }: { user: User }) {
   const [resetDone, setResetDone] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
 
-  const resetCallback = () => {
-    if (!oldPassRef.current || !passwordRef.current || !repeatPassRef.current) return;
+  const validateCallback = ({ oldPass, newPass, repeatPass }: UserResetFormValues) => {
+    const errors: UserResetFormErrors = {};
 
-    const newPass = passwordRef.current.value;
-    const repeatPass = repeatPassRef.current.value;
+    if (!oldPass) errors.oldPass = 'Required';
+    if (!newPass) errors.newPass = 'Required';
+    if (!repeatPass) errors.repeatPass = 'Required';
 
     if (newPass !== repeatPass) {
-      oldPassRef.current.value = '';
-      setResetError('Passwords do not match!');
-      return;
+      errors.repeatPass = 'Password does not match';
     }
+    return errors;
+  };
 
-    const oldPass = oldPassRef.current.value;
-
-    (async () => {
-      try {
-        await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email!, oldPass));
-        await updatePassword(user, newPass);
-        setResetDone(true);
-      } catch (error: any) {
-        // TODO Error handling
-        if (error.code === 'auth/wrong-password') {
-          oldPassRef.current!.value = '';
-          setResetError('Incorrect password');
-        }
+  const submitCallback = async ({ oldPass, newPass, repeatPass }: UserResetFormValues) => {
+    try {
+      await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email!, oldPass));
+      await updatePassword(user, newPass);
+      setResetDone(true);
+    } catch (error: any) {
+      // TODO Error handling
+      if (error.code === 'auth/wrong-password') {
+        setResetError('Incorrect password');
       }
-    })();
+    }
   };
 
   return resetDone ? <p>Password successfully changed!</p>
     : (
       <>
         {resetError}
-        <LabelledInput type="password" ref={oldPassRef} label="Existing Password" />
-        <LabelledInput type="password" ref={passwordRef} label="New Password" />
-        <LabelledInput type="password" ref={repeatPassRef} label="Repeat Password" />
-        <Button onClick={resetCallback}>Reset my password</Button>
+        <Formik
+          initialValues={{ oldPass: '', newPass: '', repeatPass: '' }}
+          validate={validateCallback}
+          onSubmit={submitCallback}
+        >
+          <Form>
+            <PasswordField label="oldPass" />
+            <PasswordField label="newPass" />
+            <PasswordField label="repeatPass" />
+          </Form>
+        </Formik>
       </>
     );
 }
