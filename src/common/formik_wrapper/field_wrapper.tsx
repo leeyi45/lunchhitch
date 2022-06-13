@@ -30,6 +30,7 @@ export default function FieldWrapper({
   fieldName, labelText, type, hint,
 }: FieldWrapperProps) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLInputElement | null>(null);
+  const focusedRef = React.useRef(false);
   const handleOpen = (target: HTMLInputElement) => setAnchorEl(target);
   const handleClose = () => setAnchorEl(null);
 
@@ -45,13 +46,19 @@ export default function FieldWrapper({
           <input
             type={type}
             {...fieldProps}
-            onFocus={(event) => handleOpen(event.target as HTMLInputElement)}
+            onFocus={(event) => {
+              focusedRef.current = true;
+              handleOpen(event.target as HTMLInputElement);
+            }}
             onBlur={(event) => {
+              focusedRef.current = false;
               handleClose();
               onBlur(event);
             }}
             onMouseEnter={(event) => handleOpen(event.target as HTMLInputElement)}
-            onMouseLeave={handleClose}
+            onMouseLeave={() => {
+              if (!focusedRef.current) handleClose();
+            }}
           />
         )}
       </Field>
