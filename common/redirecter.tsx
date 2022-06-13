@@ -17,6 +17,8 @@ type Props = {
 export default function Redirecter({ redirect, duration, children }: Props) {
   const router = useRouter();
   const startTimeRef = React.useRef<number | null>(null);
+  const animFrameRef = React.useRef<number | null>(null);
+  const [count, setCount] = React.useState(duration);
 
   const countCallback = (timestamp: number) => {
     if (!startTimeRef.current) {
@@ -24,22 +26,27 @@ export default function Redirecter({ redirect, duration, children }: Props) {
     } else if (timestamp - startTimeRef.current >= duration) {
       router.push(redirect);
       return;
+    } else {
+      setCount(Math.round(duration - (timestamp - startTimeRef.current) / 1000));
     }
-    requestAnimationFrame(countCallback);
+    animFrameRef.current = requestAnimationFrame(countCallback);
   };
 
-  React.useEffect(() => { requestAnimationFrame(countCallback); }, []);
+  React.useEffect(() => {
+    animFrameRef.current = requestAnimationFrame(countCallback);
+
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
+    };
+  }, []);
 
   return (
     <div>
       {children}
       <p>
-        Click
-        {' '}
-        <Link href={redirect}>here</Link>
-        {' '}
-        if you are not automatically redirected
+        Click <Link href={redirect}>here</Link> if you are not automatically redirected
       </p>
+      <p>Redirecting in {count}...</p>
     </div>
   );
 }
