@@ -3,12 +3,9 @@ import {
   onAuthStateChanged,
   reauthenticateWithCredential, sendPasswordResetEmail, updatePassword, User,
 } from '@firebase/auth';
-import { Button } from '@material-ui/core';
-import {
-  Form, Formik, FormikHelpers,
-} from 'formik';
+import { FormikHelpers } from 'formik';
 import React from 'react';
-import FormikWrapper, { FieldWrapper } from '../../common/formik_wrapper';
+import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { FIREBASE_AUTH } from '../../firebase';
 import getPrisma from '../../prisma';
 
@@ -16,12 +13,6 @@ function NoUserResetPage() {
   const [emailSent, setEmailSent] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
 
-  const validateCallback = ({ email }: { email?: string }) => {
-    if (!email) {
-      return { email: 'Required' };
-    }
-    return {};
-  };
   const emailCallback = async ({ email }: { email: string }) => {
     try {
       // Check with the database if the email is stored in it
@@ -43,18 +34,15 @@ function NoUserResetPage() {
     : (
       <>
         {resetError}
-        <Formik
-          initialValues={{ email: '' }}
+        <FormikWrapper
+          fields={{
+            email: {
+              type: 'text', labelText: 'Email', required: true, initialValue: '',
+            },
+          }}
           onSubmit={emailCallback}
-          validate={validateCallback}
-        >
-          {({ isSubmitting }) => (
-            <Form>
-              <FieldWrapper fieldName="email" type="text" labelText="Email" />
-              <Button disabled={isSubmitting} type="submit">Send Reset Email</Button>
-            </Form>
-          )}
-        </Formik>
+          submitButtonText="Send Reset Email"
+        />
       </>
     );
 }

@@ -1,10 +1,9 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 import React from 'react';
-import {
-  Formik, Field, FormikHelpers, ErrorMessage, Form, FormikProps,
-} from 'formik';
+import { Formik, FormikHelpers, Form } from 'formik';
 import { Button, ButtonProps } from '@material-ui/core';
+import FieldWrapper, { FieldWrapperProps } from './field_wrapper';
 
 type FormikWrapperValues = {
     [name: string]: string;
@@ -20,23 +19,9 @@ export type FormikWrapperProps<Values extends FormikWrapperValues, Errors extend
         /**
          * Internal name that Formik will use to refer to the field
          */
-        fieldName: string]: {
-          /**
-           * Type of the field
-           */
-          type: 'text' | 'password';
-          /**
-           * Text to display above the field
-           */
-          labelText: string;
-          /**
-           * Initial value of the field
-           */
-          initialValue: string;
-          /**
-           * Boolean value indicating if the field can be left empty
-           */
-          required: boolean;
+        fieldName: string]: Omit<FieldWrapperProps, 'fieldName'> & {
+          required?: boolean;
+          initialValue: any;
         }
     };
     /**
@@ -53,43 +38,18 @@ export type FormikWrapperProps<Values extends FormikWrapperValues, Errors extend
      */
     resetButton?: boolean;
     submitButtonText?: ButtonProps | string;
-
+    validateOnBlur?: boolean;
+    validateOnChange?: boolean;
 };
-
-export type FieldWrapperProps = {
-  /**
-   * Identifier to use internally with the Formik object
-   */
-  fieldName: string;
-  /**
-   * Text to display above the field
-   */
-  labelText: string;
-  /**
-   * Field type
-   */
-  type: 'text' | 'password';
-};
-
-/**
- * Wrapper around Formik fields, error message and label
- */
-export function FieldWrapper({ fieldName, labelText, type }: FieldWrapperProps) {
-  return (
-    <>
-      <label>{labelText}</label>
-      <ErrorMessage name={fieldName} />
-      <Field style={{ width: '100%' }} name={fieldName} type={type} />
-    </>
-  );
-}
 
 /**
  * Wrapper around a Formik object to ease initialization
  */
 export default function FormikWrapper<Values extends FormikWrapperValues, Errors extends FormikWrapperErrors>({
   submitButtonText, fields, onSubmit, preValidate, resetButton,
+  validateOnBlur, validateOnChange,
 }: FormikWrapperProps<Values, Errors>) {
+  // Not sure if i should leave useMemo here
   const initialValues = React.useMemo(
     () => Object.entries(fields).reduce((res: any, [name, field]) => {
       res[name] = field.initialValue;
@@ -97,10 +57,10 @@ export default function FormikWrapper<Values extends FormikWrapperValues, Errors
     }, {} as Values),
     [fields],
   );
-  // const initialValues = Object.entries(fields).reduce((res: any, [name, field]) => {
-  //   res[name] = field.initialValue;
-  //   return res;
-  // }, {} as Values);
+
+  const fieldElements = React.useMemo(() => Object.entries(fields).map(([name, field]) => (
+    <FieldWrapper key={name} fieldName={name} labelText={field.labelText} type={field.type} hint={field.hint} />
+  )), [fields]);
 
   const validateCallback = (values: Values) => Object.entries(fields).reduce((res: any, [name, field]) => {
     if (!values[name] && field.required) res[name] = `${field.labelText} Required`;
@@ -112,8 +72,8 @@ export default function FormikWrapper<Values extends FormikWrapperValues, Errors
       initialValues={initialValues}
       onSubmit={onSubmit}
       validate={validateCallback}
-      validateOnBlur={false}
-      validateOnChange={false}
+      validateOnBlur={validateOnBlur}
+      validateOnChange={validateOnChange}
     >
       {({ resetForm, isSubmitting }) => (
         <Form>
@@ -124,9 +84,7 @@ export default function FormikWrapper<Values extends FormikWrapperValues, Errors
             height: '100%',
           }}
           >
-            { Object.entries(fields).map(([name, field]) => (
-              <FieldWrapper fieldName={name} labelText={field.labelText} type={field.type} />
-            ))}
+            {fieldElements}
             {
               (resetButton || submitButtonText)
                 ? (
@@ -155,4 +113,6 @@ FormikWrapper.defaultProps = {
   submitButtonText: undefined,
   preValidate: undefined,
   resetButton: true,
+  validateOnBlur: false,
+  validateOnChange: false,
 };

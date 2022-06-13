@@ -23,8 +23,8 @@ export function useUserState() {
   return user;
 }
 
-export function useAsyncValue<T>(factory: () => Promise<T>, loadingValue?: T) {
-  const [value, setValue] = useState<T | undefined>(loadingValue);
+export function useAsyncValue<T, U>(factory: () => Promise<T>, loadingValue: U) {
+  const [value, setValue] = useState<T | U>(loadingValue);
 
   useEffect(() => {
     factory().then(setValue);

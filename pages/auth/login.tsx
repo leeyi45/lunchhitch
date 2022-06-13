@@ -9,7 +9,7 @@ import {
 } from 'formik';
 import { FIREBASE_AUTH } from '../../firebase';
 import { Credential, signIn } from '../../auth';
-import FormikWrapper from '../../common/formik_wrapper';
+import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 
 export default function LoginPage() {
   const router = useRouter();

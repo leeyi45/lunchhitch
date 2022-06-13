@@ -5,10 +5,10 @@ import {
 import { RedirectOnAuth } from '../../common/auth_wrappers';
 import Redirecter from '../../common/redirecter';
 import { signUp } from '../../auth';
-import FormikWrapper from '../../common/formik_wrapper';
+import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 
 type SignUpFormValues = {
-  name: string;
+  displayName: string;
   email: string;
   username: string;
   password: string;
@@ -22,7 +22,7 @@ export default function SignUpPage() {
   const submitCallback = async (values : SignUpFormValues, actions: FormikHelpers<SignUpFormValues>) => {
     actions.setSubmitting(true);
     try {
-      await signUp(values.username, values.password, values.name, values.email);
+      await signUp(values);
     } catch (error: any) {
       if (error.code === 'auth/email-already-exists') {
         setSignupError('An account with this username already exists');
@@ -49,11 +49,11 @@ export default function SignUpPage() {
               {signUpError}
               <FormikWrapper
                 fields={{
-                  name: {
-                    initialValue: '', type: 'text', labelText: 'Name', required: true,
+                  displayName: {
+                    initialValue: '', type: 'text', labelText: 'Name', required: true, hint: 'Name displayed to other users',
                   },
                   email: {
-                    initialValue: '', type: 'text', labelText: 'Email', required: true,
+                    initialValue: '', type: 'text', labelText: 'Email', required: true, hint: 'Email associated with this account',
                   },
                   username: {
                     initialValue: '', type: 'text', labelText: 'Username', required: true,
@@ -66,8 +66,8 @@ export default function SignUpPage() {
                   },
                 }}
                 onSubmit={submitCallback}
-                preValidate={(values: any) => {
-                  if (values.password !== values.repeatPass) {
+                preValidate={({ password, repeatPass }) => {
+                  if (password !== repeatPass) {
                     return { password: 'Passwords did not match!' };
                   }
                   return {};

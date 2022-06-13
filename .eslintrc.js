@@ -45,6 +45,7 @@ module.exports = {
     'react/destructuring-assignment': 0,
     'react/function-component-definition': 0,
     'react/jsx-filename-extension': 0,
+    'react/jsx-one-expression-per-line': 0,
     'react/jsx-props-no-spreading': 0,
     'react/no-array-index-key': 0,
     'max-len': [0, { code: 100 }],
