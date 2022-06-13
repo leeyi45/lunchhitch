@@ -22,7 +22,7 @@ export default function SignUpPage() {
   const submitCallback = async (values : SignUpFormValues, actions: FormikHelpers<SignUpFormValues>) => {
     actions.setSubmitting(true);
     try {
-      await signUp(values.username, values.password, values.name, values.email); // sign up to the firebaseapi
+      await signUp(values.username, values.password, values.name, values.email);
     } catch (error: any) {
       if (error.code === 'auth/email-already-exists') {
         setSignupError('An account with this username already exists');
@@ -72,7 +72,7 @@ export default function SignUpPage() {
                   }
                   return {};
                 }}
-                buttonText="Sign Up"
+                submitButtonText="Sign Up"
               />
             </>
           )

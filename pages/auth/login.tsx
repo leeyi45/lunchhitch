@@ -24,15 +24,6 @@ export default function LoginPage() {
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
 
-  const validateCallback = ({ username, password }: Credential) => {
-    const errors: { username?: string, password?: string} = {};
-
-    if (!username.trim()) errors.username = 'Username field cannot be blank';
-    if (!password.trim()) errors.password = 'Password field cannot be blank';
-
-    return errors;
-  };
-
   const submitCallback = async ({ username, password }: Credential, actions: FormikHelpers<Credential>) => {
     try {
       await signIn(username, password);
@@ -77,9 +68,13 @@ export default function LoginPage() {
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        width: '70%',
-        alignContent: 'center',
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
         justifyContent: 'center',
+        position: 'absolute',
+        paddingBottom: '100px',
+        border: '5px solid black',
       }}
       >
         {
@@ -100,11 +95,11 @@ export default function LoginPage() {
               type: 'text', labelText: 'Password', required: true, initialValue: '',
             },
           }}
-          preValidate={validateCallback}
           onSubmit={submitCallback}
-          buttonText="Sign In"
+          submitButtonText="Sign In"
           resetButton={false}
         />
+        <Link href="/auth/signup">Sign Up</Link>
         <Link href="/auth/reset">Forgot your password?</Link>
       </div>
     </div>

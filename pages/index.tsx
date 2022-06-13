@@ -1,66 +1,34 @@
 import React from 'react';
-import { Menu, MenuItem } from '@blueprintjs/core';
-import { Popover2 } from '@blueprintjs/popover2';
-import { Location } from '@prisma/client';
-import { onAuthStateChanged, User } from '@firebase/auth';
-import NavBar from '../common/navbar';
-import { FIREBASE_AUTH } from '../firebase';
-import getPrisma from '../prisma';
+import { User } from '@firebase/auth';
+import { useUserState } from '../common';
+import Navbar from '../common/navbar';
 
-export default function HomePage(props: { locations: Location[] }) {
-  const [locInputValue, setLocInputValue] = React.useState<string>('');
-  const [user, setUser] = React.useState<User | null>(null);
-
-  onAuthStateChanged(FIREBASE_AUTH, setUser);
-
-  const menu = (
-    <Menu>
-      {props.locations.map((x, i) => (
-        <MenuItem
-          key={i}
-          onClick={() => setLocInputValue(x.name)}
-          text={x.name}
-        />
-      ))}
-    </Menu>
-  );
-
-  const selectedLocation = props.locations.find((x) => x.name === locInputValue);
-
+function UserHomePage({ user }: { user: User }) {
   return (
-    <div>
-      <NavBar user={user} />
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-      }}
-      >
-        <div>
-          <p>Select Your Location:</p>
-          <Popover2 className="bp4-menu" content={menu}>
-            <input value={locInputValue} />
-          </Popover2>
-        </div>
-        <div>
-          {selectedLocation !== undefined
-            ? (
-              <ol>
-                {selectedLocation.stores.map((x) => <li>{x}</li>)}
-              </ol>
-            )
-            : undefined}
-        </div>
-      </div>
-    </div>
+    <>
+      <h1>
+        Welcome back,
+        {user.displayName}
+        !
+      </h1>
+      <p>What will it be today?</p>
+    </>
   );
 }
 
-export async function getServerSideProps() {
-  const locations = await getPrisma().location.findMany();
+const NoUserHomePage = () => (
+  <>
+    <h1>Welcome to LunchHitch</h1>
+    <p>Please I really need a web page that looks nice</p>
+  </>
+);
 
-  return {
-    props: {
-      locations,
-    },
-  };
-}
+export default () => {
+  const user = useUserState();
+  return (
+    <>
+      <Navbar user={user} />
+      {user ? <UserHomePage user={user} /> : <NoUserHomePage />}
+    </>
+  );
+};

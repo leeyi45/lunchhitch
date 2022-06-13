@@ -1,9 +1,10 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import {
-  Formik, Field, FormikHelpers, ErrorMessage, Form,
+  Formik, Field, FormikHelpers, ErrorMessage, Form, FormikProps,
 } from 'formik';
-import { Button } from '@material-ui/core';
+import { Button, ButtonProps } from '@material-ui/core';
 
 type FormikWrapperValues = {
     [name: string]: string;
@@ -51,7 +52,8 @@ export type FormikWrapperProps<Values extends FormikWrapperValues, Errors extend
      * Boolean value indicating if a form reset button should be displayed
      */
     resetButton?: boolean;
-    buttonText?: string;
+    submitButtonText?: ButtonProps | string;
+
 };
 
 export type FieldWrapperProps = {
@@ -77,7 +79,7 @@ export function FieldWrapper({ fieldName, labelText, type }: FieldWrapperProps) 
     <>
       <label>{labelText}</label>
       <ErrorMessage name={fieldName} />
-      <Field name={fieldName} type={type} />
+      <Field style={{ width: '100%' }} name={fieldName} type={type} />
     </>
   );
 }
@@ -86,12 +88,19 @@ export function FieldWrapper({ fieldName, labelText, type }: FieldWrapperProps) 
  * Wrapper around a Formik object to ease initialization
  */
 export default function FormikWrapper<Values extends FormikWrapperValues, Errors extends FormikWrapperErrors>({
-  buttonText, fields, onSubmit, preValidate, resetButton,
+  submitButtonText, fields, onSubmit, preValidate, resetButton,
 }: FormikWrapperProps<Values, Errors>) {
-  const initialValues = Object.entries(fields).reduce((res: any, [name, field]) => {
-    res[name] = field.initialValue;
-    return res;
-  }, {} as Values);
+  const initialValues = React.useMemo(
+    () => Object.entries(fields).reduce((res: any, [name, field]) => {
+      res[name] = field.initialValue;
+      return res;
+    }, {} as Values),
+    [fields],
+  );
+  // const initialValues = Object.entries(fields).reduce((res: any, [name, field]) => {
+  //   res[name] = field.initialValue;
+  //   return res;
+  // }, {} as Values);
 
   const validateCallback = (values: Values) => Object.entries(fields).reduce((res: any, [name, field]) => {
     if (!values[name] && field.required) res[name] = `${field.labelText} Required`;
@@ -103,26 +112,33 @@ export default function FormikWrapper<Values extends FormikWrapperValues, Errors
       initialValues={initialValues}
       onSubmit={onSubmit}
       validate={validateCallback}
+      validateOnBlur={false}
+      validateOnChange={false}
     >
       {({ resetForm, isSubmitting }) => (
         <Form>
           <div style={{
             display: 'flex',
             flexDirection: 'column',
+            width: '100%',
+            height: '100%',
           }}
           >
             { Object.entries(fields).map(([name, field]) => (
               <FieldWrapper fieldName={name} labelText={field.labelText} type={field.type} />
             ))}
             {
-              (resetButton || buttonText)
+              (resetButton || submitButtonText)
                 ? (
                   <div style={{
                     display: 'flex',
                     flexDirection: 'row',
                   }}
                   >
-                    {buttonText ? <Button type="submit" disabled={isSubmitting}>{buttonText}</Button> : undefined}
+                    {submitButtonText === undefined ? undefined
+                      : typeof submitButtonText === 'string'
+                        ? <Button type="submit" disabled={isSubmitting}>{submitButtonText}</Button>
+                        : <Button {...submitButtonText} type="submit" disabled={isSubmitting} />}
                     {resetButton ? <Button onClick={() => resetForm()}>Clear</Button> : undefined}
                   </div>
                 )
@@ -136,7 +152,7 @@ export default function FormikWrapper<Values extends FormikWrapperValues, Errors
 }
 
 FormikWrapper.defaultProps = {
-  buttonText: undefined,
+  submitButtonText: undefined,
   preValidate: undefined,
   resetButton: true,
 };
