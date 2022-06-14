@@ -3,10 +3,13 @@
  * Functions for managing users
  */
 import {
-  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile as updateFirebaseProfile, User,
+  createUserWithEmailAndPassword, signOut, updateProfile as updateFirebaseProfile, User,
 } from '@firebase/auth';
+import {
+  signIn as nextAuthSignIn, SignInResponse, useSession as useAuthSession, UseSessionOptions,
+} from 'next-auth/react';
 import { FIREBASE_AUTH } from './firebase';
-import getPrisma from './prisma';
+// import prisma from './prisma';
 
 const DEFAULT_DOMAIN = 'lunchhitch.firebaseapp.com';
 
@@ -22,35 +25,28 @@ export type LunchHitchUser = {
   firebaseObj: User;
 };
 
+// TODO migrate to server side???
 /**
- * Query the Firebase API to sign in a user
- * @param username Username of the user to sign in with
- * @param password Password of the user to sign in with
- * @returns Signed in user
+ * Wrapper around the nextauth useSession hook
  */
-export async function signIn(username: string, password: string): Promise<LunchHitchUser> {
-  const signInTask = signInWithEmailAndPassword(FIREBASE_AUTH, `${username}@${DEFAULT_DOMAIN}`, password);
-  const emailTask = getPrisma().userInfo.findFirst({
-    where: {
-      username,
-    },
-  });
+export function useSession(options: UseSessionOptions<boolean> = { required: false }) {
+  const { data: session, status } = useAuthSession(options);
 
-  await Promise.all([signInTask, emailTask]);
-  const signInResult = await signInTask;
-  const emailResult = await emailTask;
-
-  if (!emailResult) {
-    // TODO handle sign in failure
-    throw new Error();
+  if (status !== 'authenticated') {
+    return {
+      user: null,
+      status,
+    };
   }
 
   return {
-    username,
-    email: emailResult.email,
-    displayName: signInResult.user.displayName!,
-    firebaseObj: signInResult.user,
+    user: session.user as LunchHitchUser,
+    status,
   };
+}
+
+export async function signIn(creds: Credential) {
+  return await nextAuthSignIn('credentials', { ...creds, redirect: false }) as unknown as SignInResponse;
 }
 
 type SignUpParams = {
@@ -75,13 +71,14 @@ export async function signUp({
   await updateFirebaseProfile(result.user, { displayName });
 
   // Update our db containing userinfo
-  const dbtask = getPrisma().userInfo.create({
-    data: {
-      username,
-      email,
-    },
-  }); // and update our own db
-  await Promise.resolve([signOut(FIREBASE_AUTH), dbtask]);
+  // const dbtask = prisma.userInfo.create({
+  //   data: {
+  //     id: username,
+  //     email,
+  //   },
+  // }); // and update our own db
+  // await Promise.resolve([signOut(FIREBASE_AUTH), dbtask]);
+  await signOut(FIREBASE_AUTH);
 }
 
 export function updateProfile(user: LunchHitchUser, { email, displayName }: Record<'email' | 'displayName', string | undefined>) {
@@ -89,16 +86,16 @@ export function updateProfile(user: LunchHitchUser, { email, displayName }: Reco
 
   if (displayName) tasks.push(updateFirebaseProfile(user.firebaseObj, { displayName }));
 
-  if (email) {
-    tasks.push(getPrisma().userInfo.updateMany({
-      where: {
-        username: user.username,
-      },
-      data: {
-        email,
-      },
-    }));
-  }
+  // if (email) {
+  //   tasks.push(prisma.userInfo.update({
+  //     where: {
+  //       id: user.username,
+  //     },
+  //     data: {
+  //       email,
+  //     },
+  //   }));
+  // }
 
   return Promise.all(tasks);
 }

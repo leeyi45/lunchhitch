@@ -1,6 +1,6 @@
 import { Popper, Box, Fade } from '@material-ui/core';
 import { ErrorMessage, Field, FieldProps } from 'formik';
-import React from 'react';
+import React, { HTMLInputTypeAttribute } from 'react';
 
 export type FieldWrapperProps = {
   /**
@@ -14,7 +14,7 @@ export type FieldWrapperProps = {
   /**
    * Field type
    */
-  type: 'text' | 'password';
+  type: HTMLInputTypeAttribute;
 
   /**
    * Hint Element. If a string is provided, display the given string in a Popper
@@ -31,6 +31,7 @@ export default function FieldWrapper({
 }: FieldWrapperProps) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLInputElement | null>(null);
   const focusedRef = React.useRef(false);
+
   const handleOpen = (target: HTMLInputElement) => setAnchorEl(target);
   const handleClose = () => setAnchorEl(null);
 

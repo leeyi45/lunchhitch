@@ -7,7 +7,7 @@ import { FormikHelpers } from 'formik';
 import React from 'react';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { FIREBASE_AUTH } from '../../firebase';
-import getPrisma from '../../prisma';
+// import prisma from '../../prisma';
 
 function NoUserResetPage() {
   const [emailSent, setEmailSent] = React.useState(false);
@@ -16,12 +16,13 @@ function NoUserResetPage() {
   const emailCallback = async ({ email }: { email: string }) => {
     try {
       // Check with the database if the email is stored in it
-      const userResult = await getPrisma().userInfo.findFirst({
-        where: {
-          email,
-        },
-      });
-      if (userResult) await sendPasswordResetEmail(FIREBASE_AUTH, email);
+      // const userResult = await prisma.userInfo.findFirst({
+      //   where: {
+      //     email,
+      //   },
+      // });
+
+      // if (userResult) await sendPasswordResetEmail(FIREBASE_AUTH, email);
       setEmailSent(true);
     } catch (error: any) {
       if (error.code !== 'auth/user-not-found') setResetError(`Unknown error occurred: ${error.code}`);

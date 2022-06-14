@@ -7,8 +7,8 @@ module.exports = {
     es2021: true,
   },
   extends: [
-    'plugin:react/recommended',
     'airbnb',
+    'plugin:@next/next/recommended',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -42,6 +42,7 @@ module.exports = {
         },
       },
     ],
+    'no-else-return': 0,
     'react/destructuring-assignment': 0,
     'react/function-component-definition': 0,
     'react/jsx-filename-extension': 0,

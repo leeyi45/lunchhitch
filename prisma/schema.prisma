@@ -7,14 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+type OrderLocation {
+  community  String
+  restaurant String
+}
+
 model Location {
-  id     String   @id @default(auto()) @map("_id") @db.ObjectId
-  name   String
-  stores String[]
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model Order {
+  id       String        @id @default(auto()) @map("_id") @db.ObjectId
+  from     String
+  location OrderLocation
+  orders   String[]
 }
 
 model UserInfo {
-  id       String @id @default(auto()) @map("_id") @db.ObjectId
-  email    String
-  username String
+  id    String @id @map("_id")
+  email String
 }

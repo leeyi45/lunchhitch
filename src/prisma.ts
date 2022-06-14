@@ -1,8 +1,13 @@
+/* eslint-disable no-var */
+/* eslint-disable vars-on-top */
 import { PrismaClient } from '@prisma/client';
 
-let prismaClient: PrismaClient;
-
-export default function getPrisma() {
-  if (!prismaClient) prismaClient = new PrismaClient();
-  return prismaClient;
+declare global {
+  var prisma: PrismaClient | undefined;
 }
+
+const prisma = global.prisma || new PrismaClient();
+
+export default prisma;
+
+if (process.env.NODE_ENV !== 'production') global.prisma = prisma;

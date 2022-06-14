@@ -7,11 +7,11 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 import Link from 'next/link';
-import { signOut, User } from 'firebase/auth';
-import { FIREBASE_AUTH } from '../../firebase';
+import { signOut } from 'next-auth/react';
+import { LunchHitchUser } from '../../auth';
 
 export type NavbarProps = {
-  user?: User | null;
+  user?: LunchHitchUser | null;
 };
 
 /**
@@ -22,7 +22,7 @@ export default function NavBar({ user }: NavbarProps) {
   const [usernameText, setUsernameText] = React.useState('Login');
 
   React.useEffect(() => {
-    setUsernameText(user ? user.displayName! : 'Login');
+    setUsernameText(user ? user.displayName : 'Login');
   }, [user]);
 
   const handleClose = () => {
@@ -81,14 +81,7 @@ export default function NavBar({ user }: NavbarProps) {
                   <MenuItem onClick={handleClose}>
                     <Link href="./profile">Profile</Link>
                   </MenuItem>
-                  <MenuItem onClick={() => {
-                  // TODO Fix signing out
-                    signOut(FIREBASE_AUTH).then(() => {
-                      console.log('finished signing out');
-                      handleClose();
-                    });
-                  }}
-                  >
+                  <MenuItem onClick={() => signOut({ redirect: false })}>
                     Log out
                   </MenuItem>
                 </>

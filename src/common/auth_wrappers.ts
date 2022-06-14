@@ -1,11 +1,9 @@
 import { useRouter } from 'next/router';
-import { onAuthStateChanged, User } from '@firebase/auth';
-import React from 'react';
-import { FIREBASE_AUTH } from '../firebase';
+import { LunchHitchUser, useSession } from '../auth';
 
 type Props = {
     // eslint-disable-next-line no-unused-vars
-    children: (user: User) => any;
+    children: (user: LunchHitchUser) => any;
 };
 
 /**
@@ -14,22 +12,19 @@ type Props = {
  */
 export function AuthRequired({ children }: Props) {
   const router = useRouter();
-  const [user, setUser] = React.useState<User | null>(null);
+  const { user } = useSession({
+    required: true,
+    onUnauthenticated: () => router.push('/auth/login'),
+  });
 
-  onAuthStateChanged(FIREBASE_AUTH, setUser);
-
-  React.useEffect(() => {
-    if (!user) router.push('/auth/login');
-  }, [user]);
-
+  // User will never be null here because of the router redirect
   return children(user!);
 }
 
 type RedirectProps = {
-  redirect: string;
-    // eslint-disable-next-line no-unused-vars
   children: any;
-};
+  redirect: string;
+}
 
 /**
  * Wrap child components if the they require the user to be logged out
@@ -37,13 +32,10 @@ type RedirectProps = {
  */
 export function RedirectOnAuth({ redirect, children }: RedirectProps) {
   const router = useRouter();
-  const [user, setUser] = React.useState<User | null>(null);
+  const { status } = useSession();
 
-  onAuthStateChanged(FIREBASE_AUTH, setUser);
-
-  React.useEffect(() => {
-    if (user) router.push(redirect);
-  }, [user]);
+  if (status === 'authenticated') router.push(redirect);
+  else if (status === 'loading') return 'Loading...';
 
   return children;
 }
