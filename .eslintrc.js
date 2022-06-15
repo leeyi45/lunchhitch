@@ -7,8 +7,8 @@ module.exports = {
     es2021: true,
   },
   extends: [
-    'airbnb',
     'plugin:@next/next/recommended',
+    'airbnb',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {

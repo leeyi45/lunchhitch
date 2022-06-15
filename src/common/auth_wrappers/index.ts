@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
-import { LunchHitchUser, useSession } from '../auth';
+import { LunchHitchUser, useSession } from '../../auth';
+import AuthSelector from './auth_selector';
 
 type Props = {
     // eslint-disable-next-line no-unused-vars
@@ -39,3 +40,5 @@ export function RedirectOnAuth({ redirect, children }: RedirectProps) {
 
   return children;
 }
+
+export { AuthSelector };

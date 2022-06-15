@@ -3,11 +3,12 @@
  * Functions for managing users
  */
 import {
-  createUserWithEmailAndPassword, signOut, updateProfile as updateFirebaseProfile, User,
+  createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile, User,
 } from '@firebase/auth';
 import {
-  signIn as nextAuthSignIn, SignInResponse, useSession as useAuthSession, UseSessionOptions,
+  signOut as nextAuthSignOut, signIn as nextAuthSignIn, SignInResponse, useSession as useAuthSession, UseSessionOptions,
 } from 'next-auth/react';
+import { responseSymbol } from 'next/dist/server/web/spec-compliant/fetch-event';
 import { FIREBASE_AUTH } from './firebase';
 // import prisma from './prisma';
 
@@ -45,8 +46,32 @@ export function useSession(options: UseSessionOptions<boolean> = { required: fal
   };
 }
 
+async function prismaFetch(username: string, method: string, args: any) {
+  const resp = await fetch(`/api/userinfo?username=${username}&method=${method}`, {
+    method: 'POST',
+    body: JSON.stringify(args),
+  });
+
+  const result = await resp.json();
+  if (resp.status !== 200) {
+    throw result.error;
+  }
+
+  return result;
+}
+
+/**
+ * Sign in with the given username and password
+ */
 export async function signIn(creds: Credential) {
   return await nextAuthSignIn('credentials', { ...creds, redirect: false }) as unknown as SignInResponse;
+}
+
+/**
+ * Sign out the current user. Wraps around both the NextAuth signOut and Firebase signOut methods
+ */
+export async function signOut() {
+  await Promise.all([firebaseSignOut(FIREBASE_AUTH), nextAuthSignOut({ redirect: false })]);
 }
 
 type SignUpParams = {
@@ -69,16 +94,13 @@ export async function signUp({
 }: SignUpParams): Promise<void> {
   const result = await createUserWithEmailAndPassword(FIREBASE_AUTH, `${username}@${DEFAULT_DOMAIN}`, password);
   await updateFirebaseProfile(result.user, { displayName });
-
-  // Update our db containing userinfo
-  // const dbtask = prisma.userInfo.create({
-  //   data: {
-  //     id: username,
-  //     email,
-  //   },
-  // }); // and update our own db
-  // await Promise.resolve([signOut(FIREBASE_AUTH), dbtask]);
-  await signOut(FIREBASE_AUTH);
+  await prismaFetch(username, 'create', {
+    data: {
+      id: username,
+      email,
+    }
+  })
+  await firebaseSignOut(FIREBASE_AUTH);
 }
 
 export function updateProfile(user: LunchHitchUser, { email, displayName }: Record<'email' | 'displayName', string | undefined>) {

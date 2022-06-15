@@ -5,6 +5,7 @@ import {
 } from '@firebase/auth';
 import { FormikHelpers } from 'formik';
 import React from 'react';
+import { LunchHitchUser, useSession } from '../../auth';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { FIREBASE_AUTH } from '../../firebase';
 // import prisma from '../../prisma';
@@ -63,7 +64,7 @@ type UserResetFormErrors = {
 /**
  * Password reset page displayed to logged in users
  */
-function UserResetPage({ user }: { user: User }) {
+function UserResetPage({ user }: { user: LunchHitchUser }) {
   const [resetDone, setResetDone] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
 
@@ -78,8 +79,8 @@ function UserResetPage({ user }: { user: User }) {
 
   const submitCallback = async ({ oldPass, newPass }: UserResetFormValues, actions: FormikHelpers<UserResetFormValues>) => {
     try {
-      await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email!, oldPass));
-      await updatePassword(user, newPass);
+      await reauthenticateWithCredential(user.firebaseObj, EmailAuthProvider.credential(user.email!, oldPass));
+      await updatePassword(user.firebaseObj, newPass);
       setResetDone(true);
     } catch (error: any) {
       // TODO Error handling
@@ -117,8 +118,6 @@ function UserResetPage({ user }: { user: User }) {
  * Password reset page
  */
 export default function ResetPage() {
-  const [user, setUser] = React.useState<User | null>(null);
-  onAuthStateChanged(FIREBASE_AUTH, setUser);
-
-  return user ? <UserResetPage user={user} /> : <NoUserResetPage />;
+  const { user, status } = useSession();
+  return status === 'authenticated' ? <UserResetPage user={user} /> : <NoUserResetPage />;
 }

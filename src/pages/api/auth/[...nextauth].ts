@@ -7,11 +7,8 @@ import prisma from '../../../prisma';
 
 export default NextAuth({
   callbacks: {
-    jwt({ token, user }) {
-      // user received from authorize, token to send to session
-      if (user) return Promise.resolve({ ...token, user });
-      return Promise.resolve(token);
-    },
+    // user received from authorize, token to send to session
+    jwt: ({ token, user }) => Promise.resolve({ ...token, user }),
     async session({ session, token }) {
       // session is current session object
       // user received from jwt callback
@@ -46,7 +43,6 @@ export default NextAuth({
       },
       async authorize(credentials) {
         const result = await signInWithEmailAndPassword(FIREBASE_AUTH, `${credentials!.username}@lunchhitch.firebaseapp.com`, credentials!.password);
-
         return {
           displayName: result.user.displayName,
           getIdToken: result.user.getIdToken,

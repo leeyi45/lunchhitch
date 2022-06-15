@@ -16,23 +16,20 @@ type SignUpFormValues = {
 };
 
 export default function SignUpPage() {
-  const [signUpError, setSignupError] = React.useState('');
   const [signUpSuccess, setSignUpSuccess] = React.useState(false);
 
-  const submitCallback = async (values : SignUpFormValues, actions: FormikHelpers<SignUpFormValues>) => {
-    actions.setSubmitting(true);
-    try {
-      await signUp(values);
-    } catch (error: any) {
-      if (error.code === 'auth/email-already-exists') {
-        setSignupError('An account with this username already exists');
-      } else {
-        // TODO redirect to error page
-
-      }
-      return;
-    }
+  const submitCallback = async (values : SignUpFormValues) => {
+    await signUp(values);
     setSignUpSuccess(true);
+  };
+
+  const errorCallback = (error: any, actions: FormikHelpers<SignUpFormValues>) => {
+      actions.setFieldValue('password', '', false);
+      actions.setFieldValue('repeatPass', '', false);
+
+      if (error.code === 'auth/email-already-exists') return 'An account with this username already exists';
+
+      return `Unknown error: ${error}`;
   };
 
   return (
@@ -45,8 +42,6 @@ export default function SignUpPage() {
             </Redirecter>
           )
           : (
-            <>
-              {signUpError}
               <FormikWrapper
                 fields={{
                   displayName: {
@@ -66,6 +61,7 @@ export default function SignUpPage() {
                   },
                 }}
                 onSubmit={submitCallback}
+                onSubmitError={errorCallback}
                 preValidate={({ password, repeatPass }) => {
                   if (password !== repeatPass) {
                     return { password: 'Passwords did not match!' };
@@ -74,7 +70,6 @@ export default function SignUpPage() {
                 }}
                 submitButtonText="Sign Up"
               />
-            </>
           )
       }
     </RedirectOnAuth>

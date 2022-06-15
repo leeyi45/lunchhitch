@@ -1,35 +1,36 @@
 import React from 'react';
 import { Typography } from '@material-ui/core';
 import Link from 'next/link';
-import {
-  FormikHelpers,
-} from 'formik';
+import { FormikHelpers } from 'formik';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { Credential, signIn } from '../../auth';
 import { RedirectOnAuth } from '../../common/auth_wrappers';
 
 export default function LoginPage() {
-  const [loginError, setLoginError] = React.useState<string | null>(null);
-
-  const submitCallback = async (creds: Credential, actions: FormikHelpers<Credential>) => {
+  const submitCallback = async (creds: Credential) => {
     const result = await signIn(creds);
 
-    if (!result.ok) {
-      switch (result.error) {
-        case 'auth/user-not-found':
-        case 'auth/wrong-password': {
-          actions.setFieldValue('password', '', false);
-          setLoginError('Incorrect username or password');
-          break;
-        }
-        // eslint-disable-next-line no-lone-blocks
-        default: {
-          setLoginError(`An unexpected error occured: ${result.error}`);
-          break;
-        }
+    if (!result.ok) throw result.error;
+  };
+
+  const errorCallback = (error: string, actions: FormikHelpers<Credential>) => {
+    // NextAuth wants to be stupid and return errors as strings
+    // So we need to use regex and extract the Firebase error code from the string
+    const errorRegex = /\(auth\/(.+)\)/;
+    const errorCode = error.match(errorRegex);
+    actions.setFieldValue('password', '', false);
+
+    // console.log(errorCode);
+    if (errorCode) {
+      switch (errorCode[1]) {
+        case 'user-not-found':
+        case 'wrong-password': return 'Incorrect username or password';
+        case 'too-many-requests': return 'Too many failed login attempts, please try again later';
       }
     }
-  };
+
+    return `An unexpected error occured: '${errorCode}'`;
+  }
 
   return (
     <RedirectOnAuth redirect="/profile">
@@ -64,25 +65,17 @@ export default function LoginPage() {
           border: '5px solid black',
         }}
         >
-          {
-          loginError === null
-            ? null
-            : (
-              <text fontStyle="color red">
-                {loginError}
-              </text>
-            )
-        }
           <FormikWrapper
             fields={{
               username: {
                 type: 'text', labelText: 'Username', required: true, initialValue: '',
               },
               password: {
-                type: 'text', labelText: 'Password', required: true, initialValue: '',
+                type: 'password', labelText: 'Password', required: true, initialValue: '',
               },
             }}
             onSubmit={submitCallback}
+            onSubmitError={errorCallback}
             submitButtonText="Sign In"
             resetButton={false}
           />
