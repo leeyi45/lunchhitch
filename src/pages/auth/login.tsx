@@ -5,6 +5,7 @@ import { FormikHelpers } from 'formik';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { Credential, signIn } from '../../auth';
 import { RedirectOnAuth } from '../../common/auth_wrappers';
+import { firebaseErrorHandler } from '../../firebase';
 
 export default function LoginPage() {
   const submitCallback = async (creds: Credential) => {
@@ -14,22 +15,12 @@ export default function LoginPage() {
   };
 
   const errorCallback = (error: string, actions: FormikHelpers<Credential>) => {
-    // NextAuth wants to be stupid and return errors as strings
-    // So we need to use regex and extract the Firebase error code from the string
-    const errorRegex = /\(auth\/(.+)\)/;
-    const errorCode = error.match(errorRegex);
     actions.setFieldValue('password', '', false);
-
-    // console.log(errorCode);
-    if (errorCode) {
-      switch (errorCode[1]) {
-        case 'user-not-found':
-        case 'wrong-password': return 'Incorrect username or password';
-        case 'too-many-requests': return 'Too many failed login attempts, please try again later';
-      }
-    }
-
-    return `An unexpected error occured: '${errorCode}'`;
+    return firebaseErrorHandler(error, {
+      'user-not-found': 'Incorrect username or password',
+      'wrong-password': 'Incorrect username or password',
+      'too-many-requests': 'Too many failed login attempts, please try again later',
+    });
   }
 
   return (
@@ -70,9 +61,10 @@ export default function LoginPage() {
               username: {
                 type: 'text', labelText: 'Username', required: true, initialValue: '',
               },
-              password: {
-                type: 'password', labelText: 'Password', required: true, initialValue: '',
-              },
+              password: FormikWrapper.PasswordField,
+              // password: {
+              //   type: 'password', labelText: 'Password', required: true, initialValue: '',
+              // },
             }}
             onSubmit={submitCallback}
             onSubmitError={errorCallback}

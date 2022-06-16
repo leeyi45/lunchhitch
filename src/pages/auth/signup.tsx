@@ -6,6 +6,7 @@ import { RedirectOnAuth } from '../../common/auth_wrappers';
 import Redirecter from '../../common/redirecter';
 import { signUp } from '../../auth';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
+import { firebaseErrorHandler } from '../../firebase';
 
 type SignUpFormValues = {
   displayName: string;
@@ -24,13 +25,13 @@ export default function SignUpPage() {
   };
 
   const errorCallback = (error: any, actions: FormikHelpers<SignUpFormValues>) => {
-      actions.setFieldValue('password', '', false);
-      actions.setFieldValue('repeatPass', '', false);
+    actions.setFieldValue('password', '', false);
+    actions.setFieldValue('repeatPass', '', false);
 
-      if (error.code === 'auth/email-already-exists') return 'An account with this username already exists';
-
-      return `Unknown error: ${error}`;
-  };
+    return firebaseErrorHandler(error, {
+      'email-already-exists': 'An account with this username already exists',
+    });
+  }
 
   return (
     <RedirectOnAuth redirect="./profile">

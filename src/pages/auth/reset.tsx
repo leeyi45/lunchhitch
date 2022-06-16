@@ -7,7 +7,7 @@ import { FormikHelpers } from 'formik';
 import React from 'react';
 import { LunchHitchUser, useSession } from '../../auth';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
-import { FIREBASE_AUTH } from '../../firebase';
+import { firebaseErrorHandler, FIREBASE_AUTH } from '../../firebase';
 // import prisma from '../../prisma';
 
 function NoUserResetPage() {
@@ -66,7 +66,6 @@ type UserResetFormErrors = {
  */
 function UserResetPage({ user }: { user: LunchHitchUser }) {
   const [resetDone, setResetDone] = React.useState(false);
-  const [resetError, setResetError] = React.useState<string | null>(null);
 
   const validateCallback = ({ newPass, repeatPass }: UserResetFormValues) => {
     const errors: UserResetFormErrors = {};
@@ -77,24 +76,19 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
     return errors;
   };
 
-  const submitCallback = async ({ oldPass, newPass }: UserResetFormValues, actions: FormikHelpers<UserResetFormValues>) => {
-    try {
-      await reauthenticateWithCredential(user.firebaseObj, EmailAuthProvider.credential(user.email!, oldPass));
-      await updatePassword(user.firebaseObj, newPass);
-      setResetDone(true);
-    } catch (error: any) {
-      // TODO Error handling
-      if (error.code === 'auth/wrong-password') {
-        actions.resetForm();
-        setResetError('Incorrect password');
-      }
-    }
+  const submitCallback = async ({ oldPass, newPass }: UserResetFormValues) => {
+    await reauthenticateWithCredential(user.firebaseObj, EmailAuthProvider.credential(user.email!, oldPass));
+    await updatePassword(user.firebaseObj, newPass);
+    setResetDone(true);
+  };
+
+  const errorCallback = (error: any, actions: FormikHelpers<UserResetFormValues>) => {
+    actions.resetForm();
+    return firebaseErrorHandler(error, { 'wrong-password': 'Incorrect password' });
   };
 
   return resetDone ? <p>Password successfully changed!</p>
     : (
-      <>
-        {resetError}
         <FormikWrapper
           fields={{
             oldPass: {
@@ -109,8 +103,8 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
           }}
           preValidate={validateCallback}
           onSubmit={submitCallback}
+          onSubmitError={errorCallback}
         />
-      </>
     );
 }
 
