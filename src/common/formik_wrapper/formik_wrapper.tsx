@@ -68,14 +68,10 @@ export default function FormikWrapper<Values extends FormikWrapperValues, Errors
     <FieldWrapper key={name} fieldName={name} labelText={field.labelText} type={field.type} hint={field.hint} />
   )), [fields]);
 
-  const validateCallback = (values: Values) => {
-    const errors = Object.entries(fields).reduce((res: any, [name, field]) => {
-      if (!values[name] && field.required) res[name] = `${field.labelText} Required`;
-      return res;
-    }, preValidate ? preValidate(values) : {} as ValidationErrors) as ValidationErrors
-
-    return errors;
-  }
+  const validateCallback = (values: Values) => Object.entries(fields).reduce((res: any, [name, field]) => {
+    if (!values[name] && field.required) res[name] = `${field.labelText} Required`;
+    return res;
+  }, preValidate ? preValidate(values) : {} as ValidationErrors) as ValidationErrors;
 
   const submitCallback = async (values: Values, actions: FormikHelpers<Values>) => {
     try {
@@ -85,7 +81,7 @@ export default function FormikWrapper<Values extends FormikWrapperValues, Errors
     } catch (error) {
       if (onSubmitError) setSubmitError(onSubmitError(error, actions));
     }
-  }
+  };
 
   return (
     <>

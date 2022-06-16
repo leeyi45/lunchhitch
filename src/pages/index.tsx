@@ -1,9 +1,8 @@
 import React from 'react';
-import { User } from '@firebase/auth';
-import { useUserState } from '../common';
+import { LunchHitchUser, useSession } from '../auth';
 import Navbar from '../common/navbar';
 
-function UserHomePage({ user }: { user: User }) {
+function UserHomePage({ user }: { user: LunchHitchUser }) {
   return (
     <>
       <h1>
@@ -23,12 +22,12 @@ const NoUserHomePage = () => (
   </>
 );
 
-export default () => {
-  const user = useUserState();
+export default function IndexPage() {
+  const { user, status } = useSession();
   return (
     <>
       <Navbar user={user} />
-      {user ? <UserHomePage user={user} /> : <NoUserHomePage />}
+      {status === 'authenticated' ? <UserHomePage user={user} /> : <NoUserHomePage />}
     </>
   );
-};
+}

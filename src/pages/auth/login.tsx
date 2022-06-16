@@ -22,6 +22,7 @@ export default function LoginPage() {
 
     // console.log(errorCode);
     if (errorCode) {
+      // eslint-disable-next-line default-case
       switch (errorCode[1]) {
         case 'user-not-found':
         case 'wrong-password': return 'Incorrect username or password';
@@ -30,7 +31,7 @@ export default function LoginPage() {
     }
 
     return `An unexpected error occured: '${errorCode}'`;
-  }
+  };
 
   return (
     <RedirectOnAuth redirect="/profile">

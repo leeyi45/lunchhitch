@@ -8,7 +8,6 @@ import {
 import {
   signOut as nextAuthSignOut, signIn as nextAuthSignIn, SignInResponse, useSession as useAuthSession, UseSessionOptions,
 } from 'next-auth/react';
-import { responseSymbol } from 'next/dist/server/web/spec-compliant/fetch-event';
 import { FIREBASE_AUTH } from './firebase';
 // import prisma from './prisma';
 
@@ -98,8 +97,8 @@ export async function signUp({
     data: {
       id: username,
       email,
-    }
-  })
+    },
+  });
   await firebaseSignOut(FIREBASE_AUTH);
 }
 
@@ -108,16 +107,16 @@ export function updateProfile(user: LunchHitchUser, { email, displayName }: Reco
 
   if (displayName) tasks.push(updateFirebaseProfile(user.firebaseObj, { displayName }));
 
-  // if (email) {
-  //   tasks.push(prisma.userInfo.update({
-  //     where: {
-  //       id: user.username,
-  //     },
-  //     data: {
-  //       email,
-  //     },
-  //   }));
-  // }
+  if (email) {
+    tasks.push(prismaFetch(user.username, 'update', {
+      where: {
+        id: user.username,
+      },
+      data: {
+        email,
+      },
+    }));
+  }
 
   return Promise.all(tasks);
 }
