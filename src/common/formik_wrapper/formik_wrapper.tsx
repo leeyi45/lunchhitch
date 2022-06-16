@@ -20,7 +20,7 @@ export type FormikWrapperProps<Values extends FormikWrapperValues, Errors extend
          * Internal name that Formik will use to refer to the field
          */
         fieldName: string]: Omit<FieldWrapperProps, 'fieldName'> & {
-          required?: boolean;
+          required?: boolean | string;
           initialValue: any;
         }
     };
@@ -49,7 +49,7 @@ export type FormikWrapperProps<Values extends FormikWrapperValues, Errors extend
 /**
  * Wrapper around a Formik object to ease initialization
  */
-export default function FormikWrapper<Values extends FormikWrapperValues, Errors extends ValidationErrors>({
+function FormikWrapper<Values extends FormikWrapperValues, Errors extends ValidationErrors>({
   submitButtonText, fields, onSubmit, onSubmitError, preValidate, resetButton,
   validateOnBlur, validateOnChange,
 }: FormikWrapperProps<Values, Errors>) {
@@ -64,12 +64,12 @@ export default function FormikWrapper<Values extends FormikWrapperValues, Errors
     [fields],
   );
 
-  const fieldElements = React.useMemo(() => Object.entries(fields).map(([name, field]) => (
-    <FieldWrapper key={name} fieldName={name} labelText={field.labelText} type={field.type} hint={field.hint} />
+  const fieldElements = React.useMemo(() => Object.entries(fields).map(([name, { labelText, type, hint }]) => (
+    <FieldWrapper key={name} fieldName={name} labelText={labelText} type={type} hint={hint} />
   )), [fields]);
 
-  const validateCallback = (values: Values) => Object.entries(fields).reduce((res: any, [name, field]) => {
-    if (!values[name] && field.required) res[name] = `${field.labelText} Required`;
+  const validateCallback = (values: Values) => Object.entries(fields).reduce((res: any, [name, { required, labelText }]) => {
+    if (!values[name] && required) res[name] = typeof required === 'string' ? required : `${labelText} Required`;
     return res;
   }, preValidate ? preValidate(values) : {} as ValidationErrors) as ValidationErrors;
 
@@ -127,6 +127,17 @@ export default function FormikWrapper<Values extends FormikWrapperValues, Errors
     </>
   );
 }
+
+const passwordField: Omit<FieldWrapperProps, 'fieldName'> & { initialValue: any, required?: boolean } = {
+  type: 'password',
+  initialValue: '',
+  required: true,
+  labelText: 'Password',
+};
+
+export default Object.assign(FormikWrapper, {
+  PasswordField: passwordField,
+});
 
 FormikWrapper.defaultProps = {
   submitButtonText: undefined,
