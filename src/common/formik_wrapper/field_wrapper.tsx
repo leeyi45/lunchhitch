@@ -7,10 +7,12 @@ export type FieldWrapperProps = {
    * Identifier to use internally with the Formik object
    */
   fieldName: string;
+
   /**
    * Text to display above the field
    */
   labelText: string;
+
   /**
    * Field type
    */

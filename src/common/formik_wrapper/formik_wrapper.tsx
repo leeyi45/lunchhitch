@@ -9,29 +9,33 @@ type FormikWrapperValues = {
   [name: string]: string;
 };
 
-type ValidationErrors = {
-  [name: string]: string | undefined;
-};
+type FieldConfig = Omit<FieldWrapperProps, 'fieldName'> & {
+  /**
+   * Set this value to undefined if this field isn't required\
+   * Set this value to `true` to display the default error message when the field wasn't filled
+   * Set this value to a string to display a custom error message when the field isn't filled
+   */
+  required?: boolean | string;
 
-export type FormikWrapperProps<Values extends FormikWrapperValues, Errors extends ValidationErrors> = {
-    fields: {
-        [
-        /**
-         * Internal name that Formik will use to refer to the field
-         */
-        fieldName: string]: Omit<FieldWrapperProps, 'fieldName'> & {
-          required?: boolean | string;
-          initialValue: any;
-        }
-    };
+  /**
+   * The initial value of the field
+   */
+  initialValue: any;
+}
+
+export type FormikWrapperProps<Values extends FormikWrapperValues> = {
+    fields: { [K in keyof Values]: FieldConfig };
     /**
      * Submission callback
      */
     onSubmit: (values: Values, action: FormikHelpers<Values>) => Promise<void> | void;
+
     /**
      * Validation callback called before the internal validation callback that checks for empty fields
      */
-    preValidate?: (values: Values) => Errors;
+
+    preValidate?: (values: Values) => Partial<Values>;
+
     /**
      * Boolean value indicating if a form reset button should be displayed
      */
@@ -42,17 +46,25 @@ export type FormikWrapperProps<Values extends FormikWrapperValues, Errors extend
      */
     onSubmitError?: (error: any, actions: FormikHelpers<Values>) => any;
     submitButtonText?: ButtonProps | string;
+
+    /**
+     * Set to true if fields should be validated when they lose focus
+     */
     validateOnBlur?: boolean;
+
+    /**
+     * Set to true if fields should be validated every time their value changes
+     */
     validateOnChange?: boolean;
 };
 
 /**
  * Wrapper around a Formik object to ease initialization
  */
-function FormikWrapper<Values extends FormikWrapperValues, Errors extends ValidationErrors>({
+function FormikWrapper<Values extends FormikWrapperValues>({
   submitButtonText, fields, onSubmit, onSubmitError, preValidate, resetButton,
   validateOnBlur, validateOnChange,
-}: FormikWrapperProps<Values, Errors>) {
+}: FormikWrapperProps<Values>) {
   const [submitError, setSubmitError] = React.useState<any | null>(null);
 
   // Not sure if i should leave useMemo here
@@ -68,10 +80,10 @@ function FormikWrapper<Values extends FormikWrapperValues, Errors extends Valida
     <FieldWrapper key={name} fieldName={name} labelText={labelText} type={type} hint={hint} />
   )), [fields]);
 
-  const validateCallback = (values: Values) => Object.entries(fields).reduce((res: any, [name, { required, labelText }]) => {
-    if (!values[name] && required) res[name] = typeof required === 'string' ? required : `${labelText} Required`;
+  const validateCallback = (values: Values) => Object.entries(fields).reduce((res, [name, { required, labelText }]) => {
+    if (!values[name] && required) (res as any)[name] = typeof required === 'string' ? required : `${labelText} Required`;
     return res;
-  }, preValidate ? preValidate(values) : {} as ValidationErrors) as ValidationErrors;
+  }, preValidate ? preValidate(values) : {} as Partial<Values>);
 
   const submitCallback = async (values: Values, actions: FormikHelpers<Values>) => {
     try {
@@ -128,7 +140,7 @@ function FormikWrapper<Values extends FormikWrapperValues, Errors extends Valida
   );
 }
 
-const passwordField: Omit<FieldWrapperProps, 'fieldName'> & { initialValue: any, required?: boolean } = {
+const passwordField: FieldConfig = {
   type: 'password',
   initialValue: '',
   required: true,

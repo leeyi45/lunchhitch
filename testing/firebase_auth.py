@@ -1,7 +1,7 @@
 import requests
 
 def main():
-    resp = requests.post('http://localhost:3000/api/userinfo?username=leeyi45&method=findFirst', json={
+    resp = requests.post('http://localhost:3000/api/userinfo?method=findFirst', json={
         'where': {
             'id': 'leeyi45'
         }
