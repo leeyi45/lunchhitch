@@ -21,11 +21,11 @@ export const FIREBASE_AUTH = initializeAuth(FIREBASE_APP);
 export const FIRESTORE = initializeFirestore(FIREBASE_APP, {});
 
 export function firebaseErrorHandler(error: string | FirebaseError, codes: { [code: string]: string }) {
-    // NextAuth wants to be stupid and return errors as strings
-    // So we need to use regex and extract the Firebase error code from the string
-    const errorCode = (typeof error === 'string' ? error : error.code).match(/\(auth\/(.+)\)/);
+  // NextAuth wants to be stupid and return errors as strings
+  // So we need to use regex and extract the Firebase error code from the string
+  const errorCode = (typeof error === 'string' ? error : error.code).match(/\(auth\/(.+)\)/);
 
-    if (errorCode && codes[errorCode[1]]) return codes[errorCode[1]];
+  if (errorCode && codes[errorCode[1]]) return codes[errorCode[1]];
 
-    return `Unexpected error: '${errorCode}'`;
+  return `Unexpected error: '${errorCode}'`;
 }

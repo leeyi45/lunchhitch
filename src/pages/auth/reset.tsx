@@ -89,22 +89,22 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
 
   return resetDone ? <p>Password successfully changed!</p>
     : (
-        <FormikWrapper
-          fields={{
-            oldPass: {
-              labelText: 'Current Password', initialValue: '', required: true, type: 'text',
-            },
-            newPass: {
-              labelText: 'New Password', initialValue: '', required: true, type: 'text',
-            },
-            repeatPass: {
-              labelText: 'Repeat New Password', initialValue: '', required: true, type: 'text',
-            },
-          }}
-          preValidate={validateCallback}
-          onSubmit={submitCallback}
-          onSubmitError={errorCallback}
-        />
+      <FormikWrapper
+        fields={{
+          oldPass: {
+            labelText: 'Current Password', initialValue: '', required: true, type: 'text',
+          },
+          newPass: {
+            labelText: 'New Password', initialValue: '', required: true, type: 'text',
+          },
+          repeatPass: {
+            labelText: 'Repeat New Password', initialValue: '', required: true, type: 'text',
+          },
+        }}
+        preValidate={validateCallback}
+        onSubmit={submitCallback}
+        onSubmitError={errorCallback}
+      />
     );
 }
 

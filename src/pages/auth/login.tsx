@@ -62,9 +62,6 @@ export default function LoginPage() {
                 type: 'text', labelText: 'Username', required: true, initialValue: '',
               },
               password: FormikWrapper.PasswordField,
-              // password: {
-              //   type: 'password', labelText: 'Password', required: true, initialValue: '',
-              // },
             }}
             onSubmit={submitCallback}
             onSubmitError={errorCallback}
