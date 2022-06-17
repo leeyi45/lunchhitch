@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import { Formik, FormikHelpers, Form } from 'formik';
-import { Button, ButtonProps } from '@material-ui/core';
+import { Button, ButtonProps } from '@mui/material';
 import FieldWrapper, { FieldWrapperProps } from './field_wrapper';
 
 type FormikWrapperValues = {

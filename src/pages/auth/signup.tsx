@@ -1,7 +1,5 @@
 import React from 'react';
-import {
-  FormikHelpers,
-} from 'formik';
+import { FormikHelpers } from 'formik';
 import { RedirectOnAuth } from '../../common/auth_wrappers';
 import Redirecter from '../../common/redirecter';
 import { signUp } from '../../auth';
