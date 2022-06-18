@@ -42,7 +42,7 @@ export default function OrdersPage(props: Props) {
 
 export async function getServerSideProps() {
   // Fetch communities from the server side
-  const communities = await prisma.community.findMany({});
+  const communities = await prisma.community.findMany();
 
   return {
     props: {
