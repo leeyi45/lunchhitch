@@ -1,24 +1,32 @@
-import React from 'react';
+import { ReactElement } from 'react';
 import { LunchHitchUser, useSession } from '../../auth';
 
 type Props = {
-    children: [(user: LunchHitchUser) => React.FC, React.FC<{ children: any}>, React.FC<{ children: any}>];
+    children: any;
 };
 
-function createInstance() {
-    function AuthSelector({ children }: Props) {
-        const { user, status } = useSession();
+type AuthProps = {
+    children: (user: LunchHitchUser) => any;
+};
 
-        switch(status) {
-            case 'authenticated': return children[0](user);
-            case 'loading': return children[1];
-            case 'unauthenticated': return children[2];
-        }
-    }
+type SelectorProps = {
+    children: [ReactElement<AuthProps>, ReactElement<Props>, ReactElement<Props>];
+};
 
-    return Object.assign(AuthSelector, {
-        Unauthenticated: ({ children }: { children: any}) => (<>{children}</>),
-    })
-}
+export default Object.assign(({ children: [authed, unauthed, loading] }: SelectorProps) => {
+  const { status } = useSession();
 
-export default createInstance();
+  switch (status) {
+    case 'authenticated': return authed;
+    case 'unauthenticated': return unauthed;
+    case 'loading': return loading;
+    default: throw new Error('should not get here');
+  }
+}, {
+  Authenticated: ({ children }: AuthProps) => {
+    const { user } = useSession();
+    return children(user!);
+  },
+  Loading: ({ children }: Props) => children,
+  Unauthenticated: ({ children }: Props) => children,
+});
