@@ -34,7 +34,7 @@ export default function NavBar({ user }: NavbarProps) {
   };
 
   return (
-    <AppBar position="static" style={{ background: '#454B1B' }}>
+    <AppBar position="static" style={{ background: '#50C878' }}>
       <Toolbar>
         <Typography
           variant="h6"
@@ -87,9 +87,14 @@ export default function NavBar({ user }: NavbarProps) {
                 </>
               )
               : (
-                <MenuItem>
-                  <Link href="./auth/login">Log In</Link>
-                </MenuItem>
+                <>
+                  <MenuItem>
+                    <Link href="./auth/login">Log In</Link>
+                  </MenuItem>
+                  <MenuItem>
+                    <Link href="./auth/signup">Sign Up</Link>
+                  </MenuItem>
+                </>
               )}
           </Menu>
         </div>

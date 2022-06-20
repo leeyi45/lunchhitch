@@ -36,15 +36,28 @@ function NoUserResetPage() {
     : (
       <>
         {resetError}
-        <FormikWrapper
-          fields={{
-            email: {
-              type: 'text', labelText: 'Email', required: true, initialValue: '',
-            },
-          }}
-          onSubmit={emailCallback}
-          submitButtonText="Send Reset Email"
-        />
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '100%',
+          height: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'absolute',
+          paddingBottom: '100px',
+          border: '5px solid #50C878',
+        }}
+        >
+          <FormikWrapper
+            fields={{
+              email: {
+                type: 'text', labelText: 'Email', required: true, initialValue: '',
+              },
+            }}
+            onSubmit={emailCallback}
+            submitButtonText="Send Reset Email"
+          />
+        </div>
       </>
     );
 }

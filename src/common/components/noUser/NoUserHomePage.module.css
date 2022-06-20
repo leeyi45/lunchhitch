@@ -1,0 +1,9 @@
+.NoUserHomePage {
+    background: url('../../media/final.jpg') no-repeat;
+    background-size: contain;
+    color: #50C878 ;
+    text-align: center;
+    padding-top: 241px;
+    padding-bottom: 241px;
+    font-family: 'raleway';
+}

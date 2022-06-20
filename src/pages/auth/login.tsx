@@ -33,7 +33,7 @@ export default function LoginPage() {
         alignContent: 'center',
       }}
       >
-        <div style={{ background: '#454B1B' }}>
+        <div style={{ background: '#50C878' }}>
           <Typography
             variant="h6"
             component="div"
@@ -56,7 +56,7 @@ export default function LoginPage() {
           justifyContent: 'center',
           position: 'absolute',
           paddingBottom: '100px',
-          border: '5px solid black',
+          border: '5px solid #50C878',
         }}
         >
           <FormikWrapper
