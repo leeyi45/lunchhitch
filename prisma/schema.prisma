@@ -7,27 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Community {
-  id   String @id @default(auto()) @map("_id") @db.ObjectId
+type Shop {
+  id   String @db.ObjectId
   name String
-  Shop Shop[]
+}
+
+model Community {
+  id      String           @id @default(auto()) @map("_id") @db.ObjectId
   address String
+  name    String
+  shops   Shop[]
 }
 
 model Order {
   id     String   @id @default(auto()) @map("_id") @db.ObjectId
   from   String
   orders String[]
-  shop   Shop     @relation(fields: [shopId], references: [id])
-  shopId String   @db.ObjectId
-}
-
-model Shop {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  community   Community @relation(fields: [communityId], references: [id])
-  communityId String    @db.ObjectId
-  name        String
-  Order       Order[]
+  shop   String @db.ObjectId
 }
 
 model UserInfo {

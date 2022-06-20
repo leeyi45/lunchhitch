@@ -4,12 +4,12 @@
   "private": true,
   "scripts-info": {
     "clean": "Delete cached files",
-    "db:update": "Run this command after changes to the database have been made to update prisma",
     "dev": "Run the development server"
   },
   "scripts": {
     "clean": "rm -rf .next && yarn cache clean",
-    "db:update": "prisma db pull --force && prisma generate",
+    "db:pull": "prisma db pull --force",
+    "db:generate": "prisma generate",
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
