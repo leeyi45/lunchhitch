@@ -28,13 +28,9 @@ export default function FulFillForm(props: Props) {
   const [shop, setShop] = React.useState<Shop | null>(null);
   const orders = useAsync(getOrders);
 
-  React.useEffect(() => {
-    if (shop) orders.call(shop);
-  }, [shop]);
-
-  React.useEffect(() => console.log(orders), [orders]);
-
   const submitCallback = () => {};
+
+  React.useEffect(() => orders.cancel, []);
 
   return (
     <Formik
@@ -46,48 +42,66 @@ export default function FulFillForm(props: Props) {
       {(formik) => {
         let selectorElement;
 
-        if (orders.state === 'loading') {
-          selectorElement = (
-            <div>
-              <CircularProgress />
-            </div>
-          );
-        } else if (orders.state === 'errored') {
-          selectorElement = (
-            <div>
-              An unknown error occurred, please refresh the page and try again
-            </div>
-          );
-        } else if (orders.result.length === 0) {
-          selectorElement = (
-            <>
-              No Orders
-            </>
-          );
-        } else {
-          selectorElement = (
-            <List>
-
-              {orders.result.map((order, i) => (
-                <ListItem
-                  key={i}
-                  onClick={() => formik.setFieldValue('order', order)}
-                >
-                  <h3>From {order.from}</h3>
-                  <ol>
-                    {order.orders.map((each, j) => <li key={j}>{each}</li>)}
-                  </ol>
-                </ListItem>
-              ))}
-            </List>
-          );
+        switch (orders.state) {
+          case 'waiting': {
+            selectorElement = 'Select a shop and community to begin!';
+            break;
+          }
+          case 'loading': {
+            selectorElement = (
+              <div>
+                <CircularProgress />
+              </div>
+            );
+            break;
+          }
+          case 'errored': {
+            selectorElement = (
+              <div>
+                An unknown error occurred, please refresh the page and try again
+              </div>
+            );
+            break;
+          }
+          default: {
+            if (orders.result.length === 0) {
+              selectorElement = (
+                <>
+                  No Orders
+                </>
+              );
+            } else {
+              selectorElement = (
+                <List>
+                  {orders.result.map((order, i) => (
+                    <ListItem
+                      key={i}
+                      onClick={() => formik.setFieldValue('order', order)}
+                    >
+                      <h3>From {order.from}</h3>
+                      <ol>
+                        {order.orders.map((each, j) => <li key={j}>{each}</li>)}
+                      </ol>
+                    </ListItem>
+                  ))}
+                </List>
+              );
+            }
+            break;
+          }
         }
 
         return (
           <div>
             <ShopSelector
               communities={props.communities}
-              onChange={setShop}
+              onChange={(newValue) => {
+                setShop(newValue);
+
+                // Cancel already running operations
+                orders.cancel();
+                if (newValue) orders.call(newValue);
+              }}
               value={shop}
             />
             {selectorElement}
