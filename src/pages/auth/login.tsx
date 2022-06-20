@@ -30,7 +30,7 @@ export default function LoginPage() {
         alignContent: 'center',
       }}
       >
-        <div style={{ background: '#454B1B' }}>
+        <div style={{ background: '#50C878' }}>
           <Typography
             variant="h6"
             component="div"
