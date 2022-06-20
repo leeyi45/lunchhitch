@@ -3,7 +3,7 @@
  * Functions for managing users
  */
 import {
-  createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile, User,
+  createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile,
 } from '@firebase/auth';
 import {
   signOut as nextAuthSignOut, signIn as nextAuthSignIn, SignInResponse, useSession as useAuthSession, UseSessionOptions,
@@ -22,7 +22,9 @@ export type LunchHitchUser = {
   username: string;
   email: string;
   displayName: string;
-  firebaseObj: User;
+  // Because there is a limit to the size of the JWT, we can't store the firebase user
+  // object here
+  // firebaseObj: User;
 };
 
 // TODO migrate to server side???
@@ -63,6 +65,7 @@ async function prismaFetch(username: string, method: string, args: any) {
  * Sign in with the given username and password
  */
 export async function signIn(creds: Credential) {
+  debugger;
   return await nextAuthSignIn('credentials', { ...creds, redirect: false }) as unknown as SignInResponse;
 }
 
@@ -104,8 +107,11 @@ export async function signUp({
 
 export function updateProfile(user: LunchHitchUser, { email, displayName }: Record<'email' | 'displayName', string | undefined>) {
   const tasks: Promise<any>[] = [];
+  const firebaseObj = FIREBASE_AUTH.currentUser;
 
-  if (displayName) tasks.push(updateFirebaseProfile(user.firebaseObj, { displayName }));
+  if (!firebaseObj) throw new Error('Firebase was not logged in');
+
+  if (displayName) tasks.push(updateFirebaseProfile(firebaseObj, { displayName }));
 
   if (email) {
     tasks.push(prismaFetch(user.username, 'update', {

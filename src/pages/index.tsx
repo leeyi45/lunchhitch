@@ -1,6 +1,6 @@
 import React from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 import { LunchHitchUser, useSession } from '../auth';
-import Navbar from '../common/navbar';
 
 function UserHomePage({ user }: { user: LunchHitchUser }) {
   return (
@@ -24,10 +24,11 @@ const NoUserHomePage = () => (
 
 export default function IndexPage() {
   const { user, status } = useSession();
-  return (
-    <>
-      <Navbar user={user} />
-      {status === 'authenticated' ? <UserHomePage user={user} /> : <NoUserHomePage />}
-    </>
-  );
+
+  switch (status) {
+    case 'unauthenticated': return <NoUserHomePage />;
+    case 'loading': return <CircularProgress />;
+    case 'authenticated': return <UserHomePage user={user} />;
+    default: throw new Error('Should not get here');
+  }
 }

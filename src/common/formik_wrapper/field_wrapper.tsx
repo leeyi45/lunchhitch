@@ -1,8 +1,12 @@
+/* eslint-disable react/require-default-props */
 import Popper from '@mui/material/Popper';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 import { ErrorMessage, Field, FieldProps } from 'formik';
 import React, { HTMLInputTypeAttribute } from 'react';
+import { Button, InputAdornment, TextField } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 export type FieldWrapperProps = {
   /**
@@ -15,6 +19,8 @@ export type FieldWrapperProps = {
    */
   labelText: string;
 
+  placeholder?: string;
+
   /**
    * Field type
    */
@@ -25,13 +31,15 @@ export type FieldWrapperProps = {
    * Else, if a React component is provided, display that instead
    */
   hint?: any;
+
+  renderInput?: (props: FieldProps) => any;
 };
 
 /**
  * Wrapper around Formik fields, error message and label
  */
 export default function FieldWrapper({
-  fieldName, labelText, type, hint,
+  fieldName, labelText, type, hint, renderInput, placeholder,
 }: FieldWrapperProps) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLInputElement | null>(null);
   const focusedRef = React.useRef(false);
@@ -47,8 +55,9 @@ export default function FieldWrapper({
         style={{ width: '100%' }}
         name={fieldName}
       >
-        {({ field: { onBlur, ...fieldProps } }: FieldProps) => (
+        {renderInput || (({ field: { onBlur, ...fieldProps } }: FieldProps) => (
           <input
+            placeholder={placeholder}
             type={type}
             {...fieldProps}
             onFocus={(event) => {
@@ -65,7 +74,7 @@ export default function FieldWrapper({
               if (!focusedRef.current) handleClose();
             }}
           />
-        )}
+        ))}
       </Field>
       { hint !== undefined
         ? (
@@ -98,4 +107,38 @@ export default function FieldWrapper({
 
 FieldWrapper.defaultProps = {
   hint: undefined,
+};
+
+export type PasswordFieldProps = {
+  fieldName?: string;
+  labelText?: string;
+  hint?: any;
+};
+
+export const PasswordField = ({ fieldName, labelText, hint }: PasswordFieldProps) => {
+  const [showPassword, setShowPassword] = React.useState(false);
+
+  return (
+    <FieldWrapper
+      hint={hint}
+      fieldName={fieldName || 'password'}
+      labelText={labelText || 'Password'}
+      type={showPassword ? 'text' : 'password'}
+      renderInput={({ field }) => (
+        <TextField
+          value={field.value}
+          onBlur={field.onBlur}
+          onChange={field.onChange}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <Button onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </Button>
+              </InputAdornment>),
+          }}
+        />
+      )}
+    />
+  );
 };

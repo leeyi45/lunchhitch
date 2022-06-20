@@ -7,6 +7,7 @@ module.exports = {
     es2021: true,
   },
   extends: [
+    // 'eslint-config-prettier',
     'airbnb',
     'plugin:@next/next/recommended',
     'plugin:react/recommended',
@@ -22,6 +23,7 @@ module.exports = {
   plugins: [
     'react',
     'eslint-plugin-import',
+    'eslint-plugin-prettier',
     '@typescript-eslint',
   ],
   rules: {

@@ -2,16 +2,19 @@ import React from 'react';
 import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { FormikHelpers } from 'formik';
+import { useRouter } from 'next/router';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { Credential, signIn } from '../../auth';
 import { RedirectOnAuth } from '../../common/auth_wrappers';
 import { firebaseErrorHandler } from '../../firebase';
 
 export default function LoginPage() {
-  const submitCallback = async (creds: Credential) => {
+  const router = useRouter();
+  const submitCallback = async (creds: Credential, actions: FormikHelpers<Credential>) => {
     const result = await signIn(creds);
 
     if (!result.ok) throw result.error;
+    // router.push('/');
   };
 
   const errorCallback = (error: string, actions: FormikHelpers<Credential>) => {

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Formik, FormikHelpers, Form } from 'formik';
 import { Button, ButtonProps } from '@mui/material';
-import FieldWrapper, { FieldWrapperProps } from './field_wrapper';
+import FieldWrapper, { FieldWrapperProps, PasswordField } from './field_wrapper';
 
 type FormikWrapperValues = {
   [name: string]: string;
@@ -76,9 +76,18 @@ function FormikWrapper<Values extends FormikWrapperValues>({
     [fields],
   );
 
-  const fieldElements = React.useMemo(() => Object.entries(fields).map(([name, { labelText, type, hint }]) => (
-    <FieldWrapper key={name} fieldName={name} labelText={labelText} type={type} hint={hint} />
-  )), [fields]);
+  const fieldElements = React.useMemo(() => Object.entries(fields).map(([name, conf]) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { required, initialValue, ...config } = conf;
+
+    if ((conf as any).isPasswordField) {
+      return (<PasswordField key={name} fieldName={name} />);
+    }
+
+    return (
+      <FieldWrapper key={name} fieldName={name} {...config} />
+    );
+  }), [fields]);
 
   const validateCallback = (values: Values) => Object.entries(fields).reduce((res, [name, { required, labelText }]) => {
     if (!values[name] && required) (res as any)[name] = typeof required === 'string' ? required : `${labelText} Required`;
@@ -140,11 +149,13 @@ function FormikWrapper<Values extends FormikWrapperValues>({
   );
 }
 
-const passwordField: FieldConfig = {
+const passwordField: FieldConfig & { isPasswordField: true } = {
   type: 'password',
   initialValue: '',
   required: true,
   labelText: 'Password',
+  placeholder: 'Password',
+  isPasswordField: true,
 };
 
 export default Object.assign(FormikWrapper, {

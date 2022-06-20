@@ -8,11 +8,16 @@ import prisma from '../../../prisma';
 export default NextAuth({
   callbacks: {
     // user received from authorize, token to send to session
-    jwt: ({ token, user }) => Promise.resolve({ ...token, user }),
+    jwt: ({ token, user }) => {
+      console.log('jwt callback user value', user);
+      return Promise.resolve({ ...token, user });
+    },
     async session({ session, token }) {
       // session is current session object
       // user received from jwt callback
       const user = token.user as LunchHitchUser;
+
+      console.log('Session callback user value', user);
 
       const emailResult = await prisma.userInfo.findFirst({
         where: {
@@ -42,12 +47,15 @@ export default NextAuth({
         password: {},
       },
       async authorize(credentials) {
-        const result = await signInWithEmailAndPassword(FIREBASE_AUTH, `${credentials!.username}@lunchhitch.firebaseapp.com`, credentials!.password);
+        if (!credentials) throw new Error('Credentials cannot be null');
+
+        const { username, password } = credentials;
+        const result = await signInWithEmailAndPassword(FIREBASE_AUTH, `${username}@lunchhitch.firebaseapp.com`, password);
+
         return {
           displayName: result.user.displayName,
-          getIdToken: result.user.getIdToken,
-          username: credentials!.username,
-          firebaseObj: result.user,
+          // getIdToken: result.user.getIdToken,
+          username,
         };
       },
     })],

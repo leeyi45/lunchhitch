@@ -3,15 +3,19 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ErrorIcon from '@mui/icons-material/Error';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
-import {
-  Button, InputAdornment, List, ListItem, TextField,
-} from '@mui/material';
+import Button from '@mui/material/Button';
+import InputAdornment from '@mui/material/InputAdornment';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Popover from '@mui/material/Popover';
+import TextField from '@mui/material/TextField';
 import {
   Formik, Form, FieldArray,
 } from 'formik';
-import { Community, Shop } from '@prisma/client';
+import { Community, Order, Shop } from '@prisma/client';
 import ShopSelector from './shop_selector';
 import TooltipButton from '../../common/tooltip_button';
+import { LunchHitchUser } from '../../auth';
 
 const MAX_ORDERS = 10;
 
@@ -63,6 +67,7 @@ export const OrderListItem = ({
 
 type MakeFormProps = {
   communities: Community[]
+  user: LunchHitchUser;
 };
 
 type MakeFormValues = {
@@ -77,6 +82,9 @@ export const MakeForm = (props: MakeFormProps) => {
     error: false,
   });
 
+  const [popoverAnchor, setPopoverAnchor] = React.useState<HTMLElement | null>(null);
+  const formDivRef = React.useRef<HTMLDivElement | null>(null);
+
   const submitCallback = async ({ shop, orders }: MakeFormValues) => {
     if (!shop) return;
 
@@ -86,12 +94,16 @@ export const MakeForm = (props: MakeFormProps) => {
       helper: '',
     });
 
+    const orderObj = {
+      shop: shop.id,
+      orders,
+      from: props.user.username,
+    } as Omit<Order, 'id'>;
+
     await fetch('api/prisma?collection=orders&method=create', {
+      method: 'POST',
       body: JSON.stringify({
-        data: {
-          shop,
-          orders,
-        },
+        data: orderObj,
       }),
     });
   };
@@ -116,7 +128,39 @@ export const MakeForm = (props: MakeFormProps) => {
         }
 
         return (
-          <>
+          <div
+            ref={formDivRef}
+          >
+            <Popover
+              open={Boolean(popoverAnchor)}
+              anchorOrigin={{
+                horizontal: 'center',
+                vertical: 'center',
+              }}
+              transformOrigin={{
+                horizontal: 'center',
+                vertical: 'center',
+              }}
+            >
+              <h3>Confirm Your Order from {values.shop?.name}</h3>
+              <ol>
+                {values.orders.map((order, i) => <li key={i}>{order}</li>)}
+              </ol>
+              <div>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="success"
+                >Confirm
+                </Button>
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => setPopoverAnchor(null)}
+                >Go Back
+                </Button>
+              </div>
+            </Popover>
             <Form>
               <ShopSelector
                 communities={props.communities}
@@ -169,7 +213,6 @@ export const MakeForm = (props: MakeFormProps) => {
                               <InputAdornment position="end">
                                 <TooltipButton
                                   tooltip={`Add ${orderField.value} to list`}
-                                  type="submit"
                                   disabled={orderField.value === '' || formik.isSubmitting}
                                   onClick={() => addItem(orderField.value)}
                                 >
@@ -208,7 +251,7 @@ export const MakeForm = (props: MakeFormProps) => {
                       </List>
                     </>
                   );
-                }}
+                } }
               </FieldArray>
             </Form>
             <div>
@@ -226,17 +269,17 @@ export const MakeForm = (props: MakeFormProps) => {
               </Button>
               <TooltipButton
                 disabled={values.orders.length === 0
-                      || values.orders.find((order) => order === '') !== undefined
-                      || values.shop === null
-                      || formik.isSubmitting}
-                type="submit"
+                  || values.orders.find((order) => order === '') !== undefined
+                  || values.shop === null
+                  || formik.isSubmitting}
                 tooltip={submitMessage}
                 tooltipOnDisabled
+                onClick={() => setPopoverAnchor(formDivRef.current)}
               >
                 Place Orders
               </TooltipButton>
             </div>
-          </>
+          </div>
         );
       } }
     </Formik>

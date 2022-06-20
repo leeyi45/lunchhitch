@@ -1,9 +1,8 @@
 import requests
 
 def main():
-    resp = requests.post('http://localhost:3000/api/userinfo?method=findFirst', json={
+    resp = requests.post('http://localhost:3000/api/prisma?collection=order&method=findMany', json={
         'where': {
-            'id': 'leeyi45'
         }
     })
     print(resp.text)
