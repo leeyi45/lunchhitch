@@ -8,3 +8,7 @@ export function wrapIntoPromise<T>(result: (T | Promise<T>)) {
 }
 
 export type KeysOfType<T, K = any> = { [P in keyof T]: T[P] extends K ? P : never }[keyof T];
+
+export function entries<T extends { [key: string]: any }>(obj: T) {
+  return Object.entries(obj) as [KeysOfType<T, string>, T[string]][];
+}

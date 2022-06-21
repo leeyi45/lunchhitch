@@ -1,35 +1,12 @@
 import React from 'react';
-import { FormikHelpers } from 'formik';
 import { RedirectOnAuth } from '../../common/auth_wrappers';
 import Redirecter from '../../common/redirecter';
 import { signUp } from '../../auth';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { firebaseErrorHandler } from '../../firebase';
 
-type SignUpFormValues = {
-  displayName: string;
-  email: string;
-  username: string;
-  password: string;
-  repeatPass: string;
-};
-
 export default function SignUpPage() {
   const [signUpSuccess, setSignUpSuccess] = React.useState(false);
-
-  const submitCallback = async (values : SignUpFormValues) => {
-    await signUp(values);
-    setSignUpSuccess(true);
-  };
-
-  const errorCallback = (error: any, actions: FormikHelpers<SignUpFormValues>) => {
-    actions.setFieldValue('password', '', false);
-    actions.setFieldValue('repeatPass', '', false);
-
-    return firebaseErrorHandler(error, {
-      'email-already-exists': 'An account with this username already exists',
-    });
-  };
 
   return (
     <RedirectOnAuth redirect="./profile">
@@ -71,8 +48,18 @@ export default function SignUpPage() {
                     initialValue: '', type: 'text', labelText: 'Repeat Password', required: true,
                   },
                 }}
-                onSubmit={submitCallback}
-                onSubmitError={errorCallback}
+                onSubmit={async (values) => {
+                  await signUp(values);
+                  setSignUpSuccess(true);
+                }}
+                onSubmitError={(error, actions) => {
+                  actions.setFieldValue('password', '', false);
+                  actions.setFieldValue('repeatPass', '', false);
+
+                  return firebaseErrorHandler(error, {
+                    'email-already-exists': 'An account with this username already exists',
+                  });
+                }}
                 preValidate={({ password, repeatPass }) => {
                   if (password !== repeatPass) {
                     return { password: 'Passwords did not match!' };
