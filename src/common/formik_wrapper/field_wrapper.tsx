@@ -129,6 +129,7 @@ export const PasswordField = ({ fieldName, labelText, hint }: PasswordFieldProps
           value={field.value}
           onBlur={field.onBlur}
           onChange={(event) => form.setFieldValue(fieldName || 'password', event.target.value)}
+          error={form.errors[fieldName || 'password'] !== undefined}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
