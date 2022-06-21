@@ -10,6 +10,7 @@
     "clean": "rm -rf .next && yarn cache clean",
     "db:pull": "prisma db pull --force",
     "db:generate": "prisma generate",
+    "docs:serve": "python docs/dev_server.py",
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
     "build": "next build",
     "start": "next start",
