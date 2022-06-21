@@ -17,43 +17,30 @@ function UserHomePage({ user }: { user: LunchHitchUser }) {
   );
 }
 
-/*
-const NoUserHomePage = () => (
-  <body style={{
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'absolute',
-  }}
-  >
-    <Typography
-      variant="h1"
-      component="div"
-      style={{
-        flexGrow: 1,
-        textAlign: 'center',
-        fontFamily: 'Raleway',
-        color: 'black',
-      }}
-    >
-      Welcome to Lunch Hitch!
-    </Typography>
-    <p style={{
-      textAlign: 'center',
-    }}
-    >
-      Where food meets community
-    </p>
-  </body>
-);
-*/
+
 
 export default function IndexPage() {
   const { user, status } = useSession();
 
   switch (status) {
-    case 'unauthenticated': return <NoUserHomePage />;
-    case 'loading': return <CircularProgress />;
-    case 'authenticated': return <UserHomePage user={user} />;
+    case 'unauthenticated': return (
+      <>
+        <Navbar />
+        <NoUserHomePage />
+      </>
+      );
+    case 'loading': return (
+      <>
+        <Navbar />
+        <CircularProgress />
+      </>
+      );
+    case 'authenticated': return (
+      <>
+        <Navbar />
+        <UserHomePage user={user}/>
+      </>
+      );
     default: throw new Error('Should not get here');
   }
 }

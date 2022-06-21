@@ -1,4 +1,6 @@
 import React from 'react';
+import { FormikHelpers } from 'formik';
+import Link from 'next/link';
 import { RedirectOnAuth } from '../../common/auth_wrappers';
 import Redirecter from '../../common/redirecter';
 import { signUp } from '../../auth';
@@ -68,6 +70,7 @@ export default function SignUpPage() {
                 }}
                 submitButtonText="Sign Up"
               />
+              <Link href="/auth/login">Back to Login</Link>
             </div>
           )
       }
