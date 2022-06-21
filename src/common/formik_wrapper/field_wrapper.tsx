@@ -124,11 +124,12 @@ export const PasswordField = ({ fieldName, labelText, hint }: PasswordFieldProps
       fieldName={fieldName || 'password'}
       labelText={labelText || 'Password'}
       type={showPassword ? 'text' : 'password'}
-      renderInput={({ field }) => (
+      renderInput={({ field, form }) => (
         <TextField
           value={field.value}
           onBlur={field.onBlur}
-          onChange={field.onChange}
+          onChange={(event) => form.setFieldValue(fieldName || 'password', event.target.value)}
+          error={form.errors[fieldName || 'password'] !== undefined}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">

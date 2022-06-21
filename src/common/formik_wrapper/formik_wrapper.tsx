@@ -6,10 +6,10 @@ import { Button, ButtonProps } from '@mui/material';
 import FieldWrapper, { FieldWrapperProps, PasswordField } from './field_wrapper';
 
 type FormikWrapperValues = {
-  [name: string]: string;
+  [name: string]: any;
 };
 
-type FieldConfig = Omit<FieldWrapperProps, 'fieldName'> & {
+type FieldConfig<T> = Omit<FieldWrapperProps, 'fieldName'> & {
   /**
    * Set this value to undefined if this field isn't required\
    * Set this value to `true` to display the default error message when the field wasn't filled
@@ -20,11 +20,11 @@ type FieldConfig = Omit<FieldWrapperProps, 'fieldName'> & {
   /**
    * The initial value of the field
    */
-  initialValue: any;
+  initialValue: T;
 }
 
 export type FormikWrapperProps<Values extends FormikWrapperValues> = {
-    fields: { [K in keyof Values]: FieldConfig };
+    fields: { [K in keyof Values]: FieldConfig<Values[K]> };
     /**
      * Submission callback
      */
@@ -34,7 +34,7 @@ export type FormikWrapperProps<Values extends FormikWrapperValues> = {
      * Validation callback called before the internal validation callback that checks for empty fields
      */
 
-    preValidate?: (values: Values) => Partial<Values>;
+    preValidate?: (values: Values) => { [K in keyof Values]?: string };
 
     /**
      * Boolean value indicating if a form reset button should be displayed
@@ -149,7 +149,7 @@ function FormikWrapper<Values extends FormikWrapperValues>({
   );
 }
 
-const passwordField: FieldConfig & { isPasswordField: true } = {
+const passwordField: FieldConfig<string> & { isPasswordField: true } = {
   type: 'password',
   initialValue: '',
   required: true,
