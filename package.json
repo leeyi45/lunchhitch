@@ -3,16 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts-info": {
+    "//note": "Make sure the prisma client is generated before beginning development",
     "clean": "Delete cached files",
-    "dev": "Run the development server"
+    "db:generate": "Update the prisma client based on the prisma schema",
+    "dev": "Run the development server",
+    "docs:server": "Run a local http server serving the docs folder"
   },
   "scripts": {
+    "build": "next build",
     "clean": "rm -rf .next && yarn cache clean",
     "db:pull": "prisma db pull --force",
     "db:generate": "prisma generate",
-    "docs:serve": "python docs/dev_server.py",
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
-    "build": "next build",
+    "docs:serve": "python docs/dev_server.py",
     "start": "next start",
     "lint": "next lint && eslint -c .eslintrc.js"
   },
