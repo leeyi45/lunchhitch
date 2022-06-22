@@ -1,3 +1,3 @@
 [submodule "lunchhitch-docs"]
 	path = docs
-	url = https://github.com/lunchhitch/lunchhitch-docs
+	url = git@github.com:lunchhitch/lunchhitch-docs.git
