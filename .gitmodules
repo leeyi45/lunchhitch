@@ -1,0 +1,3 @@
+[submodule "lunchhitch-docs"]
+	path = lunchhitch-docs
+	url = https://github.com/lunchhitch/lunchhitch-docs
