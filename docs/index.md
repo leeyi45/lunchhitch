@@ -1,37 +1,82 @@
-## Welcome to GitHub Pages
+Developer's Guide 
 
-You can use the [editor on GitHub](https://github.com/lunchhitch/lunchhitch/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+Quick links for developer's guide
+=================================
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+*   [Tech Stack](#tech-stack)
+*   [Getting started](#quickstart)
 
-### Markdown
+Tech Stack
+----------
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+This section contains information on the different frameworks used by this project
 
-```markdown
-Syntax highlighted code block
+### yarn
 
-# Header 1
-## Header 2
-### Header 3
+`yarn` serves as the javascript/typescript package manager for the project
 
-- Bulleted
-- List
+### Typescript
 
-1. Numbered
-2. List
+The project is written mainly in typescript, augmenting javascript with type checking to improve the robustness of our code.
 
-**Bold** and _Italic_ and `Code` text
+### NextJS
 
-[Link](url) and ![Image](src)
+NextJS is a fullstack framework designed around React, allowing us to develop our project as a single server instead of a separate frontend and backend. It also comes with different integrated components, like `next/router`, saving us the hassle of installing other packages like `react-router`, and optional components, like `next-auth`, which provides authentication.
+
+#### NextAuth
+
+`next-auth` serves as our library for managing authentication, chosen for its integration with NextJS.
+
+### Firebase
+
+To avoid having to hash and store passwords ourselves and thus exposing potential security vulnerabilites, this project utilizes Firebase to manage user accounts
+
+### MongoDB/Mongo Atlas
+
+Our database of choice is MongoDB, hosted by MongoDB's [cloud](https://mongodb.com) services
+
+#### Prisma
+
+Prisma serves as an ORM for the project. Combined with typescript, it allows for rich type checking while making transactions with our database
+
+Getting Started
+---------------
+
+### Installing Dependencies
+
+Building the project requires NodeJS and yarn. Download NodeJS 16.15.x from [here](https://nodejs.org/download/release/latest-v16.x/)
+
+Installing yarn is then as simple as running `npm install yarn`, with the `-g` flag if you're installing it globally
+
+### Building the Project
+
+First, clone the repository from [github](https://github.com/leeyi45/lunchhitch)
+
+Enter the project directory, then run `yarn install`. This should install all the packages that the project requires
+
+The basic repository structure is as follows:
+
+```
+.
+├── prisma                       // Prisma configuration
+│   └── prisma.schema
+├── src
+│   ├── common                   // Common and reused React components go here
+│   ├── pages                    // NextJS will serve these as pages on the webserver
+│   │   ├── api                  // NextJS API based routes
+│   │   └── auth
+│   │       └── [...nextauth].ts // NextAuth configuration
+│   └── styles                   // CSS and styles go here
+├── testing                      // Code used for testing
+├── .eslintrc.js                 // eslint configuration
+└── .env                         // Configure environment variables
+
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+### Environment Variables
 
-### Jekyll Themes
+Before starting the project, the following environment variables need to be set:
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/lunchhitch/lunchhitch/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+*   DATABASE\_URL
+*   DATABASE\_USERNAME
+*   DATABASE\_PASSWORD
