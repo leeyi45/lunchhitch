@@ -4,6 +4,7 @@ import {
   reauthenticateWithCredential, sendPasswordResetEmail, updatePassword, User,
 } from '@firebase/auth';
 import { FormikHelpers } from 'formik';
+import Link from 'next/link';
 import React from 'react';
 import { LunchHitchUser, useSession } from '../../auth';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
@@ -48,6 +49,7 @@ function NoUserResetPage() {
           border: '5px solid #50C878',
         }}
         >
+          <p style={{color: "#50C878", fontSize: "20px"}}>Enter your email and we'll send you a link to reset your password.</p>
           <FormikWrapper
             fields={{
               email: {
@@ -57,6 +59,7 @@ function NoUserResetPage() {
             onSubmit={emailCallback}
             submitButtonText="Send Reset Email"
           />
+          <Link href="/auth/login">Back to Login</Link>
         </div>
       </>
     );

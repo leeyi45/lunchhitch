@@ -1,0 +1,9 @@
+.UserHomePage {
+    background: url('../../media/try.jpg') no-repeat;
+    background-size: cover;
+    color: #50C878 ;
+    text-align: center;
+    padding-top: 241px;
+    padding-bottom: 241px;
+    font-family: 'raleway';
+}
