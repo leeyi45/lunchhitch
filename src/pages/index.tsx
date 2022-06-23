@@ -25,7 +25,7 @@ export default function IndexPage() {
       );
     case 'authenticated': return (
       <>
-        <Navbar />
+        <Navbar user={user}/>
         <UserHomePage user={user}/>
       </>
       );
