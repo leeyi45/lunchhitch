@@ -54,23 +54,25 @@ export default function LoginPage() {
           border: '5px solid #50C878',
         }}
         >
-          {loginError}
           <Formik
             initialValues={{
               username: '',
               password: '',
             }}
-            validateOnChange={false}
-            validateOnBlur={false}
+            validateOnChange
+            validateOnBlur
+            validateOnMount={false}
             validationSchema={yup.object({
-              username: yup.string().required(),
-              password: yup.string().required(),
+              username: yup.string().required('Username is required!'),
+              password: yup.string().required('Password is required!'),
             })}
             onSubmit={async (values, actions) => {
               try {
                 const result = await signIn(values);
 
                 if (!result.ok) throw result.error;
+
+                // router.push('/profile');
               } catch (error: any) {
                 actions.setFieldValue('password', '');
                 setLoginError(firebaseErrorHandler(error, {
@@ -89,6 +91,7 @@ export default function LoginPage() {
                     flexDirection: 'column',
                   }}
                 >
+                  {loginError || Object.values(errors).at(0)}<br />
                   Username
                   <TextField
                     type="text"

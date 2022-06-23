@@ -64,17 +64,12 @@ async function prismaFetch(username: string, method: string, args: any) {
 /**
  * Sign in with the given username and password
  */
-export async function signIn(creds: Credential) {
-  debugger;
-  return await nextAuthSignIn('credentials', { ...creds, redirect: false }) as unknown as SignInResponse;
-}
+export const signIn = async (creds: Credential) => await nextAuthSignIn('credentials', { ...creds, redirect: false }) as unknown as SignInResponse;
 
 /**
  * Sign out the current user. Wraps around both the NextAuth signOut and Firebase signOut methods
  */
-export async function signOut() {
-  await Promise.all([firebaseSignOut(FIREBASE_AUTH), nextAuthSignOut({ redirect: false })]);
-}
+export const signOut = async() => await Promise.all([firebaseSignOut(FIREBASE_AUTH), nextAuthSignOut({ redirect: false })]);
 
 type SignUpParams = {
   username: string;
