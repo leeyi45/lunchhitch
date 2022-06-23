@@ -7,7 +7,7 @@ module.exports = {
     es2021: true,
   },
   extends: [
-    // 'eslint-config-prettier',
+    'eslint-config-prettier',
     'airbnb',
     'plugin:@next/next/recommended',
     'plugin:react/recommended',
