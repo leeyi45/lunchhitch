@@ -36,13 +36,27 @@ export default function NavBar({ user }: NavbarProps) {
   return (
     <AppBar position="static" style={{ background: '#50C878' }}>
       <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          style={{ flexGrow: 1, textAlign: 'left' }}
-        >
-          Lunch Hitch
-        </Typography>
+        { user
+          ? (
+            <Link href='http://localhost:3000/'>
+              <Typography
+                variant="h6"
+                component="div"
+                style={{ flexGrow: 1, textAlign: 'left' }}
+              >
+                Lunch Hitch
+              </Typography>
+            </Link>
+          ) : (
+            <Typography
+              variant="h6"
+              component="div"
+              style={{ flexGrow: 1, textAlign: 'left' }}
+            >
+              Lunch Hitch
+            </Typography>
+          )
+        }
         <div>
           <IconButton
             size="medium"
