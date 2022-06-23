@@ -3,7 +3,7 @@ import { FormikHelpers } from 'formik';
 import Link from 'next/link';
 import { RedirectOnAuth } from '../../common/auth_wrappers';
 import Redirecter from '../../common/redirecter';
-import { signUp } from '../../auth';
+import { signUp } from '../../auth/auth';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { firebaseErrorHandler } from '../../firebase';
 

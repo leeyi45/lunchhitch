@@ -15,7 +15,7 @@ import {
 import { Community, Order, Shop } from '@prisma/client';
 import ShopSelector from './shop_selector';
 import TooltipButton from '../../common/tooltip_button';
-import { LunchHitchUser } from '../../auth';
+import { LunchHitchUser } from '../../auth/auth';
 
 const MAX_ORDERS = 10;
 

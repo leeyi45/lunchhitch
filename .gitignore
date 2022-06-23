@@ -4,7 +4,6 @@
 /node_modules
 /.pnp
 .pnp.js
-*.lock
 
 # testing
 /coverage
@@ -30,6 +29,7 @@ yarn-error.log*
 # local env files
 .env*
 /.vscode/
+firebase-admin-creds.json
 
 # vercel
 .vercel

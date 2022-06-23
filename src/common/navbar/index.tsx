@@ -8,7 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import { LunchHitchUser } from '../../auth';
+import { LunchHitchUser } from '../../auth/auth';
 
 export type NavbarProps = {
   user?: LunchHitchUser | null;

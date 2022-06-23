@@ -11,7 +11,7 @@ import { useRouter } from 'next/router';
 import { Button, InputAdornment, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { signIn } from '../../auth';
+import { signIn } from '../../auth/auth';
 import { RedirectOnAuth } from '../../common/auth_wrappers';
 import { firebaseErrorHandler } from '../../firebase';
 

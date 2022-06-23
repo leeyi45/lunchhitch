@@ -1,5 +1,5 @@
 import React from 'react';
-import { LunchHitchUser } from '../auth';
+import { LunchHitchUser } from '../auth/auth';
 import { AuthRequired } from '../common/auth_wrappers';
 import NavBar from '../common/navbar';
 

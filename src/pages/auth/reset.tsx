@@ -6,7 +6,7 @@ import {
 import { FormikHelpers } from 'formik';
 import Link from 'next/link';
 import React from 'react';
-import { LunchHitchUser, useSession } from '../../auth';
+import { LunchHitchUser, useSession } from '../../auth/auth';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { firebaseErrorHandler, FIREBASE_AUTH } from '../../firebase';
 // import prisma from '../../prisma';

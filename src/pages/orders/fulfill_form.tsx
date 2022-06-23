@@ -2,7 +2,7 @@ import React from 'react';
 import { Community, Order, Shop } from '@prisma/client';
 import { Formik } from 'formik';
 import { CircularProgress, List, ListItem } from '@mui/material';
-import { LunchHitchUser } from '../../auth';
+import { LunchHitchUser } from '../../auth/auth';
 import ShopSelector from './shop_selector';
 import useAsync from '../../common/async';
 

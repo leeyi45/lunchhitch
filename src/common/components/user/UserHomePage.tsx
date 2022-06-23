@@ -1,4 +1,4 @@
-import { LunchHitchUser } from '../../../auth';
+import { LunchHitchUser } from '../../../auth/auth';
 import SwipeableEdgeDrawer from "../SwipeableEdgeDrawer/SwipeableEdgeDrawer";
 import { Button } from '@mui/material';
 

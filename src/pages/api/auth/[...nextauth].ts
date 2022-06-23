@@ -1,7 +1,7 @@
 import { signInWithEmailAndPassword } from '@firebase/auth';
 import NextAuth from 'next-auth/next';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { LunchHitchUser } from '../../../auth';
+import { LunchHitchUser } from '../../../auth/auth';
 import { FIREBASE_AUTH } from '../../../firebase';
 import prisma from '../../../prisma';
 

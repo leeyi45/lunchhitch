@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'next-auth/react';
-import { LunchHitchUser } from './auth';
+import { LunchHitchUser } from './auth/auth';
 import { wrapIntoPromise } from './common';
 
 type Params = {

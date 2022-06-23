@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
-import { LunchHitchUser, useSession } from '../../auth';
+import { LunchHitchUser } from '../../auth/auth';
+import { useSession } from '../../auth/auth_provider';
 import AuthSelector from './auth_selector';
 
 type Props = {
@@ -13,13 +14,12 @@ type Props = {
  */
 export function AuthRequired({ children }: Props) {
   const router = useRouter();
-  const { user } = useSession({
-    required: true,
-    onUnauthenticated: () => router.push('/auth/login'),
-  });
+  const { status, user } = useSession();
 
-  // User will never be null here because of the router redirect
-  return children(user!);
+  if (status === 'authenticated') return children(user);
+
+  router.push('/auth/login');
+  return user as never;
 }
 
 type RedirectProps = {
@@ -35,7 +35,10 @@ export function RedirectOnAuth({ redirect, children }: RedirectProps) {
   const router = useRouter();
   const { status } = useSession();
 
-  if (status === 'authenticated') router.push(redirect);
+  if (status === 'authenticated') {
+    router.push(redirect);
+    return undefined as never;
+  }
   else if (status === 'loading') return 'Loading...';
 
   return children;

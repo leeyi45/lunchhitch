@@ -3,12 +3,12 @@
  * Functions for managing users
  */
 import {
-  createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile, User,
 } from '@firebase/auth';
 import {
   signOut as nextAuthSignOut, signIn as nextAuthSignIn, SignInResponse, useSession as useAuthSession, UseSessionOptions,
 } from 'next-auth/react';
-import { FIREBASE_AUTH } from './firebase';
+import { FIREBASE_AUTH } from '../firebase';
 // import prisma from './prisma';
 
 const DEFAULT_DOMAIN = 'lunchhitch.firebaseapp.com';
@@ -22,30 +22,8 @@ export type LunchHitchUser = {
   username: string;
   email: string;
   displayName: string;
-  // Because there is a limit to the size of the JWT, we can't store the firebase user
-  // object here
-  // firebaseObj: User;
+  firebaseObj: User;
 };
-
-// TODO migrate to server side???
-/**
- * Wrapper around the nextauth useSession hook
- */
-export function useSession(options: UseSessionOptions<boolean> = { required: false }) {
-  const { data: session, status } = useAuthSession(options);
-
-  if (status !== 'authenticated') {
-    return {
-      user: null,
-      status,
-    };
-  }
-
-  return {
-    user: session.user as LunchHitchUser,
-    status,
-  };
-}
 
 async function prismaFetch(username: string, method: string, args: any) {
   const resp = await fetch(`/api/userinfo?username=${username}&method=${method}`, {
@@ -65,15 +43,15 @@ async function prismaFetch(username: string, method: string, args: any) {
  * Sign in with the given username and password
  */
 export async function signIn(creds: Credential) {
-  debugger;
-  return await nextAuthSignIn('credentials', { ...creds, redirect: false }) as unknown as SignInResponse;
+  await signInWithEmailAndPassword(FIREBASE_AUTH, `${creds.username}@${DEFAULT_DOMAIN}}`, creds.password);
 }
 
 /**
  * Sign out the current user. Wraps around both the NextAuth signOut and Firebase signOut methods
  */
 export async function signOut() {
-  await Promise.all([firebaseSignOut(FIREBASE_AUTH), nextAuthSignOut({ redirect: false })]);
+  await firebaseSignOut(FIREBASE_AUTH);
+  // await Promise.all([firebaseSignOut(FIREBASE_AUTH), nextAuthSignOut({ redirect: false })]);
 }
 
 type SignUpParams = {

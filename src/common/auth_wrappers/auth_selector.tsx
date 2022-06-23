@@ -1,5 +1,6 @@
 import { ReactElement } from 'react';
-import { LunchHitchUser, useSession } from '../../auth';
+import { LunchHitchUser } from '../../auth/auth';
+import { useSession } from '../../auth/auth_provider';
 
 type Props = {
     children: any;
