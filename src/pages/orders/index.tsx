@@ -38,205 +38,106 @@ export default function OrdersPage(props: Props) {
       ref={divRef}
     >
       <NavBar user={user} />
+      <p></p>
       <ShopSelector
         communities={props.communities}
         value={shop}
         onChange={setShop}
       />
-      <div
-        style={{
+      <div style={{
           display: 'flex',
           flexDirection: 'row',
         }}
       >
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          paddingRight: '10px',
-        }}
-        >
-          <NavBar user={user} />
-          <p></p>
-          <ShopSelector
-            communities={props.communities}
-            value={shop}
-            onChange={setShop}
-          />
+        <Box>
           <div style={{
-              display: 'flex',
-              flexDirection: 'row',
-            }}
-          >
-            <Box>
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                paddingRight: '10px',
-              }}
-              >
-                <h2 style={{color: "#47b16a"}}>Fulfill an Order!</h2>
-                <Formik<{ order: Order | null}>
-                  initialValues={{
-                    order: null,
-                  }}
-                  onSubmit={async (values) => {
-                  }}
-                >
-                  {({ isSubmitting, ...formik }) => (
-                    <Form>
-                      <FulFillForm
-                        shop={shop}
-                        isSubmitting={isSubmitting}
-                        onSelect={(order) => formik.setFieldValue('order', order)}
-                        onSubmit={formik.submitForm}
-                        popoverElement={divRef.current}
-                      />
-                    </Form>
-                  )}
-                </Formik>
-              </div>
-            </Box>
-            <Box>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignContent: 'center',
-                }}
-              >
-                <h2 style={{color: "#47b16a"}}>Place an Order!</h2>
-                <Formik
-                  initialValues={{
-                    orders: [],
-                  }}
-                  onSubmit={async (values) => {
-                    await fetch('/api/prisma?collection=orders&method=create', {
-                      method: 'POST',
-                      body: JSON.stringify({
-                        where: {
-                          from: user.username,
-                          orders: values.orders,
-                          shop: shop!.id,
-                        },
-                      }),
-                    });
-                  }}
-                >
-                  {({ isSubmitting, ...formik }) => (
-                    <Form>
-                      <Popover
-                        open={Boolean(makePopover)}
-                        anchorEl={divRef.current}
-                      >
-                        Confirm your order from {shop?.name}:
-                        <ol>
-                          {formik.values.orders.map((order, i) => (<li key={i}>{order}</li>))}
-                        </ol>
-                        <Button
-                          color="success"
-                          onClick={formik.submitForm}
-                        >
-                          Confirm
-                        </Button>
-                        <Button
-                          color="error"
-                          onClick={() => setMakePopover(false)}
-                        >
-                          Cancel
-                        </Button>
-                      </Popover>
-                      <MakeForm
-                        popoverElement={divRef.current!}
-                        isSubmitting={isSubmitting}
-                        onSubmit={() => setMakePopover(true)}
-                        onChange={(newValue) => formik.setFieldValue('orders', newValue)}
-                      />
-                    </Form>
-                  )}
-                </Formik>
-              </div>
-            </Box>
-          </div>
-=======
-          <h2>Fulfill an Order!</h2>
-          <Formik<{ order: Order | null}>
-            initialValues={{
-              order: null,
-            }}
-            onSubmit={async (values) => {
-            }}
-          >
-            {({ isSubmitting, ...formik }) => (
-              <Form>
-                <FulFillForm
-                  shop={shop}
-                  isSubmitting={isSubmitting}
-                  onSelect={(order) => formik.setFieldValue('order', order)}
-                  onSubmit={formik.submitForm}
-                  popoverElement={divRef.current}
-                />
-              </Form>
-            )}
-          </Formik>
-        </div>
-        <div
-          style={{
             display: 'flex',
             flexDirection: 'column',
-            alignContent: 'center',
+            paddingRight: '10px',
           }}
-        >
-          <h2>Place an Order!</h2>
-          <Formik
-            initialValues={{
-              orders: [],
-            }}
-            onSubmit={async (values) => {
-              await fetch('/api/prisma?collection=orders&method=create', {
-                method: 'POST',
-                body: JSON.stringify({
-                  where: {
-                    from: user.username,
-                    orders: values.orders,
-                    shop: shop!.id,
-                  },
-                }),
-              });
+          >
+            <h2 style={{color: "#47b16a"}}>Fulfill an Order!</h2>
+            <Formik<{ order: Order | null}>
+              initialValues={{
+                order: null,
+              }}
+              onSubmit={async (values) => {
+              }}
+            >
+              {({ isSubmitting, ...formik }) => (
+                <Form>
+                  <FulFillForm
+                    shop={shop}
+                    isSubmitting={isSubmitting}
+                    onSelect={(order) => formik.setFieldValue('order', order)}
+                    onSubmit={formik.submitForm}
+                    popoverElement={divRef.current}
+                  />
+                </Form>
+              )}
+            </Formik>
+          </div>
+        </Box>
+        <Box>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignContent: 'center',
             }}
           >
-            {({ isSubmitting, ...formik }) => (
-              <Form>
-                <Popover
-                  open={Boolean(makePopover)}
-                  anchorEl={divRef.current}
-                >
-                  Confirm your order from {shop?.name}:
-                  <ol>
-                    {formik.values.orders.map((order, i) => (<li key={i}>{order}</li>))}
-                  </ol>
-                  <Button
-                    color="success"
-                    onClick={formik.submitForm}
+            <h2 style={{color: "#47b16a"}}>Place an Order!</h2>
+            <Formik
+              initialValues={{
+                orders: [],
+              }}
+              onSubmit={async (values) => {
+                await fetch('/api/prisma?collection=orders&method=create', {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    where: {
+                      from: user.username,
+                      orders: values.orders,
+                      shop: shop!.id,
+                    },
+                  }),
+                });
+              }}
+            >
+              {({ isSubmitting, ...formik }) => (
+                <Form>
+                  <Popover
+                    open={Boolean(makePopover)}
+                    anchorEl={divRef.current}
                   >
-                    Confirm
-                  </Button>
-                  <Button
-                    color="error"
-                    onClick={() => setMakePopover(false)}
-                  >
-                    Cancel
-                  </Button>
-                </Popover>
-                <MakeForm
-                  popoverElement={divRef.current!}
-                  isSubmitting={isSubmitting}
-                  onSubmit={() => setMakePopover(true)}
-                  onChange={(newValue) => formik.setFieldValue('orders', newValue)}
-                />
-              </Form>
-            )}
-          </Formik>
-        </div>
+                    Confirm your order from {shop?.name}:
+                    <ol>
+                      {formik.values.orders.map((order, i) => (<li key={i}>{order}</li>))}
+                    </ol>
+                    <Button
+                      color="success"
+                      onClick={formik.submitForm}
+                    >
+                      Confirm
+                    </Button>
+                    <Button
+                      color="error"
+                      onClick={() => setMakePopover(false)}
+                    >
+                      Cancel
+                    </Button>
+                  </Popover>
+                  <MakeForm
+                    popoverElement={divRef.current!}
+                    isSubmitting={isSubmitting}
+                    onSubmit={() => setMakePopover(true)}
+                    onChange={(newValue) => formik.setFieldValue('orders', newValue)}
+                  />
+                </Form>
+              )}
+            </Formik>
+          </div>
+        </Box>
       </div>
     </div>
   );
