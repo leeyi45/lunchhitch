@@ -39,7 +39,10 @@ function NoUserResetPage() {
   };
 
   return emailSent ? (
-    <p>A reset email has been sent to the provided email if there is an account associated with it</p>
+    <>
+      <p style={{fontSize: "30px"}}>A reset email has been sent to the provided email if there is an account associated with it</p>
+      <Link href="./login">Back to Login</Link>
+    </>
   )
     : (
       <>
