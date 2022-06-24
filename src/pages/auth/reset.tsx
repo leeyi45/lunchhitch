@@ -1,15 +1,14 @@
 import {
   EmailAuthProvider,
-  onAuthStateChanged,
   reauthenticateWithCredential, sendPasswordResetEmail, updatePassword, User,
 } from '@firebase/auth';
 import { FormikHelpers } from 'formik';
 import Link from 'next/link';
 import React from 'react';
-import { LunchHitchUser, useSession } from '../../auth';
+import { LunchHitchUser } from '../../auth';
+import { AuthSelector } from '../../common/auth_wrappers';
 import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
 import { firebaseErrorHandler, FIREBASE_AUTH } from '../../firebase';
-// import prisma from '../../prisma';
 
 function NoUserResetPage() {
   const [emailSent, setEmailSent] = React.useState(false);
@@ -17,14 +16,22 @@ function NoUserResetPage() {
 
   const emailCallback = async ({ email }: { email: string }) => {
     try {
-      // Check with the database if the email is stored in it
-      // const userResult = await prisma.userInfo.findFirst({
+      const userResult = await fetch(`/api/prisma?collection=userInfo&method=findFirst`, {
+        method: 'POST',
+        body: JSON.stringify({
+          where: {
+            email,
+          }
+        })
+      })
+
+      // const userResult = await prismaFetch('userInfo', 'findFirst', {
       //   where: {
       //     email,
-      //   },
+      //   }
       // });
 
-      // if (userResult) await sendPasswordResetEmail(FIREBASE_AUTH, email);
+      if (userResult) await sendPasswordResetEmail(FIREBASE_AUTH, email);
       setEmailSent(true);
     } catch (error: any) {
       if (error.code !== 'auth/user-not-found') setResetError(`Unknown error occurred: ${error.code}`);
@@ -49,7 +56,7 @@ function NoUserResetPage() {
           border: '5px solid #50C878',
         }}
         >
-          <p style={{color: "#50C878", fontSize: "20px"}}>Enter your email and we'll send you a link to reset your password.</p>
+          <p style={{ color: '#50C878', fontSize: '20px' }}>Enter your email and we'll send you a link to reset your password.</p>
           <FormikWrapper
             fields={{
               email: {
@@ -93,8 +100,9 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
   };
 
   const submitCallback = async ({ oldPass, newPass }: UserResetFormValues) => {
-    await reauthenticateWithCredential(user.firebaseObj, EmailAuthProvider.credential(user.email!, oldPass));
-    await updatePassword(user.firebaseObj, newPass);
+    const currentUser = FIREBASE_AUTH.currentUser!;
+    await reauthenticateWithCredential(currentUser, EmailAuthProvider.credential(user.email!, oldPass));
+    await updatePassword(currentUser, newPass);
     setResetDone(true);
   };
 
@@ -128,6 +136,14 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
  * Password reset page
  */
 export default function ResetPage() {
-  const { user, status } = useSession();
-  return status === 'authenticated' ? <UserResetPage user={user} /> : <NoUserResetPage />;
+  return (
+    <AuthSelector>
+      <AuthSelector.Authenticated>
+        {(user) => (<UserResetPage user={user} />)}
+      </AuthSelector.Authenticated>
+      <AuthSelector.Unauthenticated>
+        <NoUserResetPage />
+      </AuthSelector.Unauthenticated>
+    </AuthSelector>
+  );
 }

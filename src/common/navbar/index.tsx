@@ -7,7 +7,8 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
+import { signIn, signOut } from 'next-auth/react';
+import Button from '@mui/material/Button';
 import { LunchHitchUser } from '../../auth';
 
 export type NavbarProps = {
@@ -38,7 +39,7 @@ export default function NavBar({ user }: NavbarProps) {
       <Toolbar>
         { user
           ? (
-            <Link href='http://localhost:3000/'>
+            <Link href="/">
               <Typography
                 variant="h6"
                 component="div"
@@ -55,8 +56,7 @@ export default function NavBar({ user }: NavbarProps) {
             >
               Lunch Hitch
             </Typography>
-          )
-        }
+          )}
         <div>
           <IconButton
             size="medium"
@@ -95,7 +95,7 @@ export default function NavBar({ user }: NavbarProps) {
                   <MenuItem onClick={handleClose}>
                     <Link href="./profile">Profile</Link>
                   </MenuItem>
-                  <MenuItem onClick={() => signOut({ redirect: false })}>
+                  <MenuItem onClick={() => signOut({ callbackUrl: '/' })}>
                     Log out
                   </MenuItem>
                 </>
@@ -103,7 +103,8 @@ export default function NavBar({ user }: NavbarProps) {
               : (
                 <>
                   <MenuItem>
-                    <Link href="./auth/login">Log In</Link>
+                    <Button onClick={() => signIn()}>Log In</Button>
+                    {/* <Link href="./auth/login">Log In</Link> */}
                   </MenuItem>
                   <MenuItem>
                     <Link href="./auth/signup">Sign Up</Link>

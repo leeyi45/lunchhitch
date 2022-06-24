@@ -1,14 +1,13 @@
 import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useSession } from '../auth';
+import { useSession } from 'next-auth/react';
 import Navbar from '../common/navbar';
 import NoUserHomePage from '../common/components/noUser/NoUserHomePage';
 import UserHomePage from '../common/components/user/UserHomePage';
-
-
+import { LunchHitchUser } from '../auth';
 
 export default function IndexPage() {
-  const { user, status } = useSession();
+  const { data: session, status } = useSession();
 
   switch (status) {
     case 'unauthenticated': return (
@@ -16,19 +15,19 @@ export default function IndexPage() {
         <Navbar />
         <NoUserHomePage />
       </>
-      );
+    );
     case 'loading': return (
       <>
         <Navbar />
         <CircularProgress />
       </>
-      );
+    );
     case 'authenticated': return (
       <>
-        <Navbar user={user}/>
-        <UserHomePage user={user}/>
+        <Navbar user={session.user as LunchHitchUser} />
+        <UserHomePage user={session.user as LunchHitchUser} />
       </>
-      );
+    );
     default: throw new Error('Should not get here');
   }
 }
