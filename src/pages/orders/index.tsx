@@ -55,7 +55,6 @@ export default function OrdersPage(props: Props) {
           paddingRight: '10px',
         }}
         >
-<<<<<<< HEAD
           <NavBar user={user} />
           <p></p>
           <ShopSelector
@@ -81,7 +80,6 @@ export default function OrdersPage(props: Props) {
                     order: null,
                   }}
                   onSubmit={async (values) => {
-
                   }}
                 >
                   {({ isSubmitting, ...formik }) => (
@@ -166,7 +164,6 @@ export default function OrdersPage(props: Props) {
               order: null,
             }}
             onSubmit={async (values) => {
-
             }}
           >
             {({ isSubmitting, ...formik }) => (
@@ -181,7 +178,6 @@ export default function OrdersPage(props: Props) {
               </Form>
             )}
           </Formik>
->>>>>>> 7124561d0cb37e96d5a0ad5c50d4c5bfebbf0be5
         </div>
         <div
           style={{
