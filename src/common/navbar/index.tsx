@@ -49,13 +49,13 @@ export default function NavBar({ user }: NavbarProps) {
               </Typography>
             </Link>
           ) : (
-            <Typography
-              variant="h6"
-              component="div"
-              style={{ flexGrow: 1, textAlign: 'left' }}
-            >
-              Lunch Hitch
-            </Typography>
+              <Typography
+                variant="h6"
+                component="div"
+                style={{ flexGrow: 1, textAlign: 'left' }}
+              >
+                Lunch Hitch
+              </Typography>
           )}
         <div>
           <IconButton
