@@ -50,6 +50,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         )}
         value={community}
       />
+      <p></p>
       <Autocomplete
         disabled={community === null}
         getOptionLabel={(option) => option.name}
