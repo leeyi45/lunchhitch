@@ -93,10 +93,10 @@ export default function NavBar({ user }: NavbarProps) {
               ? (
                 <>
                   <MenuItem onClick={handleClose}>
-                    <Link href="./profile">Profile</Link>
+                    <Button href="./profile">Profile</Button>
                   </MenuItem>
-                  <MenuItem onClick={() => signOut({ callbackUrl: '/' })}>
-                    Log out
+                  <MenuItem>
+                    <Button onClick={() => signOut({ callbackUrl: '/' })}>Log Out</Button>
                   </MenuItem>
                 </>
               )
@@ -107,7 +107,8 @@ export default function NavBar({ user }: NavbarProps) {
                     {/* <Link href="./auth/login">Log In</Link> */}
                   </MenuItem>
                   <MenuItem>
-                    <Link href="./auth/signup">Sign Up</Link>
+                    <Button href="./auth/signup">Sign Up</Button>
+                    {/*<Link href="./auth/signup">Sign Up</Link>*/}
                   </MenuItem>
                 </>
               )}
