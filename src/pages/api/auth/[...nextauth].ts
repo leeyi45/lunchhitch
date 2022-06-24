@@ -5,6 +5,9 @@ import { FIREBASE_AUTH } from '../../../firebase';
 import prisma from '../../../prisma';
 
 export default NextAuth({
+  pages: {
+    signIn: '/auth/login',
+  },
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -23,10 +26,10 @@ export default NextAuth({
           },
         });
 
-      if (!emailResult) {
+        if (!emailResult) {
         // TODO error handling
-        throw new Error('Prisma did not return an email for this account');
-      }
+          throw new Error('Prisma did not return an email for this account');
+        }
 
         return {
           displayName: result.user.displayName,

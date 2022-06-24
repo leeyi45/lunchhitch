@@ -6,7 +6,7 @@ import {
   createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile,
 } from '@firebase/auth';
 import {
-  signOut as nextAuthSignOut, signIn as nextAuthSignIn, SignInResponse, useSession as useAuthSession, UseSessionOptions,
+  signOut as nextAuthSignOut, signIn as nextAuthSignIn, SignInResponse,
 } from 'next-auth/react';
 import { FIREBASE_AUTH } from './firebase';
 // import prisma from './prisma';
@@ -26,26 +26,6 @@ export type LunchHitchUser = {
   // object here
   // firebaseObj: User;
 };
-
-// TODO migrate to server side???
-/**
- * Wrapper around the nextauth useSession hook
- */
-export function useSession(options: UseSessionOptions<boolean> = { required: false }) {
-  const { data: session, status } = useAuthSession(options);
-
-  if (status !== 'authenticated') {
-    return {
-      user: null,
-      status,
-    };
-  }
-
-  return {
-    user: session.user as LunchHitchUser,
-    status,
-  };
-}
 
 async function prismaFetch(username: string, method: string, args: any) {
   const resp = await fetch(`/api/userinfo?username=${username}&method=${method}`, {
@@ -69,7 +49,7 @@ export const signIn = async (creds: Credential) => await nextAuthSignIn('credent
 /**
  * Sign out the current user. Wraps around both the NextAuth signOut and Firebase signOut methods
  */
-export const signOut = async() => await Promise.all([firebaseSignOut(FIREBASE_AUTH), nextAuthSignOut({ redirect: false })]);
+export const signOut = () => Promise.all([firebaseSignOut(FIREBASE_AUTH), nextAuthSignOut({ redirect: false })]);
 
 type SignUpParams = {
   username: string;
