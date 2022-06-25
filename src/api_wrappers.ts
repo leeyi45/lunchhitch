@@ -46,7 +46,8 @@ export const wrapWithQuery = <P extends Params>(
       res.status(400).json({ error: `Missing required query params: ${errors.join(', ')}` });
     } else {
       try {
-        res.status(200).json(await wrapIntoPromise(handler(req, res, queryParams)));
+        const result = await wrapIntoPromise(handler(req, res, queryParams));
+        res.status(200).json(result);
       } catch (error) {
         if (errorHandler) errorHandler(error, res);
         else if (process.env.NODE_ENV === 'production') {

@@ -65,7 +65,6 @@ export default function LoginPage() {
             username: '',
             password: '',
           }}
-          validateOnBlur
           validateOnMount={false}
           validationSchema={yup.object({
             username: yup.string().required('Username is required!'),

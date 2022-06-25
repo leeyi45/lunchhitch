@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { signIn, signOut } from 'next-auth/react';
 import Button from '@mui/material/Button';
 import { LunchHitchUser } from '../../auth';
+import { useRouter } from 'next/router';
 
 export type NavbarProps = {
   user?: LunchHitchUser | null;
@@ -21,6 +22,7 @@ export type NavbarProps = {
 export default function NavBar({ user }: NavbarProps) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [usernameText, setUsernameText] = React.useState('Login');
+  const router = useRouter();
 
   React.useEffect(() => {
     setUsernameText(user ? user.displayName : 'Login');
@@ -95,7 +97,10 @@ export default function NavBar({ user }: NavbarProps) {
                   <MenuItem onClick={handleClose}>
                     <Link href="./profile">Profile</Link>
                   </MenuItem>
-                  <MenuItem onClick={() => signOut({ callbackUrl: '/' })}>
+                  <MenuItem onClick={() => {
+                    signOut({ redirect: false });
+                    router.push('/');
+                  }}>
                     Log out
                   </MenuItem>
                 </>

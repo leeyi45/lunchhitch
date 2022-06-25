@@ -8,6 +8,7 @@ import {
 import {
   signOut as nextAuthSignOut, signIn as nextAuthSignIn, SignInResponse,
 } from 'next-auth/react';
+import { useRouter } from 'next/router';
 import { FIREBASE_AUTH } from './firebase';
 // import prisma from './prisma';
 

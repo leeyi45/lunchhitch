@@ -26,11 +26,12 @@ export default function OrdersPage(props: Props) {
     required: true,
   });
 
+  const user = session?.user as LunchHitchUser;
+  React.useEffect(() => console.log('User object is ', user), [user]);
+
   if (!session) {
     return (<CircularProgress />);
   }
-
-  const user = session!.user as LunchHitchUser;
 
   return (
     <div
@@ -86,13 +87,13 @@ export default function OrdersPage(props: Props) {
           <h2>Place an Order!</h2>
           <Formik
             initialValues={{
-              orders: [],
+              orders: [] as string[],
             }}
             onSubmit={async (values) => {
-              await fetch('/api/prisma?collection=orders&method=create', {
+              await fetch('/api/prisma?collection=order&method=create', {
                 method: 'POST',
                 body: JSON.stringify({
-                  where: {
+                  data: {
                     from: user.username,
                     orders: values.orders,
                     shop: shop!.id,
