@@ -12,7 +12,7 @@ export default function UserHomePage({ user }: { user: LunchHitchUser }) {
         component="div"
         >
           Welcome back
-          {user.displayName}
+          {/*user.displayName*/}
           !
         </Typography>
         <p style={{fontSize: '30px'}}>What will it be today?
