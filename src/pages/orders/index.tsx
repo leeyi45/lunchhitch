@@ -39,6 +39,7 @@ export default function OrdersPage(props: Props) {
       ref={divRef}
     >
       <NavBar user={user} />
+      <p></p>
       <ShopSelector
         communities={props.communities}
         value={shop}
