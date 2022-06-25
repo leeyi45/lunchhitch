@@ -9,8 +9,8 @@ import Menu from '@mui/material/Menu';
 import Link from 'next/link';
 import { signIn, signOut } from 'next-auth/react';
 import Button from '@mui/material/Button';
-import { LunchHitchUser } from '../../auth';
 import { useRouter } from 'next/router';
+import { LunchHitchUser } from '../../auth';
 
 export type NavbarProps = {
   user?: LunchHitchUser | null;
@@ -95,12 +95,13 @@ export default function NavBar({ user }: NavbarProps) {
               ? (
                 <>
                   <MenuItem onClick={handleClose}>
-                    <Link href="./profile">Profile</Link>
+                    <Button href="./profile">Profile</Button>
                   </MenuItem>
                   <MenuItem onClick={() => {
                     signOut({ redirect: false });
                     router.push('/');
-                  }}>
+                  }}
+                  >
                     Log out
                   </MenuItem>
                 </>
@@ -112,7 +113,8 @@ export default function NavBar({ user }: NavbarProps) {
                     {/* <Link href="./auth/login">Log In</Link> */}
                   </MenuItem>
                   <MenuItem>
-                    <Link href="./auth/signup">Sign Up</Link>
+                    <Button href="./auth/signup">Sign Up</Button>
+                    {/* <Link href="./auth/signup">Sign Up</Link> */}
                   </MenuItem>
                 </>
               )}
