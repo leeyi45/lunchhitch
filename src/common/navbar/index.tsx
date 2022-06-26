@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
+import { Button } from '@mui/material';
 import { LunchHitchUser } from '../../auth';
 
 export type NavbarProps = {
@@ -36,13 +37,15 @@ export default function NavBar({ user }: NavbarProps) {
   return (
     <AppBar position="static" style={{ background: '#50C878' }}>
       <Toolbar>
-        <Typography
-          variant="h6"
-          component="div"
-          style={{ flexGrow: 1, textAlign: 'left' }}
-        >
-          Lunch Hitch
-        </Typography>
+        <Link href="/">
+          <Typography
+            variant="h6"
+            component="div"
+            style={{ flexGrow: 1, textAlign: 'left' }}
+          >
+            Lunch Hitch
+          </Typography>
+        </Link>
         <div>
           <IconButton
             size="medium"
@@ -79,20 +82,20 @@ export default function NavBar({ user }: NavbarProps) {
               ? (
                 <>
                   <MenuItem onClick={handleClose}>
-                    <Link href="./profile">Profile</Link>
+                    <Button href="./profile">Profile</Button>
                   </MenuItem>
                   <MenuItem onClick={() => signOut({ redirect: false })}>
-                    Log out
+                    <Button>Log Out</Button>
                   </MenuItem>
                 </>
               )
               : (
                 <>
                   <MenuItem>
-                    <Link href="./auth/login">Log In</Link>
+                    <Button href="./auth/login">Log In</Button>
                   </MenuItem>
                   <MenuItem>
-                    <Link href="./auth/signup">Sign Up</Link>
+                    <Button href="./auth/signup">Sign Up</Button>
                   </MenuItem>
                 </>
               )}

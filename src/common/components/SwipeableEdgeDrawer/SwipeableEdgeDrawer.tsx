@@ -22,11 +22,11 @@ interface Props {
 const Root = styled('div')(({ theme }) => ({
   height: '100%',
   backgroundColor:
-    theme.palette.mode === 'light' ? grey[100] : theme.palette.background.default,
+    theme.palette.mode === 'light' ? 'transparent' : theme.palette.background.default,
 }));
 
 const StyledBox = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'light' ? '#fff' : grey[800],
+  backgroundColor: theme.palette.mode === 'light' ? '#8BE796' : grey[800],
 }));
 
 const Puller = styled(Box)(({ theme }) => ({
@@ -62,7 +62,7 @@ export default function SwipeableEdgeDrawer(props: Props) {
         }}
       />
       <Box sx={{ textAlign: 'center', pt: 1 }}>
-        <Button onClick={toggleDrawer(true)}>View Current Orders</Button>
+        <Button variant='outlined' onClick={toggleDrawer(true)} style={{color: '#50C878', backgroundColor: 'white'}}>View Current Orders</Button>
       </Box>
       <SwipeableDrawer
         container={container}
@@ -88,7 +88,7 @@ export default function SwipeableEdgeDrawer(props: Props) {
           }}
         >
           <Puller />
-          <Typography sx={{ p: 2, color: 'text.secondary' }}>0 Orders</Typography>
+          <Typography sx={{ p: 2, color: '#1f4423' }}>0 Orders</Typography>
         </StyledBox>
         <StyledBox
           sx={{

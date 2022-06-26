@@ -1,14 +1,17 @@
 import React from 'react';
-import { Community, Order, Shop } from '@prisma/client';
-import { Formik } from 'formik';
-import { CircularProgress, List, ListItem } from '@mui/material';
-import { LunchHitchUser } from '../../auth';
-import ShopSelector from './shop_selector';
+import { Order, Shop } from '@prisma/client';
+import {
+  Button,
+  CircularProgress, List, ListItem, Popover,
+} from '@mui/material';
 import useAsync from '../../common/async';
 
 type Props = {
-  communities: Community[];
-  user: LunchHitchUser;
+  onSubmit: () => void;
+  onSelect: (order: Order) => void;
+  shop: Shop | null;
+  popoverElement: any;
+  isSubmitting: boolean;
 };
 
 async function getOrders(shop: Shop): Promise<Order[]> {
@@ -24,90 +27,105 @@ async function getOrders(shop: Shop): Promise<Order[]> {
   return result.json();
 }
 
-export default function FulFillForm(props: Props) {
-  const [shop, setShop] = React.useState<Shop | null>(null);
-  const orders = useAsync(getOrders);
+type OrderItemProps = {
+  order: Order;
+  onSelect: () => void;
+};
 
-  const submitCallback = () => {};
-
-  React.useEffect(() => orders.cancel, []);
+const OrderListItem = ({ order, onSelect }: OrderItemProps) => {
+  const [showBorder, setShowBorder] = React.useState(false);
 
   return (
-    <Formik
-      initialValues={{
-        order: null,
+    <ListItem
+      onClick={onSelect}
+      onMouseEnter={() => setShowBorder(true)}
+      onMouseLeave={() => setShowBorder(false)}
+      style={{
+        border: showBorder ? 'solid black 1px' : '',
       }}
-      onSubmit={submitCallback}
     >
-      {(formik) => {
-        let selectorElement;
+      <div>
+        <h3>From {order.from}</h3>
+        <ol>
+          {order.orders.map((x, j) => (<li key={j}>{x}</li>))}
+        </ol>
+        <p> </p>
+      </div>
+    </ListItem>
+  );
+};
 
-        switch (orders.state) {
-          case 'waiting': {
-            selectorElement = 'Select a shop and community to begin!';
-            break;
-          }
-          case 'loading': {
-            selectorElement = (
-              <div>
-                <CircularProgress />
-              </div>
-            );
-            break;
-          }
-          case 'errored': {
-            selectorElement = (
-              <div>
-                An unknown error occurred, please refresh the page and try again
-              </div>
-            );
-            break;
-          }
-          default: {
-            if (orders.result.length === 0) {
-              selectorElement = (
-                <>
-                  No Orders
-                </>
-              );
-            } else {
-              selectorElement = (
-                <List>
-                  {orders.result.map((order, i) => (
-                    <ListItem
-                      key={i}
-                      onClick={() => formik.setFieldValue('order', order)}
-                    >
-                      <h3>From {order.from}</h3>
-                      <ol>
-                        {order.orders.map((each, j) => <li key={j}>{each}</li>)}
-                      </ol>
-                    </ListItem>
-                  ))}
-                </List>
-              );
-            }
-            break;
-          }
-        }
+export default function FulFillForm({
+  shop, onSelect, onSubmit, popoverElement, isSubmitting,
+}: Props) {
+  const [popover, setPopover] = React.useState(false);
+  const [selected, setSelected] = React.useState<Order | null>(null);
 
+  const orders = useAsync(getOrders);
+
+  React.useEffect(() => {
+    if (shop) orders.call(shop);
+    setSelected(null);
+    return orders.cancel;
+  }, [shop]);
+
+  const getForm = () => {
+    switch (orders.state) {
+      case 'loading': return (<CircularProgress />);
+      case 'errored': return <>An error occurred, please refresh the page and try again</>;
+      case 'done': {
+        if (orders.result.length === 0) return <>No Orders</>;
         return (
-          <div>
-            <ShopSelector
-              communities={props.communities}
-              onChange={(newValue) => {
-                setShop(newValue);
-
-                // Cancel already running operations
-                orders.cancel();
-                if (newValue) orders.call(newValue);
-              }}
-              value={shop}
-            />
-            {selectorElement}
-          </div>
+          <List>
+            {orders.result.map((order, i) => (
+              <OrderListItem
+                order={order}
+                key={i}
+                onSelect={() => {
+                  onSelect(order);
+                  setPopover(true);
+                  setSelected(order);
+                }}
+              />
+            ))}
+          </List>
         );
-      }}
-    </Formik>
+      }
+      default: return null as never;
+    }
+  };
+
+  return (
+    <>
+      <Popover
+        open={popover}
+        anchorEl={popoverElement}
+      >
+        <h3 style={{ paddingInline: '30px' }}>Accept the following order?</h3>
+        <ol>
+          {selected?.orders.map((order, i) => <li key={i}>{order}</li>)}
+        </ol>
+        <div style={{ textAlign: 'center' }}>
+          <Button
+            color="success"
+            onClick={() => {
+              if (!isSubmitting) {
+                setPopover(false);
+                onSubmit();
+              }
+            }}
+          >
+            Accept order
+          </Button>
+          <Button
+            color="error"
+            onClick={() => setPopover(false)}
+          >
+            Cancel
+          </Button>
+        </div>
+      </Popover>
+      {getForm()}
+    </>
   );
 }

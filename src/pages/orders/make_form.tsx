@@ -9,13 +9,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
-import {
-  Formik, Form, FieldArray,
-} from 'formik';
-import { Community, Order, Shop } from '@prisma/client';
-import ShopSelector from './shop_selector';
 import TooltipButton from '../../common/tooltip_button';
-import { LunchHitchUser } from '../../auth';
 
 const MAX_ORDERS = 10;
 
@@ -26,7 +20,7 @@ type OrderListItemProps = {
   onDuplicate: () => void;
 }
 
-export const OrderListItem = ({
+const OrderListItem = ({
   order, onRemove, onChange, onDuplicate,
 }: OrderListItemProps) => {
   const [inputField, setInputField] = React.useState(order);
@@ -66,222 +60,161 @@ export const OrderListItem = ({
 };
 
 type MakeFormProps = {
-  communities: Community[]
-  user: LunchHitchUser;
+  isSubmitting: boolean;
+  onChange: (newValue: string[]) => void;
+  onSubmit: (orders: string[]) => void;
+  popoverElement: any;
 };
 
-type MakeFormValues = {
-  shop: Shop | null;
-  orders: string[];
-}
-
-export const MakeForm = (props: MakeFormProps) => {
+const MakeForm = (props: MakeFormProps) => {
   const [orderField, setOrderField] = React.useState({
     value: '',
     helper: '',
     error: false,
   });
 
-  const [popoverAnchor, setPopoverAnchor] = React.useState<HTMLElement | null>(null);
-  const formDivRef = React.useRef<HTMLDivElement | null>(null);
+  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  const [orders, setOrdersValue] = React.useState<string[]>([]);
 
-  const submitCallback = async ({ shop, orders }: MakeFormValues) => {
-    if (!shop) return;
+  const setOrders = (value: string[]) => {
+    setOrdersValue(value);
+    props.onChange(value);
+  };
 
-    setOrderField({
-      ...orderField,
-      error: false,
-      helper: '',
-    });
+  const addOrder = (order: string, index?: number) => {
+    if (orders.length >= MAX_ORDERS) {
+      setOrderField({
+        ...orderField,
+        helper: 'Maximum number of orders reached!',
+        error: true,
+      });
+      return;
+    }
 
-    const orderObj = {
-      shop: shop.id,
-      orders,
-      from: props.user.username,
-    } as Omit<Order, 'id'>;
+    if (index) {
+      const before = orders.slice(0, index);
+      const after = orders.slice(index + 1);
 
-    await fetch('api/prisma?collection=orders&method=create', {
-      method: 'POST',
-      body: JSON.stringify({
-        data: orderObj,
-      }),
-    });
+      setOrders([...before, order, ...after]);
+    } else {
+      setOrders([...orders, order]);
+    }
+  };
+
+  const removeOrder = (index: number) => {
+    const before = orders.slice(0, index);
+    const after = orders.slice(index + 1);
+
+    setOrders(before.concat(after));
+  };
+
+  const changeOrder = (order: string, index: number) => {
+    const before = orders.slice(0, index);
+    const after = orders.slice(index + 1);
+
+    setOrders([...before, order, ...after]);
   };
 
   return (
-    <Formik<MakeFormValues>
-      initialValues={{
-        shop: null,
-        orders: [],
-      }}
-      onSubmit={submitCallback}
-    >
-      {({ values, ...formik }) => {
-        let submitMessage: string;
-
-        if (values.orders.length === 0) {
-          submitMessage = 'Add some orders first!';
-        } else if (values.shop === null) {
-          submitMessage = 'Select a community and store!';
-        } else {
-          submitMessage = 'Place this order';
-        }
-
-        return (
-          <div
-            ref={formDivRef}
+    <>
+      <div>
+        <Popover
+          open={popoverOpen}
+          anchorEl={props.popoverElement}
+        >
+          Are you sure you want to clear all orders?
+          <Button
+            color="success"
+            onClick={() => {
+              setPopoverOpen(false);
+              setOrders([]);
+              setOrderField({
+                ...orderField,
+                error: false,
+                helper: 'Orders cleared',
+              });
+            }}
           >
-            <Popover
-              open={Boolean(popoverAnchor)}
-              anchorOrigin={{
-                horizontal: 'center',
-                vertical: 'center',
-              }}
-              transformOrigin={{
-                horizontal: 'center',
-                vertical: 'center',
-              }}
-            >
-              <h3>Confirm Your Order from {values.shop?.name}</h3>
-              <ol>
-                {values.orders.map((order, i) => <li key={i}>{order}</li>)}
-              </ol>
-              <div>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="success"
-                >Confirm
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => setPopoverAnchor(null)}
-                >Go Back
-                </Button>
-              </div>
-            </Popover>
-            <Form>
-              <ShopSelector
-                communities={props.communities}
-                onChange={(newValue) => formik.setFieldValue('shop', newValue)}
-                value={values.shop}
-              />
-              {values.shop ? (<h3>Ordering from {values.shop.name}</h3>) : undefined}
-              <FieldArray name="orders">
-                {(arrayHelpers) => {
-                  const addItem = (value: string) => {
-                    if (values.orders.length < MAX_ORDERS) {
-                      arrayHelpers.push(value);
-                      setOrderField({
-                        value,
-                        helper: `Added ${value}`,
-                        error: false,
-                      });
-                    } else {
-                      setOrderField({
-                        ...orderField,
-                        error: true,
-                        helper: 'Maximum number of orders reached!',
-                      });
-                    }
-                  };
-
-                  return (
-                    <>
-                      <div>
-                        <TextField
-                          error={orderField.error}
-                          disabled={formik.isSubmitting}
-                          placeholder="Order"
-                          onChange={(event) => setOrderField({
-                            value: event.target.value,
-                            helper: '',
-                            error: false,
-                          })}
-                          value={orderField.value}
-                          type="text"
-                          onSubmit={() => addItem(orderField.value)}
-                          onFocus={() => setOrderField({
-                            ...orderField,
-                            helper: '',
-                            error: false,
-                          })}
-                          helperText={orderField.helper}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <TooltipButton
-                                  tooltip={`Add ${orderField.value} to list`}
-                                  disabled={orderField.value === '' || formik.isSubmitting}
-                                  onClick={() => addItem(orderField.value)}
-                                >
-                                  <AddIcon />
-                                </TooltipButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                        {values.orders.length}/{MAX_ORDERS} Orders
-                      </div>
-                      <List>
-                        {values.orders.map((order, i) => (
-                          <OrderListItem
-                            order={order}
-                            key={i}
-                            onRemove={() => {
-                              arrayHelpers.remove(i);
-                              setOrderField({
-                                ...orderField,
-                                error: false,
-                                helper: `Removed ${order}`,
-                              });
-                            }}
-                            onDuplicate={() => addItem(order)}
-                            onChange={(newValue) => {
-                              arrayHelpers.replace(i, newValue);
-                              setOrderField({
-                                ...orderField,
-                                error: false,
-                                helper: '',
-                              });
-                            }}
-                          />
-                        ))}
-                      </List>
-                    </>
-                  );
-                } }
-              </FieldArray>
-            </Form>
-            <div>
-              <Button
-                disabled={values.orders.length === 0}
-                onClick={() => {
-                  formik.setFieldValue('orders', [], false);
-                  setOrderField({
-                    ...orderField,
-                    error: false,
-                    helper: '',
-                  });
-                }}
-              >Clear Orders
-              </Button>
-              <TooltipButton
-                disabled={values.orders.length === 0
-                  || values.orders.find((order) => order === '') !== undefined
-                  || values.shop === null
-                  || formik.isSubmitting}
-                tooltip={submitMessage}
-                tooltipOnDisabled
-                onClick={() => setPopoverAnchor(formDivRef.current)}
-              >
-                Place Orders
-              </TooltipButton>
-            </div>
-          </div>
-        );
-      } }
-    </Formik>
+            Confirm
+          </Button>
+          <Button
+            color="error"
+            onClick={() => setPopoverOpen(false)}
+          >
+            Cancel
+          </Button>
+        </Popover>
+        <TextField
+          error={orderField.error}
+          disabled={props.isSubmitting}
+          placeholder="Order"
+          onChange={(event) => setOrderField({
+            value: event.target.value,
+            helper: '',
+            error: false,
+          })}
+          value={orderField.value}
+          type="text"
+          onSubmit={() => addOrder(orderField.value)}
+          onFocus={() => setOrderField({
+            ...orderField,
+            helper: '',
+            error: false,
+          })}
+          helperText={orderField.helper}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <TooltipButton
+                  tooltip={`Add ${orderField.value} to list`}
+                  disabled={orderField.value === '' || props.isSubmitting}
+                  onClick={() => addOrder(orderField.value)}
+                >
+                  <AddIcon />
+                </TooltipButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+        {orders.length}/{MAX_ORDERS} Orders
+      </div>
+      <List>
+        {orders.map((order, i) => (
+          <OrderListItem
+            key={i}
+            onChange={(newValue) => changeOrder(newValue, i)}
+            onRemove={() => {
+              removeOrder(i);
+              setOrderField({
+                ...orderField,
+                error: false,
+                helper: `Removed ${order}`,
+              });
+            }}
+            onDuplicate={() => addOrder(order, i)}
+            order={order}
+          />
+        ))}
+      </List>
+      <div>
+        <Button
+          disabled={orders.length === 0}
+          onClick={() => setPopoverOpen(true)}
+        >Clear Orders
+        </Button>
+        <TooltipButton
+          disabled={orders.length === 0
+                  || orders.find((order) => order === '') !== undefined
+                  || props.isSubmitting}
+          tooltip={orders.length === 0 ? 'Add some orders first' : 'Place these orders!'}
+          tooltipOnDisabled
+          onClick={() => props.onSubmit(orders)}
+        >
+          Place Orders
+        </TooltipButton>
+      </div>
+    </>
   );
 };
+
+export default MakeForm;

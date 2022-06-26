@@ -7,7 +7,7 @@ import {
   FieldProps,
   Form, Formik,
 } from 'formik';
-import { useRouter } from 'next/router';
+// import { useRouter } from 'next/router';
 import { Button, InputAdornment, TextField } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
@@ -16,7 +16,7 @@ import { RedirectOnAuth } from '../../common/auth_wrappers';
 import { firebaseErrorHandler } from '../../firebase';
 
 export default function LoginPage() {
-  const router = useRouter();
+  // const router = useRouter();
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
   const [showPassword, setShowPassword] = React.useState(false);
@@ -37,6 +37,7 @@ export default function LoginPage() {
               textAlign: 'left',
               fontFamily: 'Raleway',
               color: 'white',
+              paddingLeft: '8px',
             }}
           >
             Log In to Lunch Hitch
@@ -46,11 +47,10 @@ export default function LoginPage() {
           display: 'flex',
           flexDirection: 'column',
           width: '100%',
-          height: '100%',
+          height: '95.2%',
           alignItems: 'center',
           justifyContent: 'center',
           position: 'absolute',
-          paddingBottom: '100px',
           border: '5px solid #50C878',
         }}
         >
@@ -129,7 +129,7 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     disabled={formik.isSubmitting || errors.password !== undefined || errors.username !== undefined}
-                  >Sign In
+                  >Login
                   </Button>
                 </div>
               </Form>

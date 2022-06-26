@@ -5,8 +5,6 @@ import Navbar from '../common/navbar';
 import NoUserHomePage from '../common/components/noUser/NoUserHomePage';
 import UserHomePage from '../common/components/user/UserHomePage';
 
-
-
 export default function IndexPage() {
   const { user, status } = useSession();
 
@@ -16,19 +14,19 @@ export default function IndexPage() {
         <Navbar />
         <NoUserHomePage />
       </>
-      );
+    );
     case 'loading': return (
       <>
         <Navbar />
         <CircularProgress />
       </>
-      );
+    );
     case 'authenticated': return (
       <>
-        <Navbar />
-        <UserHomePage user={user}/>
+        <Navbar user={user} />
+        <UserHomePage user={user} />
       </>
-      );
+    );
     default: throw new Error('Should not get here');
   }
 }
