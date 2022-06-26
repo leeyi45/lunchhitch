@@ -1,4 +1,9 @@
 # lunchhitch
+LunchHitch Project, as part of NUS Orbitals 2022.
+
+## Documentation
+[Website](https://www.notion.so/teamby/Readme-a3e794a36caf4a7cbaed605ec177c887)
+[Github Pages](https://lunchhitch.github.io/lunchhitch)
 
 ## Dependencies
 Node 16.15.0
@@ -23,14 +28,12 @@ Node 16.15.0
 ├── src
 │   ├── common                   // Common and reused React components go here
 │   ├── pages                    // NextJS will serve these as pages on the webserver
-│   │   ├── api                  // NextJS API based routes
-│   │   └── auth
-│   │       └── [...nextauth].ts // NextAuth configuration
+│   │   └── api                  // NextJS API based routes
+│   │       └── auth
+│   │           └── [...nextauth].ts // NextAuth configuration
 │   └── styles                   // CSS and styles go here
 ├── testing                      // Code used for testing
 ├── .eslintrc.js                 // eslint configuration
 └── .env                         // Configure environment variables
-
 ```
 Generated from [here](https://tree.nathanfriend.io/)
-
