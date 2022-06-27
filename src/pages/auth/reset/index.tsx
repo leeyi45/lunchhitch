@@ -7,12 +7,14 @@ import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import React from 'react';
 import * as yup from 'yup';
-import { LunchHitchUser } from '../../auth';
-import AuthSelector from '../../common/auth_selector';
-import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
-import PasswordField from '../../common/formik_wrapper/password_field';
-import NavBar from '../../common/navbar';
-import { firebaseErrorHandler, FIREBASE_AUTH } from '../../firebase';
+import { LunchHitchUser } from '../../../auth';
+import AuthSelector from '../../../common/auth_selector';
+import FormikWrapper from '../../../common/formik_wrapper/formik_wrapper';
+import PasswordField from '../../../common/formik_wrapper/password_field';
+import NavBar from '../../../common/navbar';
+import { firebaseErrorHandler, FIREBASE_AUTH } from '../../../firebase';
+
+import style from './ResetPage.module.css';
 
 function NoUserResetPage() {
   const [emailSent, setEmailSent] = React.useState(false);
@@ -99,63 +101,83 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
 
   return resetDone ? <p>Password successfully changed!</p>
     : (
-      <Formik
-        initialValues={{
-          oldPass: '',
-          newPass: '',
-          repeatPass: '',
-        }}
-        onSubmit={submitCallback}
-        validationSchema={yup.object({
-          oldPass: yup.string().required('Current Password required!'),
-          newPass: yup.string().required('New Password Required!'),
-          repeatPass: yup.string().required().when(['newPass'], (newPass) => yup.string().test('equality', 'Passwords must match!', (value) => value === newPass)),
-        })}
-        validateOnChange={false}
-        validateOnBlur={false}
-      >
-        {({ values, errors, ...formik }) => (
-          <>
-            {resetError || Object.values(errors).at(0)}
-            <Form>
-              <div
+      <div id={style.formdiv}>
+        <h2
+          style={{
+            textAlign: 'center',
+          }}
+        >Password Reset
+        </h2>
+        <Formik
+          initialValues={{
+            oldPass: '',
+            newPass: '',
+            repeatPass: '',
+          }}
+          onSubmit={submitCallback}
+          validationSchema={yup.object({
+            oldPass: yup.string().required('Current Password required!'),
+            newPass: yup.string().required('New Password Required!'),
+            repeatPass: yup.string().required().when(['newPass'], (newPass) => yup.string().test('equality', 'Passwords must match!', (value) => value === newPass)),
+          })}
+          validateOnChange={false}
+          validateOnBlur={false}
+        >
+          {({ values, errors, ...formik }) => (
+            <>
+              <p
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
+                  fontSize: '18px',
                 }}
               >
-                <PasswordField
-                  label="Current Password"
-                  value={values.oldPass}
-                  onChange={(event) => formik.setFieldValue('oldPass', event.target.value)}
-                  error={Boolean(errors.oldPass)}
-                />
-                <PasswordField
-                  label="New Password"
-                  value={values.newPass}
-                  onChange={(event) => formik.setFieldValue('newPass', event.target.value)}
-                  error={Boolean(errors.newPass)}
-                />
-                <PasswordField
-                  label="Repeat New Password"
-                  value={values.repeatPass}
-                  onChange={(event) => formik.setFieldValue('repeatPass', event.target.value)}
-                  error={Boolean(errors.repeatPass)}
-                />
-                <div>
-                  <Button
-                    onClick={() => formik.resetForm()}
-                  >Clear
-                  </Button>
-                  <Button type="submit">
-                    Reset Password
-                  </Button>
+                {resetError || Object.values(errors).at(0)}
+              </p>
+              <Form>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                  }}
+                >
+                  <PasswordField
+                    className={style.PasswordField}
+                    style={{
+                      marginTop: '15px',
+                    }}
+                    label="Current Password"
+                    value={values.oldPass}
+                    onChange={(event) => formik.setFieldValue('oldPass', event.target.value)}
+                    error={Boolean(errors.oldPass)}
+                  />
+                  <PasswordField
+                    className={style.PasswordField}
+                    label="New Password"
+                    value={values.newPass}
+                    onChange={(event) => formik.setFieldValue('newPass', event.target.value)}
+                    error={Boolean(errors.newPass)}
+                  />
+                  <PasswordField
+                    className={style.PasswordField}
+                    label="Repeat New Password"
+                    value={values.repeatPass}
+                    onChange={(event) => formik.setFieldValue('repeatPass', event.target.value)}
+                    error={Boolean(errors.repeatPass)}
+                  />
+                  <div>
+                    <Button
+                      onClick={() => formik.resetForm()}
+                    >Clear
+                    </Button>
+                    <Button type="submit">
+                      Reset Password
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </Form>
-          </>
-        )}
-      </Formik>
+              </Form>
+            </>
+          )}
+        </Formik>
+      </div>
     );
 }
 
@@ -170,7 +192,7 @@ export default function ResetPage() {
           <NavBar />
           <NoUserResetPage />
         </div>
-)}
+      )}
     >
       {(user) => (
         <>
