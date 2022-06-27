@@ -11,9 +11,7 @@ export default function UserHomePage({ user }: { user: LunchHitchUser }) {
         variant="h1"
         component="div"
         >
-          Welcome back
-          {user.displayName}
-          !
+          Welcome back!
         </Typography>
         <p style={{fontSize: '30px'}}>What will it be today?
           
