@@ -32,7 +32,7 @@ export default function SignUpPage() {
               border: '5px solid #50C878',
             }}
             >
-              <p style={{color: "#50C878", fontSize: "30px"}}>Sign up for a Lunch Hitch account</p>
+              <p style={{ color: '#50C878', fontSize: '30px' }}>Sign up for a Lunch Hitch account</p>
               <FormikWrapper
                 fields={{
                   displayName: {
