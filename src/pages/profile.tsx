@@ -1,10 +1,10 @@
 import React from 'react';
-import { LunchHitchUser } from '../auth';
-import { AuthRequired } from '../common/auth_wrappers';
-import NavBar from '../common/navbar';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
+import NavBar from '../common/navbar';
+import { LunchHitchUser } from '../auth';
+import AuthSelector from '../common/auth_selector';
 
 type Props = {
   user: LunchHitchUser;
@@ -23,7 +23,7 @@ const Item = styled(Paper)(({ theme }) => ({
 const ProfileDisplay = ({ user }: Props) => (
   <>
     <NavBar user={user} />
-    <Stack spacing={1} style={{alignItems: 'center', color: '#47b16a'}}>
+    <Stack spacing={1} style={{ alignItems: 'center', color: '#47b16a' }}>
       <h1>My Profile</h1>
       <h3>Name:</h3>
       <Item>{user.displayName}</Item>
@@ -37,10 +37,8 @@ const ProfileDisplay = ({ user }: Props) => (
 
 export default function ProfilePage() {
   return (
-    <AuthRequired>
-      {
-        (user) => (<ProfileDisplay user={user} />)
-      }
-    </AuthRequired>
+    <AuthSelector>
+      {(user) => (<ProfileDisplay user={user} />)}
+    </AuthSelector>
   );
 }

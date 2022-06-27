@@ -1,18 +1,16 @@
 import React from 'react';
 import * as yup from 'yup';
+import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 import Link from 'next/link';
 import {
-  Field,
-  FieldProps,
   Form, Formik,
 } from 'formik';
 import { useRouter } from 'next/router';
-import { Button, InputAdornment, TextField } from '@mui/material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { signIn, SignInResponse, useSession } from 'next-auth/react';
 import { firebaseErrorHandler } from '../../firebase';
+import PasswordField from '../../common/formik_wrapper/password_field';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,7 +24,6 @@ export default function LoginPage() {
   }
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
-  const [showPassword, setShowPassword] = React.useState(false);
 
   return (
     <div style={{
@@ -102,33 +99,16 @@ export default function LoginPage() {
                   variant="standard"
                   onChange={(event) => formik.setFieldValue('username', event.target.value)}
                   onBlur={formik.handleBlur}
-                  error={errors.username !== null}
+                  error={!!errors.username && formik.touched.username}
                 />
                 Password
-                <Field
-                  name="password"
-                >
-                  {({ field }: FieldProps) => (
-                    <TextField
-                      variant="standard"
-                      type={showPassword ? 'text' : 'password'}
-                      value={field.value}
-                      onChange={(event) => formik.setFieldValue('password', event.target.value)}
-                      onBlur={field.onBlur}
-                      error={errors.password !== null}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <Button
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                            </Button>
-                          </InputAdornment>),
-                      }}
-                    />
-                  )}
-                </Field>
+                <PasswordField
+                  variant="standard"
+                  value={values.password}
+                  onChange={(event) => formik.setFieldValue('password', event.target.value)}
+                  onBlur={formik.handleBlur}
+                  error={!!errors.password && formik.touched.password}
+                />
                 <Button
                   type="submit"
                   disabled={formik.isSubmitting}
