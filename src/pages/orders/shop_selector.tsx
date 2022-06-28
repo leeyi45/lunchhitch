@@ -41,7 +41,6 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         options={communities}
-        filterOptions={(x) => x}
         onChange={(_event, value) => setCommunity(value)}
         renderInput={(params) => (<TextField {...params} label="Community" />)}
         renderOption={(liProps, option) => (

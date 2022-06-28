@@ -182,7 +182,10 @@ const MakeForm = ({
               </ol>
               <Button
                 color="success"
-                onClick={() => onSubmit(orders)}
+                onClick={() => {
+                  setConfirmOpen(false);
+                  onSubmit(orders);
+                }}
               >
                 Confirm
               </Button>
