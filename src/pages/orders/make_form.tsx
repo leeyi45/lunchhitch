@@ -10,6 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
 import { Shop } from '@prisma/client';
+import { ClickAwayListener } from '@mui/material';
 import TooltipButton from '../../common/tooltip_button';
 
 const MAX_ORDERS = 10;
@@ -134,27 +135,33 @@ const MakeForm = ({
             alignItems: 'center',
           }}
         >
-          Are you sure you want to clear all orders?
-          <Button
-            color="success"
-            onClick={() => {
-              setClearOpen(false);
-              setOrders([]);
-              setOrderField({
-                ...orderField,
-                error: false,
-                helper: 'Orders cleared',
-              });
-            }}
+          <ClickAwayListener
+            onClickAway={() => setClearOpen(false)}
           >
-            Confirm
-          </Button>
-          <Button
-            color="error"
-            onClick={() => setClearOpen(false)}
-          >
-            Cancel
-          </Button>
+            <div>
+              <h3>Are you sure you want to clear all orders?</h3>
+              <Button
+                color="success"
+                onClick={() => {
+                  setClearOpen(false);
+                  setOrders([]);
+                  setOrderField({
+                    ...orderField,
+                    error: false,
+                    helper: 'Orders cleared',
+                  });
+                }}
+              >
+                Confirm
+              </Button>
+              <Button
+                color="error"
+                onClick={() => setClearOpen(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </ClickAwayListener>
         </Popover>
         <Popover
           open={confirmPopover}
@@ -165,22 +172,28 @@ const MakeForm = ({
             alignItems: 'center',
           }}
         >
-          <p>Confirm your order from {shop?.name}:</p>
-          <ol>
-            {orders.map((order, i) => (<li key={i}>{order}</li>))}
-          </ol>
-          <Button
-            color="success"
-            onClick={() => onSubmit(orders)}
+          <ClickAwayListener
+            onClickAway={() => setConfirmOpen(false)}
           >
-            Confirm
-          </Button>
-          <Button
-            color="error"
-            onClick={() => setConfirmOpen(false)}
-          >
-            Cancel
-          </Button>
+            <div>
+              <p>Confirm your order from {shop?.name}:</p>
+              <ol>
+                {orders.map((order, i) => (<li key={i}>{order}</li>))}
+              </ol>
+              <Button
+                color="success"
+                onClick={() => onSubmit(orders)}
+              >
+                Confirm
+              </Button>
+              <Button
+                color="error"
+                onClick={() => setConfirmOpen(false)}
+              >
+                Cancel
+              </Button>
+            </div>
+          </ClickAwayListener>
         </Popover>
         <TextField
           error={orderField.error}
