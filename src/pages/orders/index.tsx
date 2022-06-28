@@ -1,5 +1,3 @@
-import { Popover } from '@mui/material';
-import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Community, Order, Shop } from '@prisma/client';
 import { Form, Formik } from 'formik';
@@ -19,9 +17,7 @@ type Props = {
 
 export default function OrdersPage(props: Props) {
   const [shop, setShop] = React.useState<Shop | null>(null);
-  const divRef = React.useRef<HTMLDivElement | null>(null);
-
-  const [makePopover, setMakePopover] = React.useState(false);
+  const [popoverOpened, setPopoverOpened] = React.useState(false);
 
   const { data: session } = useSession({
     required: true,
@@ -36,7 +32,9 @@ export default function OrdersPage(props: Props) {
 
   return (
     <div
-      ref={divRef}
+      style={{
+        filter: popoverOpened ? 'blur(3px)' : '',
+      }}
     >
       <NavBar user={user} />
       <ShopSelector
@@ -44,10 +42,11 @@ export default function OrdersPage(props: Props) {
         value={shop}
         onChange={setShop}
       />
-      <div style={{
-        display: 'flex',
-        flexDirection: 'row',
-      }}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+        }}
       >
         <Box>
           <div style={{
@@ -56,12 +55,12 @@ export default function OrdersPage(props: Props) {
             paddingRight: '10px',
           }}
           >
-            <h2 style={{ color: '#47b16a' }}>Fulfill an Order!</h2>
-            <Formik<{ order: Order | null}>
+            <Formik<{ order: Order | null }>
               initialValues={{
                 order: null,
               }}
               onSubmit={async (values) => {
+                // TODO need to figure out how to accept orders
               }}
             >
               {({ isSubmitting, ...formik }) => (
@@ -71,7 +70,7 @@ export default function OrdersPage(props: Props) {
                     isSubmitting={isSubmitting}
                     onSelect={(order) => formik.setFieldValue('order', order)}
                     onSubmit={formik.submitForm}
-                    popoverElement={divRef.current}
+                    onPopoverChanged={setPopoverOpened}
                   />
                 </Form>
               )}
@@ -92,6 +91,7 @@ export default function OrdersPage(props: Props) {
                 orders: [],
               }}
               onSubmit={async (values) => {
+                return;
                 await fetch('/api/prisma?collection=orders&method=create', {
                   method: 'POST',
                   body: JSON.stringify({
@@ -106,32 +106,12 @@ export default function OrdersPage(props: Props) {
             >
               {({ isSubmitting, ...formik }) => (
                 <Form>
-                  <Popover
-                    open={Boolean(makePopover)}
-                    anchorEl={divRef.current}
-                  >
-                    Confirm your order from {shop?.name}:
-                    <ol>
-                      {formik.values.orders.map((order, i) => (<li key={i}>{order}</li>))}
-                    </ol>
-                    <Button
-                      color="success"
-                      onClick={formik.submitForm}
-                    >
-                      Confirm
-                    </Button>
-                    <Button
-                      color="error"
-                      onClick={() => setMakePopover(false)}
-                    >
-                      Cancel
-                    </Button>
-                  </Popover>
                   <MakeForm
-                    popoverElement={divRef.current!}
                     isSubmitting={isSubmitting}
-                    onSubmit={() => setMakePopover(true)}
+                    onSubmit={() => formik.handleSubmit()}
                     onChange={(newValue) => formik.setFieldValue('orders', newValue)}
+                    onPopoverChange={setPopoverOpened}
+                    shop={shop}
                   />
                 </Form>
               )}

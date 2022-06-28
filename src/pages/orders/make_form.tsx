@@ -9,6 +9,7 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
+import { Shop } from '@prisma/client';
 import TooltipButton from '../../common/tooltip_button';
 
 const MAX_ORDERS = 10;
@@ -63,22 +64,28 @@ type MakeFormProps = {
   isSubmitting: boolean;
   onChange: (newValue: string[]) => void;
   onSubmit: (orders: string[]) => void;
-  popoverElement: any;
+  shop: Shop | null;
+  onPopoverChange: (opened: boolean) => void;
 };
 
-const MakeForm = (props: MakeFormProps) => {
+const MakeForm = ({
+  isSubmitting, onChange, onSubmit, shop, onPopoverChange,
+}: MakeFormProps) => {
   const [orderField, setOrderField] = React.useState({
     value: '',
     helper: '',
     error: false,
   });
 
-  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  const [clearPopover, setClearOpen] = React.useState(false);
+  const [confirmPopover, setConfirmOpen] = React.useState(false);
   const [orders, setOrdersValue] = React.useState<string[]>([]);
+
+  React.useEffect(() => onPopoverChange(clearPopover || confirmPopover), [clearPopover, confirmPopover, onPopoverChange]);
 
   const setOrders = (value: string[]) => {
     setOrdersValue(value);
-    props.onChange(value);
+    onChange(value);
   };
 
   const addOrder = (order: string, index?: number) => {
@@ -119,14 +126,19 @@ const MakeForm = (props: MakeFormProps) => {
     <>
       <div>
         <Popover
-          open={popoverOpen}
-          anchorEl={props.popoverElement}
+          open={clearPopover}
+          anchorReference="none"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
         >
           Are you sure you want to clear all orders?
           <Button
             color="success"
             onClick={() => {
-              setPopoverOpen(false);
+              setClearOpen(false);
               setOrders([]);
               setOrderField({
                 ...orderField,
@@ -139,14 +151,40 @@ const MakeForm = (props: MakeFormProps) => {
           </Button>
           <Button
             color="error"
-            onClick={() => setPopoverOpen(false)}
+            onClick={() => setClearOpen(false)}
+          >
+            Cancel
+          </Button>
+        </Popover>
+        <Popover
+          open={confirmPopover}
+          anchorReference="none"
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <p>Confirm your order from {shop?.name}:</p>
+          <ol>
+            {orders.map((order, i) => (<li key={i}>{order}</li>))}
+          </ol>
+          <Button
+            color="success"
+            onClick={() => onSubmit(orders)}
+          >
+            Confirm
+          </Button>
+          <Button
+            color="error"
+            onClick={() => setConfirmOpen(false)}
           >
             Cancel
           </Button>
         </Popover>
         <TextField
           error={orderField.error}
-          disabled={props.isSubmitting}
+          disabled={isSubmitting}
           placeholder="Order"
           onChange={(event) => setOrderField({
             value: event.target.value,
@@ -167,7 +205,7 @@ const MakeForm = (props: MakeFormProps) => {
               <InputAdornment position="end">
                 <TooltipButton
                   tooltip={`Add ${orderField.value} to list`}
-                  disabled={orderField.value === '' || props.isSubmitting}
+                  disabled={orderField.value === '' || isSubmitting}
                   onClick={() => addOrder(orderField.value)}
                 >
                   <AddIcon />
@@ -199,16 +237,16 @@ const MakeForm = (props: MakeFormProps) => {
       <div>
         <Button
           disabled={orders.length === 0}
-          onClick={() => setPopoverOpen(true)}
+          onClick={() => setClearOpen(true)}
         >Clear Orders
         </Button>
         <TooltipButton
           disabled={orders.length === 0
                   || orders.find((order) => order === '') !== undefined
-                  || props.isSubmitting}
+                  || isSubmitting}
           tooltip={orders.length === 0 ? 'Add some orders first' : 'Place these orders!'}
           tooltipOnDisabled
-          onClick={() => props.onSubmit(orders)}
+          onClick={() => setConfirmOpen(true)}
         >
           Place Orders
         </TooltipButton>
