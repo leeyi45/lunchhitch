@@ -16,6 +16,7 @@ interface Props {
    * Injected by the documentation to work in an iframe.
    * You won't need it on your project.
    */
+  // eslint-disable-next-line react/require-default-props
   window?: () => Window;
 }
 
@@ -62,7 +63,7 @@ export default function SwipeableEdgeDrawer(props: Props) {
         }}
       />
       <Box sx={{ textAlign: 'center', pt: 1 }}>
-        <Button variant='outlined' onClick={toggleDrawer(true)} style={{color: '#50C878', backgroundColor: 'white'}}>View Current Orders</Button>
+        <Button variant="outlined" onClick={toggleDrawer(true)} style={{ color: '#50C878', backgroundColor: 'white' }}>View Current Orders</Button>
       </Box>
       <SwipeableDrawer
         container={container}

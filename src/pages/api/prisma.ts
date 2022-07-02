@@ -7,6 +7,6 @@ type PrismaType = {
 
 export default wrapWithQuery(
   ['collection', 'method'],
-  async (req, res, { collection, method }) => (prisma as PrismaType)[collection][method](req.body),
+  async (req, { collection, method }) => (prisma as PrismaType)[collection][method](req.body),
   (error, res) => res.status(500).json({ error }),
 );

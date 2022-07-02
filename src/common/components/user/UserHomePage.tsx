@@ -1,11 +1,11 @@
 import React from 'react';
 import { Button, Typography } from '@mui/material';
-import { LunchHitchUser } from '../../../auth';
+// import { LunchHitchUser } from '../../../auth';
 import SwipeableEdgeDrawer from '../SwipeableEdgeDrawer/SwipeableEdgeDrawer';
 
 import styles from './UserHomePage.module.css';
 
-export default function UserHomePage({ user }: { user: LunchHitchUser }) {
+export default function UserHomePage() {
   return (
     <div className={styles.UserHomePage}>
       <Typography
