@@ -8,9 +8,10 @@ import {
   Form, Formik,
 } from 'formik';
 import { useRouter } from 'next/router';
-import { signIn, SignInResponse, useSession } from 'next-auth/react';
 import { firebaseErrorHandler } from '../../firebase';
 import PasswordField from '../../common/formik_wrapper/password_field';
+import { signIn } from '../../auth';
+import { useSession } from '../../auth_provider';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -69,9 +70,7 @@ export default function LoginPage() {
           })}
           onSubmit={async (values, actions) => {
             try {
-              const result = await signIn('credentials', { ...values, redirect: false }) as unknown as SignInResponse;
-
-              if (!result.ok) throw result.error;
+              await signIn(values);
               // router.push('/profile');
             } catch (error: any) {
               actions.setFieldValue('password', '');
@@ -104,10 +103,8 @@ export default function LoginPage() {
                 Password
                 <PasswordField
                   variant="standard"
-                  value={values.password}
-                  onChange={(event) => formik.setFieldValue('password', event.target.value)}
-                  onBlur={formik.handleBlur}
-                  error={!!errors.password && formik.touched.password}
+                  label="Password"
+                  name="password"
                 />
                 <Button
                   type="submit"

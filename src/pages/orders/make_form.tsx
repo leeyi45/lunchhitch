@@ -125,80 +125,86 @@ const MakeForm = ({
 
   return (
     <>
-      <div>
-        <Popover
-          open={clearPopover}
-          anchorReference="none"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
+      <Popover
+        open={clearPopover}
+        anchorReference="none"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <ClickAwayListener
+          onClickAway={() => setClearOpen(false)}
         >
-          <ClickAwayListener
-            onClickAway={() => setClearOpen(false)}
-          >
-            <div>
-              <h3>Are you sure you want to clear all orders?</h3>
-              <Button
-                color="success"
-                onClick={() => {
-                  setClearOpen(false);
-                  setOrders([]);
-                  setOrderField({
-                    ...orderField,
-                    error: false,
-                    helper: 'Orders cleared',
-                  });
-                }}
-              >
-                Confirm
-              </Button>
-              <Button
-                color="error"
-                onClick={() => setClearOpen(false)}
-              >
-                Cancel
-              </Button>
-            </div>
-          </ClickAwayListener>
-        </Popover>
-        <Popover
-          open={confirmPopover}
-          anchorReference="none"
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
+          <div>
+            <h3>Are you sure you want to clear all orders?</h3>
+            <Button
+              color="success"
+              onClick={() => {
+                setClearOpen(false);
+                setOrders([]);
+                setOrderField({
+                  ...orderField,
+                  error: false,
+                  helper: 'Orders cleared',
+                });
+              }}
+            >
+              Confirm
+            </Button>
+            <Button
+              color="error"
+              onClick={() => setClearOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </ClickAwayListener>
+      </Popover>
+      <Popover
+        open={confirmPopover}
+        anchorReference="none"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <ClickAwayListener
+          onClickAway={() => setConfirmOpen(false)}
         >
-          <ClickAwayListener
-            onClickAway={() => setConfirmOpen(false)}
-          >
-            <div>
-              <p>Confirm your order from {shop?.name}:</p>
-              <ol>
-                {orders.map((order, i) => (<li key={i}>{order}</li>))}
-              </ol>
-              <Button
-                color="success"
-                onClick={() => {
-                  setConfirmOpen(false);
-                  onSubmit(orders);
-                }}
-              >
-                Confirm
-              </Button>
-              <Button
-                color="error"
-                onClick={() => setConfirmOpen(false)}
-              >
-                Cancel
-              </Button>
-            </div>
-          </ClickAwayListener>
-        </Popover>
+          <div>
+            <p>Confirm your order from {shop?.name}:</p>
+            <ol>
+              {orders.map((order, i) => (<li key={i}>{order}</li>))}
+            </ol>
+            <Button
+              color="success"
+              onClick={() => {
+                setConfirmOpen(false);
+                onSubmit(orders);
+              }}
+            >
+              Confirm
+            </Button>
+            <Button
+              color="error"
+              onClick={() => setConfirmOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </ClickAwayListener>
+      </Popover>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+        }}
+      >
         <TextField
+          variant="standard"
           error={orderField.error}
           disabled={isSubmitting}
           placeholder="Order"
@@ -230,7 +236,21 @@ const MakeForm = ({
             ),
           }}
         />
-        {orders.length}/{MAX_ORDERS} Orders
+        <p
+          style={{
+            paddingLeft: '10px',
+          }}
+        >
+          {orders.length}/{MAX_ORDERS} Orders
+        </p>
+        <TextField
+          style={{
+            paddingLeft: '10px',
+          }}
+          variant="standard"
+          type="datetime-local"
+          defaultValue={Date.now()}
+        />
       </div>
       <List>
         {orders.map((order, i) => (

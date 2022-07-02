@@ -31,7 +31,7 @@ export default function OrdersPage(props: Props) {
   React.useEffect(() => console.log('User object is ', user), [user]);
 
   if (!session) {
-    return (<CircularProgress />);
+    // return (<CircularProgress />);
   }
 
   return (

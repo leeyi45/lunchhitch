@@ -7,10 +7,9 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import Link from 'next/link';
-import { signIn, signOut } from 'next-auth/react';
 import Button from '@mui/material/Button';
 import { useRouter } from 'next/router';
-import { LunchHitchUser } from '../../auth';
+import { LunchHitchUser, signOut } from '../../auth';
 
 export type NavbarProps = {
   user?: LunchHitchUser | null;
@@ -100,7 +99,7 @@ export default function NavBar({ user }: NavbarProps) {
                     <Button href="./profile">Profile</Button>
                   </MenuItem>
                   <MenuItem onClick={() => {
-                    signOut({ redirect: false });
+                    signOut();
                     router.push('/');
                   }}
                   >
@@ -111,12 +110,10 @@ export default function NavBar({ user }: NavbarProps) {
               : (
                 <>
                   <MenuItem>
-                    <Button onClick={() => signIn()}>Log In</Button>
-                    {/* <Link href="./auth/login">Log In</Link> */}
+                    <Link href="./auth/login">Log In</Link>
                   </MenuItem>
                   <MenuItem>
-                    <Button href="./auth/signup">Sign Up</Button>
-                    {/* <Link href="./auth/signup">Sign Up</Link> */}
+                    <Link href="./auth/signup">Sign Up</Link>
                   </MenuItem>
                 </>
               )}

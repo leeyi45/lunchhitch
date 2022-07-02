@@ -23,12 +23,13 @@ model Community {
 }
 
 model Order {
-  id     String   @id @default(auto()) @map("_id") @db.ObjectId
-  from   UserInfo @relation(fields: [fromId], references: [id])
-  fromId String
-  orders String[]
-  shop   Shop     @relation(fields: [shopId], references: [id])
-  shopId String   @db.ObjectId
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  from      UserInfo @relation(fields: [fromId], references: [id])
+  fromId    String
+  orders    String[]
+  shop      Shop     @relation(fields: [shopId], references: [id])
+  shopId    String   @db.ObjectId
+  deliverBy DateTime
 }
 
 model UserInfo {

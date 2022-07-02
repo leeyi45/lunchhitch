@@ -26,14 +26,11 @@ const ProfileDisplay = ({ user }: Props) => (
     <Stack spacing={1} style={{ alignItems: 'center', color: '#47b16a' }}>
       <h1>My Profile</h1>
       <h3>Name:</h3>
-      <Item>test</Item>
-      {/*<Item>{user.displayName}</Item>*/}
+      <Item>{user.displayName}</Item>
       <h3>Username:</h3>
-      <Item>test</Item>
-      {/*<Item>{user.username}</Item>*/}
+      <Item>{user.username}</Item>
       <h3>Email:</h3>
-      <Item>test@lunchhitch.firebaseapp.com</Item>
-      {/*<Item>{user.email}</Item>*/}
+      <Item>{user.email}</Item>
     </Stack>
   </>
 );

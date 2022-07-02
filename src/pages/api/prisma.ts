@@ -10,5 +10,5 @@ export default wrapWithQuery(
   async (req, res, { collection, method }) => {
     console.log(req.body);
     return (prisma as PrismaType)[collection][method](req.body);
-  }
+  },
 );

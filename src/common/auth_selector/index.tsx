@@ -1,7 +1,7 @@
-import { signIn, useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { LunchHitchUser } from '../../auth';
+import { useSession } from '../../auth_provider';
 import LoadingScreen from './loading_screen';
 
 type Props = ({
@@ -32,7 +32,7 @@ type Props = ({
 
 export default function AuthSelector({ unauthenticated, loading, ...props }: Props) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { user, status } = useSession();
 
   switch (status) {
     case 'authenticated': {
@@ -42,14 +42,14 @@ export default function AuthSelector({ unauthenticated, loading, ...props }: Pro
 
         return null as never;
       } else if (typeof props.children === 'function') {
-        return props.children(session.user as LunchHitchUser);
+        return props.children(user);
       } else {
         return props.children!;
       }
     }
     case 'unauthenticated': {
       if (!unauthenticated) {
-        signIn();
+        router.push(`/auth/login?callback=${router.pathname}`);
         return null as never;
       } else if (typeof unauthenticated === 'string') {
         router.push(unauthenticated);
