@@ -11,8 +11,12 @@ export default function LoadingScreen({ maxCount, message }: Props) {
   const [msgCount, setMsgCount] = React.useState(0);
 
   React.useEffect(() => {
-    const handle = setTimeout(() => setMsgCount(msgCount === maxCount ? 0 : msgCount + 1), 500);
-    return () => clearTimeout(handle);
+    if (maxCount! > 0) {
+      const handle = setTimeout(() => setMsgCount(msgCount === maxCount ? 0 : msgCount + 1), 500);
+      return () => clearTimeout(handle);
+    } else {
+      return () => {};
+    }
   }, [msgCount, maxCount]);
 
   return (

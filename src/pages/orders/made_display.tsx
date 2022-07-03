@@ -9,6 +9,7 @@ import { Order } from '@prisma/client';
 import { LunchHitchUser } from '../../auth';
 import useAsync from '../../common/async';
 import TooltipButton from '../../common/tooltip_button';
+import { LunchHitchOrder } from '../../prisma';
 
 const getOrdersMade = async (user: LunchHitchUser) => {
   const result = await fetch('api/prisma?collection=order&method=findMany', {
@@ -17,15 +18,19 @@ const getOrdersMade = async (user: LunchHitchUser) => {
       where: {
         from: user.username,
       },
+      include: {
+        from: true,
+        shop: true,
+      },
     }),
   });
 
-  return result.json() as unknown as Order[];
+  return result.json() as unknown as LunchHitchOrder[];
 };
 
 type OrderDisplayProps = {
-  orders: Order[];
-  onRemove: (index: number, order: Order) => void;
+  orders: LunchHitchOrder[];
+  onRemove: (index: number, order: LunchHitchOrder) => void;
 };
 
 const OrderDisplay = ({ orders, onRemove }: OrderDisplayProps) => {

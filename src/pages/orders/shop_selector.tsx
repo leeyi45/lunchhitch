@@ -3,13 +3,15 @@ import React from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import ListItem from '@mui/material/ListItem';
 import TextField from '@mui/material/TextField';
-import { Community, Shop } from '@prisma/client';
+import { Shop } from '@prisma/client';
+
+import { LunchHitchCommunity } from '../../prisma';
 
 type Props = {
   /**
    * Communities available to be selected
    */
-  communities: Community[];
+  communities: LunchHitchCommunity[];
 
   /**
    * Event fired when the value of the selected shop changes
@@ -26,7 +28,7 @@ type Props = {
  * Autocomplete selectors to select a community and shop
  */
 export default function ShopSelector({ communities, onChange, value }: Props) {
-  const [community, setCommunity] = React.useState<Community | null>(null);
+  const [community, setCommunity] = React.useState<LunchHitchCommunity | null>(null);
   const [shop, setShop] = React.useState<Shop | null>(value);
 
   React.useEffect(() => setShop(value), [value]);

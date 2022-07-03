@@ -1,7 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-var */
 /* eslint-disable vars-on-top */
-import { PrismaClient } from '@prisma/client';
+import {
+  Community, Order, PrismaClient, Shop, UserInfo,
+} from '@prisma/client';
 
 import { KeysOfType } from './common';
 
@@ -29,3 +31,12 @@ export const prismaFetch = (
   method: 'POST',
   body: JSON.stringify(args),
 });
+
+export type LunchHitchOrder = {
+  from: UserInfo;
+  shop: Shop;
+} & Order;
+
+export type LunchHitchCommunity = {
+  shops: Shop[];
+} & Community;
