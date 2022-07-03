@@ -4,7 +4,7 @@ import React from 'react';
 export default function OrderItem({ order }: { order: Order }) {
   return (
     <>
-      <h3>Order from {order.shop.name}</h3>
+      <h3>Order from {order.shop}</h3>
       <ol>
         {order.orders.map((item, i) => (
           <li key={i}>
