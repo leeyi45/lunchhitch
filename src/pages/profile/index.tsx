@@ -3,9 +3,9 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 
-import { LunchHitchUser } from '../auth';
-import AuthSelector from '../common/auth_selector';
-import NavBar from '../common/navbar';
+import { LunchHitchUser } from '../../auth';
+import AuthSelector from '../../common/auth_selector';
+import NavBar from '../../common/navbar';
 
 type Props = {
   user: LunchHitchUser;

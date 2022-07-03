@@ -2,8 +2,8 @@ import React from 'react';
 
 import { LunchHitchUser } from '../auth';
 import AuthSelector from '../common/auth_selector';
-import NoUserHomePage from '../common/components/noUser/NoUserHomePage';
-import UserHomePage from '../common/components/user/UserHomePage';
+import NoUserHomePage from './profile/noUser/NoUserHomePage';
+import UserHomePage from './profile/user/UserHomePage';
 import Navbar from '../common/navbar';
 
 export default function IndexPage() {
