@@ -1,8 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import React from 'react';
-import Popover, { PopoverProps } from '@mui/material/Popover';
-import { Button, ClickAwayListener } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Button, ClickAwayListener } from '@mui/material';
+import Popover, { PopoverProps } from '@mui/material/Popover';
 
 type Props = {
   confirmMessage: string;

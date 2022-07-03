@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { wrapIntoPromise } from './common';
+
 import { getSession } from './firebase/admin';
+import { wrapIntoPromise } from './common';
 
 type Params = {
   [name: string]: string;

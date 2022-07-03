@@ -1,38 +1,33 @@
-import CircularProgress from '@mui/material/CircularProgress';
+import React from 'react';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Button, ClickAwayListener, Popover } from '@mui/material';
 import { Community, Order, Shop } from '@prisma/client';
 import { Form, Formik } from 'formik';
-import { useSession } from 'next-auth/react';
-import React from 'react';
-import { Button, ClickAwayListener, Popover } from '@mui/material';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { LunchHitchUser } from '../../auth';
+import { GetServerSideProps, NextPage } from 'next';
+import { useRouter } from 'next/router';
+
+import { useSession } from '../../auth/auth_provider';
+import LoadingScreen from '../../common/auth_selector/loading_screen';
+import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/navbar';
+import { getSession } from '../../firebase/admin';
 import prisma from '../../prisma';
+
 import FulFillForm from './fulfill_form';
+import MadeDisplay from './made_display';
 import MakeForm from './make_form';
 import ShopSelector from './shop_selector';
-import Box from '../../common/components/Box/Box';
-import MadeDisplay from './made_display';
 
 type Props = {
   communities: Community[];
 }
 
-export default function OrdersPage(props: Props) {
+const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
   const [shop, setShop] = React.useState<Shop | null>(null);
   const [popoverOpened, setPopoverOpened] = React.useState(false);
   const [successPopover, setSuccessPopover] = React.useState<string | null>(null);
 
-  const { data: session } = useSession({
-    required: true,
-  });
-
-  const user = session?.user as LunchHitchUser;
-  React.useEffect(() => console.log('User object is ', user), [user]);
-
-  if (!session) {
-    // return (<CircularProgress />);
-  }
+  const { user } = useSession();
 
   return (
     <div
@@ -42,7 +37,7 @@ export default function OrdersPage(props: Props) {
     >
       <NavBar user={user} />
       <ShopSelector
-        communities={props.communities}
+        communities={communities}
         value={shop}
         onChange={setShop}
       />
@@ -97,7 +92,7 @@ export default function OrdersPage(props: Props) {
                   order: null,
                 }}
                 onSubmit={async (values) => {
-                // TODO need to figure out how to accept orders
+                  // TODO need to figure out how to accept orders
                 }}
               >
                 {({ isSubmitting, ...formik }) => (
@@ -158,17 +153,33 @@ export default function OrdersPage(props: Props) {
           </Box>
         </div>
         <Box>
-          <MadeDisplay user={user} />
+          <MadeDisplay user={user!} />
         </Box>
       </div>
     </div>
   );
-}
+};
 
-export async function getServerSideProps() {
+export default OrdersPage;
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  console.log(req.cookies.token);
+  const user = await getSession(req.cookies.token);
+
+  if (!user) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: '/auth/login?callback=orders',
+      },
+      props: {},
+    };
+  }
+
   // TODO:
   // Honestly not sure if we should fetch ALL communities server side
   // or load communities as the user types
+
   const communities = await prisma.community.findMany();
 
   return {
@@ -176,4 +187,4 @@ export async function getServerSideProps() {
       communities,
     },
   };
-}
+};

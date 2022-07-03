@@ -1,9 +1,9 @@
 /* eslint-disable no-shadow */
+import React from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import ListItem from '@mui/material/ListItem';
 import TextField from '@mui/material/TextField';
 import { Community, Shop } from '@prisma/client';
-import React from 'react';
 
 type Props = {
   /**

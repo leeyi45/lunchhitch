@@ -1,10 +1,11 @@
 import React from 'react';
+import CancelIcon from '@mui/icons-material/Cancel';
 import {
   Autocomplete, Button, ClickAwayListener, List, ListItem, Popover, TextField,
 } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Order } from '@prisma/client';
-import CancelIcon from '@mui/icons-material/Cancel';
+
 import { LunchHitchUser } from '../../auth';
 import useAsync from '../../common/async';
 import TooltipButton from '../../common/tooltip_button';

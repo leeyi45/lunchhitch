@@ -1,8 +1,9 @@
 import React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import ErrorIcon from '@mui/icons-material/Error';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ErrorIcon from '@mui/icons-material/Error';
+import RemoveIcon from '@mui/icons-material/Remove';
+import { ClickAwayListener } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import List from '@mui/material/List';
@@ -10,7 +11,7 @@ import ListItem from '@mui/material/ListItem';
 import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
 import { Shop } from '@prisma/client';
-import { ClickAwayListener } from '@mui/material';
+
 import TooltipButton from '../../common/tooltip_button';
 
 const MAX_ORDERS = 10;
