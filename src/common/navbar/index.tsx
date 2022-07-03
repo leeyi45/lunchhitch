@@ -6,10 +6,12 @@ import IconButton from '@mui/material/IconButton';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import Link from 'next/link';
 import Button from '@mui/material/Button';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+import Image from 'next/image';
 import { LunchHitchUser, signOut } from '../../auth';
+import Logo from '../media/logo.png';
 
 export type NavbarProps = {
   user?: LunchHitchUser | null;
@@ -40,25 +42,38 @@ export default function NavBar({ user }: NavbarProps) {
       <Toolbar>
         { user
           ? (
-            <Link href="/">
+            <>
+              <Image
+                src={Logo}
+                alt="logo"
+                width={60}
+                height={50}
+              />
               <Typography
-                variant="h6"
+                variant="h5"
                 component="div"
-                style={{ flexGrow: 1, textAlign: 'left' }}
+                style={{ flexGrow: 1, textAlign: 'left', paddingLeft: '10px' }}
               >
                 Lunch Hitch
               </Typography>
-            </Link>
+              <Link href="/">hi</Link>
+            </>
           ) : (
-            <Link href="/">
+            <>
+              <Image
+                src={Logo}
+                alt="logo"
+                width={60}
+                height={50}
+              />
               <Typography
-                variant="h6"
+                variant="h5"
                 component="div"
-                style={{ flexGrow: 1, textAlign: 'left' }}
+                style={{ flexGrow: 1, textAlign: 'left', paddingLeft: '10px' }}
               >
                 Lunch Hitch
               </Typography>
-            </Link>
+            </>
           )}
         <div>
           <IconButton
