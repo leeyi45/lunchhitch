@@ -9,7 +9,7 @@ import { useRouter } from 'next/router';
 import { useSession } from '../../auth/auth_provider';
 import LoadingScreen from '../../common/auth_selector/loading_screen';
 import Box from '../../common/components/Box/Box';
-import NavBar from '../../common/navbar';
+import NavBar from '../../common/components/navbar';
 import { getSession } from '../../firebase/admin';
 import prisma from '../../prisma';
 

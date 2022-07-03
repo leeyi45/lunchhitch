@@ -7,7 +7,7 @@ import {
 import { Order, Shop } from '@prisma/client';
 
 import useAsync from '../../common/async';
-import TooltipButton from '../../common/tooltip_button';
+import TooltipButton from '../../common/components/tooltip_button';
 
 type Props = {
   onSubmit: () => void;

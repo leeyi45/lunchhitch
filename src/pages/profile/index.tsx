@@ -5,7 +5,7 @@ import { styled } from '@mui/material/styles';
 
 import { LunchHitchUser } from '../../auth';
 import AuthSelector from '../../common/auth_selector';
-import NavBar from '../../common/navbar';
+import NavBar from '../../common/components/navbar';
 
 type Props = {
   user: LunchHitchUser;
