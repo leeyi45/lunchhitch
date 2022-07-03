@@ -1,20 +1,19 @@
 import React, { HTMLInputTypeAttribute } from 'react';
-import { useRouter } from 'next/router';
-import {
-  Form, Formik, useField,
-} from 'formik';
-import {
-  Button, Stack, TextField, TextFieldProps,
-} from '@mui/material';
-import * as yup from 'yup';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import Redirecter from '../../common/redirecter';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { FirebaseError } from 'firebase/app';
+import { Form, Formik, useField } from 'formik';
+import { useRouter } from 'next/router';
+import * as yup from 'yup';
+
 import { signUp } from '../../auth';
-import { firebaseErrorHandler } from '../../firebase';
-import { useSession } from '../../auth_provider';
+import { useSession } from '../../auth/auth_provider';
 import LoadingScreen from '../../common/auth_selector/loading_screen';
-import NavBar from '../../common/navbar';
 import PasswordField from '../../common/formik_wrapper/password_field';
+import NavBar from '../../common/navbar';
+import Redirecter from '../../common/redirecter';
 
 type SignupFieldProps = {
   name: string;
@@ -22,6 +21,9 @@ type SignupFieldProps = {
   labelText: string;
 } & TextFieldProps;
 
+/**
+ * Wrapper combining a Formik field and a MUI textfield
+ */
 const SignUpField = ({
   name, type, labelText, ...props
 }: SignupFieldProps) => {
@@ -29,9 +31,6 @@ const SignUpField = ({
 
   return (
     <TextField
-      style={{
-        marginTop: '20px',
-      }}
       type={type}
       variant="standard"
       label={labelText}
@@ -48,8 +47,11 @@ type SignUpFormProps = {
   onSubmitSuccess: () => void;
 };
 
+/**
+ * The actual signup form
+ */
 const SignUpForm = (props: SignUpFormProps) => {
-  const router = useRouter();
+  const [signUpError, setSignUpError] = React.useState<string | null>(null);
 
   return (
     <Formik
@@ -61,12 +63,25 @@ const SignUpForm = (props: SignUpFormProps) => {
         repeatPass: '',
       }}
       onSubmit={async (values) => {
-        await signUp(values);
-        props.onSubmitSuccess();
+        try {
+          await signUp(values);
+          props.onSubmitSuccess();
+        } catch (error: any) {
+          switch ((error as FirebaseError).code) {
+            case 'auth/email-already-exists': {
+              setSignUpError('An account with this username already exists');
+              break;
+            }
+            default: {
+              setSignUpError(`Unknown error: ${error.code}`);
+              break;
+            }
+          }
+        }
       }}
       validationSchema={yup.object({
         displayName: yup.string().required(),
-        email: yup.string().email(),
+        email: yup.string().email().required(),
         username: yup.string().required(),
         password: yup.string().required(),
         repeatPass: yup.string().required(),
@@ -74,7 +89,7 @@ const SignUpForm = (props: SignUpFormProps) => {
       validateOnBlur={false}
       validateOnChange={false}
     >
-      {({ resetForm, isSubmitting }) => (
+      {({ resetForm, isSubmitting, errors }) => (
         <Form>
           <Stack
             style={{
@@ -84,10 +99,11 @@ const SignUpForm = (props: SignUpFormProps) => {
               width: '30%',
             }}
             direction="column"
+            spacing={1.5}
           >
             <p style={{ color: '#50C878', fontSize: '30px' }}>Sign up for a Lunch Hitch account</p>
             <Button
-              onClick={() => router.push('/auth/login')}
+              href="/auth/login"
               style={{
                 float: 'left',
                 width: '20%',
@@ -98,6 +114,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                 Back To Login
               </Stack>
             </Button>
+            {signUpError || Object.values(errors).at(0)}
             <SignUpField
               labelText="Display Name"
               type="text"
@@ -149,6 +166,9 @@ const SignUpForm = (props: SignUpFormProps) => {
   );
 };
 
+/**
+ * Signup page to be displayed to the user
+ */
 export default function SignUpPage() {
   const [signUpSuccess, setSignUpSuccess] = React.useState(false);
   const { status } = useSession();

@@ -1,7 +1,9 @@
-import { useRouter } from 'next/router';
 import React from 'react';
+import { useRouter } from 'next/router';
+
 import { LunchHitchUser } from '../../auth';
-import { useSession } from '../../auth_provider';
+import { useSession } from '../../auth/auth_provider';
+
 import LoadingScreen from './loading_screen';
 
 type Props = ({
@@ -30,6 +32,9 @@ type Props = ({
   loading?: React.ReactElement<any> | string | null;
 };
 
+/**
+ * Component for displaying different results based on the current authentication status
+ */
 export default function AuthSelector({ unauthenticated, loading, ...props }: Props) {
   const router = useRouter();
   const { user, status } = useSession();

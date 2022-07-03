@@ -1,5 +1,5 @@
-import { Order } from '@prisma/client';
 import React from 'react';
+import { Order } from '@prisma/client';
 
 export default function OrderItem({ order }: { order: Order }) {
   return (

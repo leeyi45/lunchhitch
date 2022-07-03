@@ -1,6 +1,6 @@
 import React from 'react';
-import Popover, { PopoverProps } from '@mui/material/Popover';
 import ClickAwayListener, { ClickAwayListenerProps } from '@mui/material/ClickAwayListener';
+import Popover, { PopoverProps } from '@mui/material/Popover';
 
 type Props = PopoverProps & {
   children: ClickAwayListenerProps['children']

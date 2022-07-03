@@ -1,10 +1,11 @@
 import React from 'react';
-import { Order, Shop } from '@prisma/client';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import {
   Button,
   CircularProgress, ClickAwayListener, List, ListItem, Popover,
 } from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { Order, Shop } from '@prisma/client';
+
 import useAsync from '../../common/async';
 import TooltipButton from '../../common/tooltip_button';
 

@@ -1,6 +1,6 @@
-import { Paper } from "@mui/material";
+import { Paper } from '@mui/material';
 
-import styles from "./Box.module.css";
+import styles from './Box.module.css';
 
 function Box(props: { children: any; }) {
   const { children } = props;
