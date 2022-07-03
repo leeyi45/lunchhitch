@@ -7,7 +7,12 @@ import {
 import { Order, Shop } from '@prisma/client';
 
 import useAsync from '../../common/async';
+<<<<<<< Updated upstream
 import TooltipButton from '../../common/tooltip_button';
+=======
+import TooltipButton from '../../common/components/tooltip_button';
+import prisma, { LunchHitchOrder } from '../../prisma';
+>>>>>>> Stashed changes
 
 type Props = {
   onSubmit: () => void;
@@ -17,17 +22,31 @@ type Props = {
   isSubmitting: boolean;
 };
 
-async function getOrders(shop: Shop): Promise<Order[]> {
+async function newGetOrders(shop: Shop) {
+  const result = await prisma.order.findMany({
+    where: {
+      shop,
+    },
+    include: {
+      from: true,
+    },
+  });
+}
+
+async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
   const result = await fetch('api/prisma?collection=order&method=findMany', {
     method: 'POST',
     body: JSON.stringify({
       where: {
         shop: shop.id,
       },
+      include: {
+        from: true,
+      },
     }),
   });
 
-  return result.json();
+  return result.json() as unknown as LunchHitchOrder[];
 }
 
 type OrderItemProps = {
