@@ -14,9 +14,9 @@ export default function NoUserHomePage() {
       >
         Welcome to LunchHitch
       </Typography>
-      <p style={{fontSize: "30px"}}>
+      <p style={{ fontSize: '30px' }}>
         <DinnerDiningTwoToneIcon />
-        <b>Where food meets community{" "}</b>
+        <b>Where food meets community{' '}</b>
         <PeopleTwoToneIcon />
       </p>
     </div>
