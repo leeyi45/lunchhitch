@@ -7,12 +7,7 @@ import {
 import { Order, Shop } from '@prisma/client';
 
 import useAsync from '../../common/async';
-<<<<<<< Updated upstream
 import TooltipButton from '../../common/tooltip_button';
-=======
-import TooltipButton from '../../common/components/tooltip_button';
-import prisma, { LunchHitchOrder } from '../../prisma';
->>>>>>> Stashed changes
 
 type Props = {
   onSubmit: () => void;
