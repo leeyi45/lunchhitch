@@ -5,7 +5,7 @@
 import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile,
 } from '@firebase/auth';
-import { useRouter } from 'next/router';
+// import { useRouter } from 'next/router';
 import { FIREBASE_AUTH } from '../firebase';
 // import prisma from './prisma';
 

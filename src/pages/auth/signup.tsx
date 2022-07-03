@@ -10,7 +10,7 @@ import * as yup from 'yup';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Redirecter from '../../common/redirecter';
 import { signUp } from '../../auth';
-import { firebaseErrorHandler } from '../../firebase';
+// import { firebaseErrorHandler } from '../../firebase';
 import { useSession } from '../../auth_provider';
 import LoadingScreen from '../../common/auth_selector/loading_screen';
 import NavBar from '../../common/navbar';
