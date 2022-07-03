@@ -36,6 +36,7 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
       }}
     >
       <NavBar user={user} />
+      <p></p>
       <ShopSelector
         communities={communities}
         value={shop}
