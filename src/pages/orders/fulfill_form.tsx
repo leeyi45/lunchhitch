@@ -19,6 +19,17 @@ type Props = {
   isSubmitting: boolean;
 };
 
+async function newGetOrders(shop: Shop) {
+  const result = await prisma.order.findMany({
+    where: {
+      shop,
+    },
+    include: {
+      from: true,
+    },
+  });
+}
+
 async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
   const result = await fetch('api/prisma?collection=order&method=findMany', {
     method: 'POST',
@@ -33,7 +44,7 @@ async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
     }),
   });
 
-  return result.json();
+  return result.json() as unknown as LunchHitchOrder[];
 }
 
 type OrderItemProps = {
