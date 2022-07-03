@@ -52,11 +52,12 @@ export default function NavBar({ user }: NavbarProps) {
               <Typography
                 variant="h5"
                 component="div"
-                style={{ flexGrow: 1, textAlign: 'left', paddingLeft: '10px' }}
+                style={{ flexGrow: 1, textAlign: 'left', paddingLeft: '10px', paddingRight: '20px' }}
               >
                 Lunch Hitch
+                <Button style={{ color: 'white', paddingInline: '30px' }}><Link href="/">Home</Link></Button>
+                <Button style={{ color: 'white'}}><Link href="http://localhost:3000/orders">New Orders</Link></Button>
               </Typography>
-              <Link href="/">hi</Link>
             </>
           ) : (
             <>

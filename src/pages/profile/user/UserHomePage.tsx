@@ -18,8 +18,6 @@ export default function UserHomePage({ user }: { user: LunchHitchUser }) {
       <p style={{ fontSize: '30px' }}>What will it be today?
 
       </p>
-      <Button variant="outlined" href="http://localhost:3000/orders" style={{ color: '#50C878', backgroundColor: 'white' }}>New Orders</Button>
-      <p />
       <SwipeableEdgeDrawer />
 
     </div>
