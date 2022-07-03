@@ -98,22 +98,23 @@ export default function NavBar({ user }: NavbarProps) {
                   <MenuItem onClick={handleClose}>
                     <Button href="./profile">Profile</Button>
                   </MenuItem>
-                  <MenuItem onClick={() => {
-                    signOut();
-                    router.push('/');
-                  }}
-                  >
-                    Log out
+                  <MenuItem>
+                    <Button onClick={() => {
+                      signOut();
+                      router.push('/');
+                    }}
+                    >Log out
+                    </Button>
                   </MenuItem>
                 </>
               )
               : (
                 <>
                   <MenuItem>
-                    <Link href="./auth/login">Log In</Link>
+                    <Button href="./auth/login">Log In</Button>
                   </MenuItem>
                   <MenuItem>
-                    <Link href="./auth/signup">Sign Up</Link>
+                    <Button href="./auth/signup">Sign Up</Button>
                   </MenuItem>
                 </>
               )}
