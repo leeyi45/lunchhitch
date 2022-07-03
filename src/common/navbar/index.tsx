@@ -112,7 +112,7 @@ export default function NavBar({ user }: NavbarProps) {
               ? (
                 <>
                   <MenuItem onClick={handleClose}>
-                    <Button href="./profile">Profile</Button>
+                    <Button><Link href="./profile">Profile</Link></Button>
                   </MenuItem>
                   <MenuItem>
                     <Button onClick={() => {
