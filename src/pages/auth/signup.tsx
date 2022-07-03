@@ -85,7 +85,12 @@ const SignUpForm = (props: SignUpFormProps) => {
             }}
             direction="column"
           >
-            <p style={{ color: '#50C878', fontSize: '30px' }}>Sign up for a Lunch Hitch account</p>
+            <p style={{
+              color: '#50C878', fontSize: '30px', lineHeight: '100px', textAlign: 'center',
+            }}
+            >
+              Sign up for a Lunch Hitch account
+            </p>
             <Button
               onClick={() => router.push('/auth/login')}
               style={{
