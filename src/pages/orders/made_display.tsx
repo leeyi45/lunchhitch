@@ -8,7 +8,7 @@ import { Order } from '@prisma/client';
 
 import { LunchHitchUser } from '../../auth';
 import useAsync from '../../common/async';
-import TooltipButton from '../../common/tooltip_button';
+import TooltipButton from '../../common/components/tooltip_button';
 
 const getOrdersMade = async (user: LunchHitchUser) => {
   const result = await fetch('api/prisma?collection=order&method=findMany', {

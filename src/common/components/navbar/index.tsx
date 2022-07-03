@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { LunchHitchUser, signOut } from '../../auth';
+import { LunchHitchUser, signOut } from '../../../auth';
 
 export type NavbarProps = {
   user?: LunchHitchUser | null;
