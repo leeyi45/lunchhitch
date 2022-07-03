@@ -1,10 +1,13 @@
 .UserHomePage {
     background: url('../../media/userBack.jpg') no-repeat;
     background-size: cover;
+    background-position: center;
     color: #1f4423 ;
     text-align: center;
-    padding-top: 100px;
-    padding-bottom: 260px;
     font-family: 'raleway';
-    line-height: 30px;
+    line-height: 40px;
+    height: calc(100vh - 90px);
+    overflow: hidden;
+    padding: 12%;
+
 }
