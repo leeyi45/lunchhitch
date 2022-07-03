@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getSession } from 'next-auth/react';
-import { LunchHitchUser } from './auth';
+
+import { getSession } from './firebase/admin';
 import { wrapIntoPromise } from './common';
 
 type Params = {
   [name: string]: string;
 };
 
-type Handler<P extends Params> = (req: NextApiRequest, res: NextApiResponse, params: P) => any | Promise<any>;
+type Handler = (req: NextApiRequest, res: NextApiResponse, params: Params) => any | Promise<any>;
 
 type ErrorHandler = (error: any, res: NextApiResponse) => void;
 
@@ -17,71 +17,57 @@ type ErrorHandler = (error: any, res: NextApiResponse) => void;
  * @param params Array containing the keys of the desired parameters
  * @returns Wrapped API route handler
  */
-export const wrapWithQuery = <P extends Params>(
+export const wrapWithQuery = (
   params: string[],
-  handler: Handler<P>,
+  handler: Handler,
   errorHandler?: ErrorHandler,
 ) => async (req: NextApiRequest, res: NextApiResponse) => {
-    const query = req.query as P;
-    const { hasError: errored, result: errors, paramResult: queryParams } = params.reduce(({ hasError, result, paramResult }, param) => {
-      if (typeof query[param] !== 'string') {
-        result.push(param);
-        return {
-          hasError: true,
-          result,
-          paramResult,
-        };
-      }
+  const query = req.query as Params;
+  const { hasError: errored, result: errors, paramResult: queryParams } = params.reduce(({ hasError, result, paramResult }, param) => {
+    if (typeof query[param] !== 'string') {
+      result.push(param);
       return {
-        hasError,
+        hasError: true,
         result,
-        paramResult: {
-          ...paramResult,
-          [param]: query[param],
-        },
+        paramResult,
       };
-    }, { hasError: false, result: [] as string[], paramResult: {} as P });
-
-    if (errored) {
-      res.status(400).json({ error: `Missing required query params: ${errors.join(', ')}` });
-    } else {
-      try {
-        const result = await wrapIntoPromise(handler(req, res, queryParams));
-        res.status(200).json(result);
-      } catch (error) {
-        if (errorHandler) errorHandler(error, res);
-        else if (process.env.NODE_ENV === 'production') {
-          res.status(500).json({ error });
-          return;
-        }
-        throw error;
-      }
     }
-  };
+    return {
+      hasError,
+      result,
+      paramResult: {
+        ...paramResult,
+        [param]: query[param],
+      },
+    };
+  }, { hasError: false, result: [] as string[], paramResult: {} as Params });
 
-/**
- * Wrap API routes to automatically require a username parameter and check authentication using `getSession` and return HTTP 401/403
- * @param handler API route handler
- * @param paramStrs Array containing the keys of the desired parameters
- * @returns Wrapped API route handler
- */
-export const wrapWithAuth = <P extends Params>(
+  if (errored) {
+    res.status(400).json({ error: `Missing required query params: ${errors.join(', ')}` });
+  } else {
+    try {
+      const result = await wrapIntoPromise(handler(req, res, queryParams));
+      res.status(200).json(result);
+    } catch (error) {
+      if (errorHandler) errorHandler(error, res);
+      else if (process.env.NODE_ENV === 'production') {
+        res.status(500).json({ error });
+        return;
+      }
+      throw error;
+    }
+  }
+};
+
+export const wrapWithAuth = (
   paramStrs: string[],
-  handler: Handler<P & { username: string }>,
+  handler: Handler,
   errorHandler?: ErrorHandler,
-) => wrapWithQuery<P & { username: string }>([...paramStrs, 'username'], async (request, response, params) => {
-  const session = await getSession();
-
-  if (!session) {
+) => wrapWithQuery(paramStrs, async (request, response, params) => {
+  const username = await getSession(request.cookies.token);
+  if (!username) {
     response.status(401).json({ error: 'Must be logged in' });
     return undefined;
   }
-
-  const user = session.user as LunchHitchUser;
-  if (user.username !== params.username) {
-    response.status(403).json({ error: `Must be logged in as ${params.username}` });
-    return undefined;
-  }
-
-  return wrapIntoPromise(handler(request, response, params));
+  return wrapIntoPromise(handler(request, response, { username, ...params }));
 }, errorHandler);

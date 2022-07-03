@@ -1,13 +1,15 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import '../styles/globals.css';
 import React from 'react';
-import type { AppProps } from 'next/app';
-import { SessionProvider } from 'next-auth/react';
+import { AppProps } from 'next/app';
 
-export default function MyApp({ Component, pageProps: { session, ...pageProps } }: AppProps) {
+import { AuthProvider } from '../auth/auth_provider';
+
+import '../styles/globals.css';
+
+export default function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <SessionProvider session={session}>
+    <AuthProvider>
       <Component {...pageProps} />
-    </SessionProvider>
+    </AuthProvider>
   );
 }

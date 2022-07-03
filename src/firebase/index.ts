@@ -2,9 +2,8 @@
  * firebase/index.ts
  * Configuration information for firebase integrations
  */
-import { initializeAuth } from '@firebase/auth';
-import { FirebaseError, initializeApp } from 'firebase/app';
-import { initializeFirestore } from 'firebase/firestore';
+import * as firebase from 'firebase/app';
+import * as firebaseAuth from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: process.env.FIREBASE_API_KEY,
@@ -16,11 +15,14 @@ const firebaseConfig = {
   measurementId: 'G-QHNWEVTCH0',
 };
 
-export const FIREBASE_APP = initializeApp(firebaseConfig);
-export const FIREBASE_AUTH = initializeAuth(FIREBASE_APP);
-export const FIRESTORE = initializeFirestore(FIREBASE_APP, {});
+if (firebase.getApps().length === 0) {
+  firebase.initializeApp(firebaseConfig);
+}
 
-export function firebaseErrorHandler(error: string | FirebaseError, codes: { [code: string]: string }) {
+export const FIREBASE_APP = firebase.getApps()[0];
+export const FIREBASE_AUTH = firebaseAuth.initializeAuth(FIREBASE_APP);
+
+export function firebaseErrorHandler(error: string | firebase.FirebaseError, codes: { [code: string]: string }) {
   // NextAuth wants to be stupid and return errors as strings
   // So we need to use regex and extract the Firebase error code from the string
   const errorCode = (typeof error === 'string' ? error : error.code).match(/\(auth\/(.+)\)/);

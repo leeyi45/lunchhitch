@@ -1,17 +1,19 @@
 import React from 'react';
-import * as yup from 'yup';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import Link from 'next/link';
 import {
-  Field,
-  FieldProps,
   Form, Formik,
 } from 'formik';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Button, InputAdornment, TextField } from '@mui/material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { signIn, SignInResponse, useSession } from 'next-auth/react';
+import * as yup from 'yup';
+
+import { signIn } from '../../auth';
+import { useSession } from '../../auth/auth_provider';
+import PasswordField from '../../common/formik_wrapper/password_field';
+import NavBar from '../../common/navbar';
 import { firebaseErrorHandler } from '../../firebase';
 
 export default function LoginPage() {
@@ -26,7 +28,6 @@ export default function LoginPage() {
   }
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
-  const [showPassword, setShowPassword] = React.useState(false);
 
   return (
     <div style={{
@@ -34,47 +35,52 @@ export default function LoginPage() {
       alignContent: 'center',
     }}
     >
-      <div style={{ background: '#50C878' }}>
-        <Typography
-          variant="h6"
-          component="div"
-          style={{
-            flexGrow: 1,
-            textAlign: 'left',
-            fontFamily: 'Raleway',
-            color: 'white',
-          }}
-        >
-          Log In to Lunch Hitch
-        </Typography>
-      </div>
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        height: '100%',
-        alignItems: 'center',
-        justifyContent: 'center',
-        position: 'absolute',
-        paddingBottom: '100px',
-        border: '5px solid #50C878',
-      }}
+      <NavBar />
+      <Stack
+        style={{
+          width: '30%',
+          left: '35%',
+          height: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'absolute',
+          paddingBottom: '100px',
+        }}
+        spacing={2}
       >
+        <div style={{
+          background: '#50C878',
+          width: '100%',
+        }}
+        >
+          <Typography
+            variant="h4"
+            component="div"
+            style={{
+              flexGrow: 1,
+              textAlign: 'center',
+              fontFamily: 'Raleway',
+              color: 'white',
+            }}
+          >
+            Log In to Lunch Hitch
+          </Typography>
+        </div>
         <Formik
           initialValues={{
             username: '',
             password: '',
           }}
           validateOnMount={false}
+          validateOnBlur={false}
+          validateOnChange={false}
           validationSchema={yup.object({
             username: yup.string().required('Username is required!'),
             password: yup.string().required('Password is required!'),
           })}
           onSubmit={async (values, actions) => {
             try {
-              const result = await signIn('credentials', { ...values, redirect: false }) as unknown as SignInResponse;
-
-              if (!result.ok) throw result.error;
+              await signIn(values);
               // router.push('/profile');
             } catch (error: any) {
               actions.setFieldValue('password', '');
@@ -88,59 +94,37 @@ export default function LoginPage() {
         >
           {({ values, errors, ...formik }) => (
             <Form>
-              <div
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
+              <Stack
+                direction="column"
+                spacing={1.5}
               >
                 {loginError || Object.values(errors).at(0)}<br />
-                Username
                 <TextField
                   type="text"
+                  label="Username"
                   value={values.username}
                   variant="standard"
                   onChange={(event) => formik.setFieldValue('username', event.target.value)}
                   onBlur={formik.handleBlur}
-                  error={errors.username !== null}
+                  error={!!errors.username && formik.touched.username}
                 />
-                Password
-                <Field
+                <PasswordField
+                  variant="standard"
+                  label="Password"
                   name="password"
-                >
-                  {({ field }: FieldProps) => (
-                    <TextField
-                      variant="standard"
-                      type={showPassword ? 'text' : 'password'}
-                      value={field.value}
-                      onChange={(event) => formik.setFieldValue('password', event.target.value)}
-                      onBlur={field.onBlur}
-                      error={errors.password !== null}
-                      InputProps={{
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <Button
-                              onClick={() => setShowPassword(!showPassword)}
-                            >
-                              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                            </Button>
-                          </InputAdornment>),
-                      }}
-                    />
-                  )}
-                </Field>
+                />
                 <Button
                   type="submit"
                   disabled={formik.isSubmitting}
                 >Sign In
                 </Button>
-              </div>
+              </Stack>
             </Form>
           )}
         </Formik>
         <Link href="/auth/signup">Sign Up</Link>
         <Link href="/auth/reset">Forgot your password?</Link>
-      </div>
+      </Stack>
     </div>
   );
 }

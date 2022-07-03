@@ -1,9 +1,9 @@
 /* eslint-disable no-shadow */
+import React from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import ListItem from '@mui/material/ListItem';
 import TextField from '@mui/material/TextField';
 import { Community, Shop } from '@prisma/client';
-import React from 'react';
 
 type Props = {
   /**
@@ -34,10 +34,13 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
   return (
     <>
       <Autocomplete
+        style={{
+          paddingTop: '20px',
+          paddingBottom: '20px',
+        }}
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         options={communities}
-        filterOptions={(x) => x}
         onChange={(_event, value) => setCommunity(value)}
         renderInput={(params) => (<TextField {...params} label="Community" />)}
         renderOption={(liProps, option) => (
@@ -50,8 +53,10 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         )}
         value={community}
       />
-      <p></p>
       <Autocomplete
+        style={{
+          paddingBottom: '20px',
+        }}
         disabled={community === null}
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}

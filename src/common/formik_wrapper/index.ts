@@ -1,5 +1,5 @@
-import FormikWrapper from './formik_wrapper';
 import FieldWrapper from './field_wrapper';
+import FormikWrapper from './formik_wrapper';
 
 export {
   FormikWrapper,

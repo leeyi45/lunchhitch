@@ -1,14 +1,17 @@
 import React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import ErrorIcon from '@mui/icons-material/Error';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ErrorIcon from '@mui/icons-material/Error';
+import RemoveIcon from '@mui/icons-material/Remove';
+import { ClickAwayListener } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
+import { Shop } from '@prisma/client';
+
 import TooltipButton from '../../common/tooltip_button';
 
 const MAX_ORDERS = 10;
@@ -63,22 +66,28 @@ type MakeFormProps = {
   isSubmitting: boolean;
   onChange: (newValue: string[]) => void;
   onSubmit: (orders: string[]) => void;
-  popoverElement: any;
+  shop: Shop | null;
+  onPopoverChange: (opened: boolean) => void;
 };
 
-const MakeForm = (props: MakeFormProps) => {
+const MakeForm = ({
+  isSubmitting, onChange, onSubmit, shop, onPopoverChange,
+}: MakeFormProps) => {
   const [orderField, setOrderField] = React.useState({
     value: '',
     helper: '',
     error: false,
   });
 
-  const [popoverOpen, setPopoverOpen] = React.useState(false);
+  const [clearPopover, setClearOpen] = React.useState(false);
+  const [confirmPopover, setConfirmOpen] = React.useState(false);
   const [orders, setOrdersValue] = React.useState<string[]>([]);
+
+  React.useEffect(() => onPopoverChange(clearPopover || confirmPopover), [clearPopover, confirmPopover, onPopoverChange]);
 
   const setOrders = (value: string[]) => {
     setOrdersValue(value);
-    props.onChange(value);
+    onChange(value);
   };
 
   const addOrder = (order: string, index?: number) => {
@@ -117,36 +126,88 @@ const MakeForm = (props: MakeFormProps) => {
 
   return (
     <>
-      <div>
-        <Popover
-          open={popoverOpen}
-          anchorEl={props.popoverElement}
+      <Popover
+        open={clearPopover}
+        anchorReference="none"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <ClickAwayListener
+          onClickAway={() => setClearOpen(false)}
         >
-          Are you sure you want to clear all orders?
-          <Button
-            color="success"
-            onClick={() => {
-              setPopoverOpen(false);
-              setOrders([]);
-              setOrderField({
-                ...orderField,
-                error: false,
-                helper: 'Orders cleared',
-              });
-            }}
-          >
-            Confirm
-          </Button>
-          <Button
-            color="error"
-            onClick={() => setPopoverOpen(false)}
-          >
-            Cancel
-          </Button>
-        </Popover>
+          <div>
+            <h3>Are you sure you want to clear all orders?</h3>
+            <Button
+              color="success"
+              onClick={() => {
+                setClearOpen(false);
+                setOrders([]);
+                setOrderField({
+                  ...orderField,
+                  error: false,
+                  helper: 'Orders cleared',
+                });
+              }}
+            >
+              Confirm
+            </Button>
+            <Button
+              color="error"
+              onClick={() => setClearOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </ClickAwayListener>
+      </Popover>
+      <Popover
+        open={confirmPopover}
+        anchorReference="none"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <ClickAwayListener
+          onClickAway={() => setConfirmOpen(false)}
+        >
+          <div>
+            <p>Confirm your order from {shop?.name}:</p>
+            <ol>
+              {orders.map((order, i) => (<li key={i}>{order}</li>))}
+            </ol>
+            <Button
+              color="success"
+              onClick={() => {
+                setConfirmOpen(false);
+                onSubmit(orders);
+              }}
+            >
+              Confirm
+            </Button>
+            <Button
+              color="error"
+              onClick={() => setConfirmOpen(false)}
+            >
+              Cancel
+            </Button>
+          </div>
+        </ClickAwayListener>
+      </Popover>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+        }}
+      >
         <TextField
+          variant="standard"
           error={orderField.error}
-          disabled={props.isSubmitting}
+          disabled={isSubmitting}
           placeholder="Order"
           onChange={(event) => setOrderField({
             value: event.target.value,
@@ -167,7 +228,7 @@ const MakeForm = (props: MakeFormProps) => {
               <InputAdornment position="end">
                 <TooltipButton
                   tooltip={`Add ${orderField.value} to list`}
-                  disabled={orderField.value === '' || props.isSubmitting}
+                  disabled={orderField.value === '' || isSubmitting}
                   onClick={() => addOrder(orderField.value)}
                 >
                   <AddIcon />
@@ -176,7 +237,21 @@ const MakeForm = (props: MakeFormProps) => {
             ),
           }}
         />
-        {orders.length}/{MAX_ORDERS} Orders
+        <p
+          style={{
+            paddingLeft: '10px',
+          }}
+        >
+          {orders.length}/{MAX_ORDERS} Orders
+        </p>
+        <TextField
+          style={{
+            paddingLeft: '10px',
+          }}
+          variant="standard"
+          type="datetime-local"
+          defaultValue={Date.now()}
+        />
       </div>
       <List>
         {orders.map((order, i) => (
@@ -199,16 +274,16 @@ const MakeForm = (props: MakeFormProps) => {
       <div>
         <Button
           disabled={orders.length === 0}
-          onClick={() => setPopoverOpen(true)}
+          onClick={() => setClearOpen(true)}
         >Clear Orders
         </Button>
         <TooltipButton
           disabled={orders.length === 0
                   || orders.find((order) => order === '') !== undefined
-                  || props.isSubmitting}
+                  || isSubmitting}
           tooltip={orders.length === 0 ? 'Add some orders first' : 'Place these orders!'}
           tooltipOnDisabled
-          onClick={() => props.onSubmit(orders)}
+          onClick={() => setConfirmOpen(true)}
         >
           Place Orders
         </TooltipButton>

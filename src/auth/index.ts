@@ -3,13 +3,11 @@
  * Functions for managing users
  */
 import {
-  createUserWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile,
 } from '@firebase/auth';
-import {
-  signOut as nextAuthSignOut, signIn as nextAuthSignIn, SignInResponse,
-} from 'next-auth/react';
 import { useRouter } from 'next/router';
-import { FIREBASE_AUTH } from './firebase';
+
+import { FIREBASE_AUTH } from '../firebase';
 // import prisma from './prisma';
 
 const DEFAULT_DOMAIN = 'lunchhitch.firebaseapp.com';
@@ -45,12 +43,12 @@ async function prismaFetch(username: string, method: string, args: any) {
 /**
  * Sign in with the given username and password
  */
-export const signIn = async (creds: Credential) => await nextAuthSignIn('credentials', { ...creds, redirect: false }) as unknown as SignInResponse;
+export const signIn = ({ username, password }: Credential) => signInWithEmailAndPassword(FIREBASE_AUTH, `${username}@${DEFAULT_DOMAIN}`, password);
 
 /**
  * Sign out the current user. Wraps around both the NextAuth signOut and Firebase signOut methods
  */
-export const signOut = () => Promise.all([firebaseSignOut(FIREBASE_AUTH), nextAuthSignOut({ redirect: false })]);
+export const signOut = () => firebaseSignOut(FIREBASE_AUTH);
 
 type SignUpParams = {
   username: string;

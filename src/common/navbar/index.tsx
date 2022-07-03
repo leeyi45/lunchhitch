@@ -6,11 +6,12 @@ import IconButton from '@mui/material/IconButton';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import Link from 'next/link';
-import { signIn, signOut } from 'next-auth/react';
 import Button from '@mui/material/Button';
 import { useRouter } from 'next/router';
-import { LunchHitchUser } from '../../auth';
+import Link from 'next/link';
+import Image from 'next/image';
+import { LunchHitchUser, signOut } from '../../auth';
+import Logo from '../media/logo.png';
 
 export type NavbarProps = {
   user?: LunchHitchUser | null;
@@ -41,23 +42,38 @@ export default function NavBar({ user }: NavbarProps) {
       <Toolbar>
         { user
           ? (
-            <Link href="/">
+            <>
+              <Image
+                src={Logo}
+                alt="logo"
+                width={60}
+                height={50}
+              />
               <Typography
-                variant="h6"
+                variant="h5"
                 component="div"
-                style={{ flexGrow: 1, textAlign: 'left' }}
+                style={{ flexGrow: 1, textAlign: 'left', paddingLeft: '10px' }}
               >
                 Lunch Hitch
               </Typography>
-            </Link>
+              <Link href="/">hi</Link>
+            </>
           ) : (
-            <Typography
-              variant="h6"
-              component="div"
-              style={{ flexGrow: 1, textAlign: 'left' }}
-            >
-              Lunch Hitch
-            </Typography>
+            <>
+              <Image
+                src={Logo}
+                alt="logo"
+                width={60}
+                height={50}
+              />
+              <Typography
+                variant="h5"
+                component="div"
+                style={{ flexGrow: 1, textAlign: 'left', paddingLeft: '10px' }}
+              >
+                Lunch Hitch
+              </Typography>
+            </>
           )}
         <div>
           <IconButton
@@ -97,24 +113,23 @@ export default function NavBar({ user }: NavbarProps) {
                   <MenuItem onClick={handleClose}>
                     <Button href="./profile">Profile</Button>
                   </MenuItem>
-                  <MenuItem onClick={() => {
-                    signOut({ redirect: false });
-                    router.push('/');
-                  }}
-                  >
-                    Log out
+                  <MenuItem>
+                    <Button onClick={() => {
+                      signOut();
+                      router.push('/');
+                    }}
+                    >Log out
+                    </Button>
                   </MenuItem>
                 </>
               )
               : (
                 <>
                   <MenuItem>
-                    <Button onClick={() => signIn()}>Log In</Button>
-                    {/* <Link href="./auth/login">Log In</Link> */}
+                    <Button href="./auth/login">Log In</Button>
                   </MenuItem>
                   <MenuItem>
                     <Button href="./auth/signup">Sign Up</Button>
-                    {/* <Link href="./auth/signup">Sign Up</Link> */}
                   </MenuItem>
                 </>
               )}

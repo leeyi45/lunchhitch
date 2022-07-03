@@ -1,16 +1,19 @@
 import React from 'react';
-import { Order, Shop } from '@prisma/client';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import {
   Button,
-  CircularProgress, List, ListItem, Popover,
+  CircularProgress, ClickAwayListener, List, ListItem, Popover,
 } from '@mui/material';
+import { Order, Shop } from '@prisma/client';
+
 import useAsync from '../../common/async';
+import TooltipButton from '../../common/tooltip_button';
 
 type Props = {
   onSubmit: () => void;
   onSelect: (order: Order) => void;
+  onPopoverChanged: (opened: boolean) => void;
   shop: Shop | null;
-  popoverElement: any;
   isSubmitting: boolean;
 };
 
@@ -55,7 +58,7 @@ const OrderListItem = ({ order, onSelect }: OrderItemProps) => {
 };
 
 export default function FulFillForm({
-  shop, onSelect, onSubmit, popoverElement, isSubmitting,
+  shop, onSelect, onSubmit, isSubmitting, onPopoverChanged,
 }: Props) {
   const [popover, setPopover] = React.useState(false);
   const [selected, setSelected] = React.useState<Order | null>(null);
@@ -68,60 +71,101 @@ export default function FulFillForm({
     return orders.cancel;
   }, [shop]);
 
-  const getForm = () => {
+  React.useEffect(() => onPopoverChanged(popover), [popover, onPopoverChanged]);
+
+  const getForm = React.useCallback(() => {
+    if (!shop) {
+      return <>Select a community and shop to show orders!</>;
+    }
+
     switch (orders.state) {
       case 'loading': return (<CircularProgress />);
       case 'errored': return <>An error occurred, please refresh the page and try again</>;
       case 'done': {
         if (orders.result.length === 0) return <>No Orders</>;
         return (
-          <List>
-            {orders.result.map((order, i) => (
-              <OrderListItem
-                order={order}
-                key={i}
-                onSelect={() => {
-                  onSelect(order);
-                  setPopover(true);
-                  setSelected(order);
-                }}
-              />
-            ))}
-          </List>
+          <>
+            Displaying orders from {shop.name}
+            <List>
+              {orders.result.map((order, i) => (
+                <OrderListItem
+                  order={order}
+                  key={i}
+                  onSelect={() => {
+                    onSelect(order);
+                    setPopover(true);
+                    setSelected(order);
+                  }}
+                />
+              ))}
+            </List>
+          </>
         );
       }
       default: return null as never;
     }
-  };
+  }, [orders, shop]);
 
   return (
     <>
+      <div
+        style={{
+          display: 'inline',
+        }}
+      >
+        <h2 style={{ color: '#47b16a' }}>Fulfill an Order!</h2>
+        <TooltipButton
+          style={{
+            float: 'right',
+          }}
+          tooltip="Refresh orders"
+          onClick={() => orders.call(shop!)}
+          disabled={shop === null}
+        >
+          <RefreshIcon />
+        </TooltipButton>
+      </div>
       <Popover
         open={popover}
-        anchorEl={popoverElement}
+        anchorReference="none"
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       >
-        <h3>Accept the following order?</h3>
-        <ol>
-          {selected?.orders.map((order, i) => <li key={i}>{order}</li>)}
-        </ol>
-        <Button
-          color="success"
-          onClick={() => {
-            if (!isSubmitting) {
-              setPopover(false);
-              onSubmit();
-            }
-          }}
+        <ClickAwayListener
+          onClickAway={() => setPopover(false)}
         >
-          Accept order
-        </Button>
-        <Button
-          color="error"
-          onClick={() => setPopover(false)}
-        >
-          Cancel
-        </Button>
+          <div
+            style={{
+              padding: '10px 10px 10px 10px',
+            }}
+          >
+            <h3>Accept the following order?</h3>
+            <ol>
+              {selected?.orders.map((order, i) => <li key={i}>{order}</li>)}
+            </ol>
+            <Button
+              color="success"
+              onClick={() => {
+                if (!isSubmitting) {
+                  setPopover(false);
+                  onSubmit();
+                }
+              }}
+            >
+              Accept order
+            </Button>
+            <Button
+              color="error"
+              onClick={() => setPopover(false)}
+            >
+              Cancel
+            </Button>
 
+          </div>
+        </ClickAwayListener>
       </Popover>
       {getForm()}
     </>
