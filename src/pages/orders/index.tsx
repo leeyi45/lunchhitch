@@ -161,7 +161,7 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
 
 export default OrdersPage;
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+export const getServerSideProps: GetServerSideProps = async ({ }) => {
   // console.log(req.cookies.token);
   // const user = await getSession(req.cookies.token);
 
