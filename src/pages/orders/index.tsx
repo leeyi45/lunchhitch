@@ -8,7 +8,7 @@ import { GetServerSideProps } from 'next';
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/navbar';
-import { getSession } from '../../firebase/admin';
+// import { getSession } from '../../firebase/admin';
 import prisma, { LunchHitchCommunity } from '../../prisma';
 
 import FulFillForm from './fulfill_form';
@@ -89,7 +89,7 @@ export default function OrdersPage({ communities }: Props) {
                 initialValues={{
                   order: null,
                 }}
-                onSubmit={async (values) => {
+                onSubmit={async () => {
                   // TODO need to figure out how to accept orders
                 }}
               >
@@ -127,7 +127,7 @@ export default function OrdersPage({ communities }: Props) {
                     method: 'POST',
                     body: JSON.stringify({
                       where: {
-                        from: user.username,
+                        from: user!.username,
                         orders: values.orders,
                         shop: shop!.id,
                       },
