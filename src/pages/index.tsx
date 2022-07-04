@@ -1,3 +1,4 @@
+import React from 'react';
 import { LunchHitchUser } from '../auth';
 import AuthSelector from '../common/auth_selector';
 import Navbar from '../common/navbar';

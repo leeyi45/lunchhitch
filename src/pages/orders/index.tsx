@@ -120,10 +120,8 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
                 initialValues={{
                   orders: [],
                 }}
-                onSubmit={async () => {
+                onSubmit={async ( values ) => {
                   setSuccessPopover('Successfully placed your order!');
-                  return;
-                  /*
                   await fetch('/api/prisma?collection=orders&method=create', {
                     method: 'POST',
                     body: JSON.stringify({
@@ -133,7 +131,7 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
                         shop: shop!.id,
                       },
                     }),
-                  }); */
+                  });
                 }}
               >
                 {({ isSubmitting, ...formik }) => (
@@ -162,6 +160,7 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
 export default OrdersPage;
 
 export const getServerSideProps: GetServerSideProps = async ({ }) => {
+  /* eslint-disable no-empty-pattern */
   // console.log(req.cookies.token);
   // const user = await getSession(req.cookies.token);
 
