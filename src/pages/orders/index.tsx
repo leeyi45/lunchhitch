@@ -127,7 +127,7 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
                     method: 'POST',
                     body: JSON.stringify({
                       where: {
-                        from: user.username,
+                        from: user!.username,
                         orders: values.orders,
                         shop: shop!.id,
                       },
