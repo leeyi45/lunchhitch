@@ -8,7 +8,7 @@ import { Order } from '@prisma/client';
 
 import { LunchHitchUser } from '../../auth';
 import useAsync from '../../common/async';
-import TooltipButton from '../../common/tooltip_button';
+import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
 
 const getOrdersMade = async (user: LunchHitchUser) => {

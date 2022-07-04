@@ -3,7 +3,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Button, ClickAwayListener, Popover } from '@mui/material';
 import { Order, Shop } from '@prisma/client';
 import { Form, Formik } from 'formik';
-import { GetServerSideProps, NextPage } from 'next';
+import { GetServerSideProps } from 'next';
 
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
@@ -20,7 +20,7 @@ type Props = {
   communities: LunchHitchCommunity[];
 }
 
-const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
+export default function OrdersPage({ communities }: Props) {
   const [shop, setShop] = React.useState<Shop | null>(null);
   const [popoverOpened, setPopoverOpened] = React.useState(false);
   const [successPopover, setSuccessPopover] = React.useState<string | null>(null);
@@ -156,28 +156,9 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
       </div>
     </div>
   );
-};
+}
 
-export default OrdersPage;
-
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  console.log(req.cookies.token);
-  // const user = await getSession(req.cookies.token);
-
-  // if (!user) {
-  //   return {
-  //     redirect: {
-  //       permanent: false,
-  //       destination: '/auth/login?callback=orders',
-  //     },
-  //     props: {},
-  //   };
-  // }
-
-  // TODO:
-  // Honestly not sure if we should fetch ALL communities server side
-  // or load communities as the user types
-
+export async function getServerSideProps() {
   const communities = await prisma.community.findMany({
     include: {
       shops: true,
@@ -189,4 +170,35 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       communities,
     },
   };
-};
+}
+
+// export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+//   console.log(req.cookies.token);
+//   // const user = await getSession(req.cookies.token);
+
+//   // if (!user) {
+//   //   return {
+//   //     redirect: {
+//   //       permanent: false,
+//   //       destination: '/auth/login?callback=orders',
+//   //     },
+//   //     props: {},
+//   //   };
+//   // }
+
+//   // TODO:
+//   // Honestly not sure if we should fetch ALL communities server side
+//   // or load communities as the user types
+
+//   const communities = await prisma.community.findMany({
+//     include: {
+//       shops: true,
+//     },
+//   });
+
+//   return {
+//     props: {
+//       communities,
+//     },
+//   };
+// };

@@ -7,10 +7,10 @@ async function main() {
       where: {
         name: {
           contains: 'Eusoff Hall',
-        }
-      }
-    })
-  })
+        },
+      },
+    }),
+  });
 
   console.log(await resp.json());
 }

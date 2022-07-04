@@ -1,15 +1,16 @@
 import React from 'react';
+import AccountCircle from '@mui/icons-material/AccountCircle';
 import AppBar from '@mui/material/AppBar';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
-import Button from '@mui/material/Button';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+
 import { LunchHitchUser, signOut } from '../../auth';
 import Logo from '../media/logo.png';
 
@@ -52,11 +53,13 @@ export default function NavBar({ user }: NavbarProps) {
               <Typography
                 variant="h5"
                 component="div"
-                style={{ flexGrow: 1, textAlign: 'left', paddingLeft: '10px', paddingRight: '20px' }}
+                style={{
+                  flexGrow: 1, textAlign: 'left', paddingLeft: '10px', paddingRight: '20px',
+                }}
               >
                 Lunch Hitch
                 <Button style={{ color: 'white', paddingInline: '30px' }}><Link href="/">Home</Link></Button>
-                <Button style={{ color: 'white'}}><Link href="http://localhost:3000/orders">New Orders</Link></Button>
+                <Button style={{ color: 'white' }}><Link href="http://localhost:3000/orders">New Orders</Link></Button>
               </Typography>
             </>
           ) : (
