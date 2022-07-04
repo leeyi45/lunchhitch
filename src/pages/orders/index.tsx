@@ -1,9 +1,10 @@
+/* eslint-disable no-empty-pattern */
+import React from 'react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Button, ClickAwayListener, Popover } from '@mui/material';
 import { Order, Shop } from '@prisma/client';
 import { Form, Formik } from 'formik';
 import { GetServerSideProps, NextPage } from 'next';
-import React from 'react';
 
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
@@ -120,7 +121,7 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
                 initialValues={{
                   orders: [],
                 }}
-                onSubmit={async ( values ) => {
+                onSubmit={async (values) => {
                   setSuccessPopover('Successfully placed your order!');
                   await fetch('/api/prisma?collection=orders&method=create', {
                     method: 'POST',
@@ -160,7 +161,6 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
 export default OrdersPage;
 
 export const getServerSideProps: GetServerSideProps = async ({ }) => {
-  /* eslint-disable no-empty-pattern */
   // console.log(req.cookies.token);
   // const user = await getSession(req.cookies.token);
 
