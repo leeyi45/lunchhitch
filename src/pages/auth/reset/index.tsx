@@ -149,6 +149,7 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
                     value={values.oldPass}
                     onChange={(event) => formik.setFieldValue('oldPass', event.target.value)}
                     error={Boolean(errors.oldPass)}
+                    name="oldPass"
                   />
                   <PasswordField
                     className={style.PasswordField}
@@ -156,6 +157,7 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
                     value={values.newPass}
                     onChange={(event) => formik.setFieldValue('newPass', event.target.value)}
                     error={Boolean(errors.newPass)}
+                    name="newPass"
                   />
                   <PasswordField
                     className={style.PasswordField}
@@ -163,6 +165,7 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
                     value={values.repeatPass}
                     onChange={(event) => formik.setFieldValue('repeatPass', event.target.value)}
                     error={Boolean(errors.repeatPass)}
+                    name="repeatPass"
                   />
                   <div>
                     <Button

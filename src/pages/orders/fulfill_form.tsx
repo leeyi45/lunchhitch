@@ -19,8 +19,9 @@ type Props = {
   isSubmitting: boolean;
 };
 
+/*
 async function newGetOrders(shop: Shop) {
-  const result = await prisma.order.findMany({
+  const result = await prisma!.order.findMany({
     where: {
       shop,
     },
@@ -29,6 +30,7 @@ async function newGetOrders(shop: Shop) {
     },
   });
 }
+*/
 
 async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
   const result = await fetch('api/prisma?collection=order&method=findMany', {

@@ -8,7 +8,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/navbar';
-import { getSession } from '../../firebase/admin';
+// import { getSession } from '../../firebase/admin';
 import prisma, { LunchHitchCommunity } from '../../prisma';
 
 import FulFillForm from './fulfill_form';
@@ -89,7 +89,7 @@ const OrdersPage: NextPage<Props> = ({ communities }: Props) => {
                 initialValues={{
                   order: null,
                 }}
-                onSubmit={async (values) => {
+                onSubmit={async () => {
                   // TODO need to figure out how to accept orders
                 }}
               >

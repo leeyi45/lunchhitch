@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
 import { LunchHitchUser } from '../../../auth';
 import SwipeableEdgeDrawer from '../../../common/components/SwipeableEdgeDrawer/SwipeableEdgeDrawer';
@@ -13,7 +13,7 @@ export default function UserHomePage({ user }: { user: LunchHitchUser }) {
         variant="h1"
         component="div"
       >
-        Welcome back!
+        Welcome back {user.username}!
       </Typography>
       <p style={{ fontSize: '30px' }}>What will it be today?
 

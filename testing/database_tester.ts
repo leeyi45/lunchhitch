@@ -28,9 +28,9 @@ async function main() {
 
   const order = await prisma.order.create({
     data: {
-      fromId: user!.id,
+      from: user!.id,
       orders: ['item1', 'item2', 'item3'],
-      shopId: ammans.id,
+      shop: ammans.id,
     },
   });
 
