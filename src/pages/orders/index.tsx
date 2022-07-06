@@ -15,6 +15,7 @@ import FulFillForm from './fulfill_form';
 import MadeDisplay from './made_display';
 import MakeForm from './make_form';
 import ShopSelector from './shop_selector';
+import { getSession } from '../../firebase/admin';
 
 type Props = {
   communities: LunchHitchCommunity[];
@@ -158,7 +159,24 @@ export default function OrdersPage({ communities }: Props) {
   );
 }
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const user = await getSession(req.cookies.token);
+  console.log('User is ', user);
+
+  // if (!user) {
+  //   return {
+  //     redirect: {
+  //       permanent: false,
+  //       destination: '/auth/login?callback=orders',
+  //     },
+  //     props: {},
+  //   };
+  // }
+
+  // TODO:
+  // Honestly not sure if we should fetch ALL communities server side
+  // or load communities as the user types
+
   const communities = await prisma.community.findMany({
     include: {
       shops: true,
@@ -168,37 +186,7 @@ export async function getServerSideProps() {
   return {
     props: {
       communities,
+      token: req.cookies.token,
     },
   };
-}
-
-// export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-//   console.log(req.cookies.token);
-//   // const user = await getSession(req.cookies.token);
-
-//   // if (!user) {
-//   //   return {
-//   //     redirect: {
-//   //       permanent: false,
-//   //       destination: '/auth/login?callback=orders',
-//   //     },
-//   //     props: {},
-//   //   };
-//   // }
-
-//   // TODO:
-//   // Honestly not sure if we should fetch ALL communities server side
-//   // or load communities as the user types
-
-//   const communities = await prisma.community.findMany({
-//     include: {
-//       shops: true,
-//     },
-//   });
-
-//   return {
-//     props: {
-//       communities,
-//     },
-//   };
-// };
+};
