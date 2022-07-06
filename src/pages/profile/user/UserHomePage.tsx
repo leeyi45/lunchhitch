@@ -2,20 +2,20 @@ import React from 'react';
 import { Typography } from '@mui/material';
 
 // import { LunchHitchUser } from '../../../auth';
-import { useSession } from '../../../auth/auth_provider';
+// import { useSession } from '../../../auth/auth_provider';
 import SwipeableEdgeDrawer from '../../../common/components/SwipeableEdgeDrawer/SwipeableEdgeDrawer';
 
 import styles from './UserHomePage.module.css';
 
 export default function UserHomePage() {
-  const { user } = useSession();
+  // const { user } = useSession();
   return (
     <div className={styles.UserHomePage}>
       <Typography
         variant="h1"
         component="div"
       >
-        Welcome back {user!.username}!
+        Welcome back!
       </Typography>
       <p style={{ fontSize: '30px' }}>What will it be today?
 
