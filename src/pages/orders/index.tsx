@@ -5,6 +5,7 @@ import { Button, ClickAwayListener, Popover } from '@mui/material';
 import { Order, Shop } from '@prisma/client';
 import { Form, Formik } from 'formik';
 
+import { LunchHitchUser } from '../../auth';
 // import { GetServerSideProps } from 'next';
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
@@ -34,7 +35,7 @@ export default function OrdersPage({ communities }: Props) {
         filter: popoverOpened || !!successPopover ? 'blur(3px)' : '',
       }}
     >
-      <NavBar user={user} />
+      <NavBar user={user as LunchHitchUser} />
       <ShopSelector
         communities={communities}
         value={shop}
