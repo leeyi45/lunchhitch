@@ -38,6 +38,20 @@ type Props = ({
 export default function AuthSelector({ unauthenticated, loading, ...props }: Props) {
   const router = useRouter();
   const { user, status } = useSession();
+  // Wrap router usage in useEffect
+  React.useEffect(() => {
+    if (status === 'unauthenticated') {
+      if (!unauthenticated) {
+        router.push(`/auth/login?callback=${router.pathname}`);
+      } else if (typeof unauthenticated === 'string') {
+        router.push(unauthenticated);
+      }
+    } else if (status === 'loading' && typeof loading === 'string') {
+      router.push(loading);
+    } else if (status === 'authenticated' && typeof props.authenticated === 'string') {
+      router.push(props.authenticated);
+    }
+  }, [status, router]);
 
   // Wrap router usage in useEffect
   React.useEffect(() => {

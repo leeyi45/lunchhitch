@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-pattern */
 import React from 'react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Button, ClickAwayListener, Popover } from '@mui/material';
@@ -5,17 +6,18 @@ import { Order, Shop } from '@prisma/client';
 import { Form, Formik } from 'formik';
 import { GetServerSideProps } from 'next';
 
+import { LunchHitchUser } from '../../auth';
+// import { GetServerSideProps } from 'next';
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/components/navbar';
-// import { getSession } from '../../firebase/admin';
+import { getSession } from '../../firebase/admin';
 import prisma, { LunchHitchCommunity } from '../../prisma';
 
 import FulFillForm from './fulfill_form';
 import MadeDisplay from './made_display';
 import MakeForm from './make_form';
 import ShopSelector from './shop_selector';
-import { getSession } from '../../firebase/admin';
 
 type Props = {
   communities: LunchHitchCommunity[];
@@ -34,7 +36,7 @@ export default function OrdersPage({ communities }: Props) {
         filter: popoverOpened || !!successPopover ? 'blur(3px)' : '',
       }}
     >
-      <NavBar user={user} />
+      <NavBar user={user as LunchHitchUser} />
       <ShopSelector
         communities={communities}
         value={shop}
@@ -123,7 +125,6 @@ export default function OrdersPage({ communities }: Props) {
                 }}
                 onSubmit={async (values) => {
                   setSuccessPopover('Successfully placed your order!');
-                  return;
                   await fetch('/api/prisma?collection=orders&method=create', {
                     method: 'POST',
                     body: JSON.stringify({
@@ -186,7 +187,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   return {
     props: {
       communities,
-      token: req.cookies.token,
     },
   };
 };

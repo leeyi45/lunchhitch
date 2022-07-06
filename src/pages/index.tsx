@@ -20,7 +20,7 @@ export default function IndexPage() {
       {(user) => (
         <>
           <Navbar user={user as LunchHitchUser} />
-          <UserHomePage user={user as LunchHitchUser} />
+          <UserHomePage />
         </>
       )}
     </AuthSelector>
