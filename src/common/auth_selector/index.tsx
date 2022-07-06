@@ -53,6 +53,21 @@ export default function AuthSelector({ unauthenticated, loading, ...props }: Pro
     }
   }, [status, router]);
 
+  // Wrap router usage in useEffect
+  React.useEffect(() => {
+    if (status === 'unauthenticated') {
+      if (!unauthenticated) {
+        router.push(`/auth/login?callback=${router.pathname}`);
+      } else if (typeof unauthenticated === 'string') {
+        router.push(unauthenticated);
+      }
+    } else if (status === 'loading' && typeof loading === 'string') {
+      router.push(loading);
+    } else if (status === 'authenticated' && typeof props.authenticated === 'string') {
+      router.push(props.authenticated);
+    }
+  }, [status, router]);
+
   switch (status) {
     case 'authenticated': {
       if (props.authenticated) {

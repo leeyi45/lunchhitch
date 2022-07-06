@@ -8,7 +8,7 @@ import { Order, Shop } from '@prisma/client';
 
 import useAsync from '../../common/async';
 import LoadingScreen from '../../common/auth_selector/loading_screen';
-import TooltipButton from '../../common/tooltip_button';
+import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
 
 type Props = {
@@ -18,19 +18,6 @@ type Props = {
   shop: Shop | null;
   isSubmitting: boolean;
 };
-
-/*
-async function newGetOrders(shop: Shop) {
-  const result = await prisma!.order.findMany({
-    where: {
-      shop,
-    },
-    include: {
-      from: true,
-    },
-  });
-}
-*/
 
 async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
   const result = await fetch('api/prisma?collection=order&method=findMany', {

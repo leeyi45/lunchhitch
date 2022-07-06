@@ -12,7 +12,7 @@ import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
 import { Shop } from '@prisma/client';
 
-import TooltipButton from '../../common/tooltip_button';
+import TooltipButton from '../../common/components/tooltip_button';
 
 const MAX_ORDERS = 10;
 
