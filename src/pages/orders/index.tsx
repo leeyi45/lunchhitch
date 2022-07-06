@@ -171,33 +171,3 @@ export async function getServerSideProps() {
     },
   };
 }
-// export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-//   console.log(req.cookies.token);
-//   // const user = await getSession(req.cookies.token);
-
-//   // if (!user) {
-//   //   return {
-//   //     redirect: {
-//   //       permanent: false,
-//   //       destination: '/auth/login?callback=orders',
-//   //     },
-//   //     props: {},
-//   //   };
-//   // }
-
-//   // TODO:
-//   // Honestly not sure if we should fetch ALL communities server side
-//   // or load communities as the user types
-
-//   const communities = await prisma.community.findMany({
-//     include: {
-//       shops: true,
-//     },
-//   });
-
-//   return {
-//     props: {
-//       communities,
-//     },
-//   };
-// };
