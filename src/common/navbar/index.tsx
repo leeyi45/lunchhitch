@@ -130,10 +130,10 @@ export default function NavBar({ user }: NavbarProps) {
               : (
                 <>
                   <MenuItem>
-                    <Button href="/auth/login">Log In</Button>
+                    <Button href="./auth/login">Log In</Button>
                   </MenuItem>
                   <MenuItem>
-                    <Button href="/auth/signup">Sign Up</Button>
+                    <Button href="./auth/signup">Sign Up</Button>
                   </MenuItem>
                 </>
               )}
