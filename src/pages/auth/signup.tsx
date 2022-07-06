@@ -13,7 +13,7 @@ import { useSession } from '../../auth/auth_provider';
 import LoadingScreen from '../../common/auth_selector/loading_screen';
 import Redirecter from '../../common/components/redirecter';
 import PasswordField from '../../common/formik_wrapper/password_field';
-import NavBar from '../../common/navbar';
+import NavBar from '../../common/components/navbar';
 
 type SignupFieldProps = {
   name: string;

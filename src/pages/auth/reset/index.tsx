@@ -12,7 +12,7 @@ import { LunchHitchUser } from '../../../auth';
 import AuthSelector from '../../../common/auth_selector';
 import FormikWrapper from '../../../common/formik_wrapper/formik_wrapper';
 import PasswordField from '../../../common/formik_wrapper/password_field';
-import NavBar from '../../../common/navbar';
+import NavBar from '../../../common/components/navbar';
 import { FIREBASE_AUTH, firebaseErrorHandler } from '../../../firebase';
 
 import style from './ResetPage.module.css';

@@ -7,7 +7,7 @@ import { GetServerSideProps } from 'next';
 
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
-import NavBar from '../../common/navbar';
+import NavBar from '../../common/components/navbar';
 // import { getSession } from '../../firebase/admin';
 import prisma, { LunchHitchCommunity } from '../../prisma';
 

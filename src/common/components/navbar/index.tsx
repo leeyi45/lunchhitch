@@ -11,8 +11,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { LunchHitchUser, signOut } from '../../auth';
-import Logo from '../media/logo.png';
+import { LunchHitchUser, signOut } from '../../../auth';
+import Logo from '../../media/logo.png';
 
 export type NavbarProps = {
   user?: LunchHitchUser | null;

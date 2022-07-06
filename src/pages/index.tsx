@@ -2,7 +2,7 @@ import React from 'react';
 
 import { LunchHitchUser } from '../auth';
 import AuthSelector from '../common/auth_selector';
-import Navbar from '../common/navbar';
+import Navbar from '../common/components/navbar';
 
 import NoUserHomePage from './profile/noUser/NoUserHomePage';
 import UserHomePage from './profile/user/UserHomePage';
