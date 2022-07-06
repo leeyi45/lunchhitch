@@ -12,8 +12,8 @@ import * as yup from 'yup';
 
 import { signIn } from '../../auth';
 import { useSession } from '../../auth/auth_provider';
-import PasswordField from '../../common/formik_wrapper/password_field';
 import NavBar from '../../common/components/navbar';
+import PasswordField from '../../common/formik_wrapper/password_field';
 import { firebaseErrorHandler } from '../../firebase';
 
 export default function LoginPage() {
