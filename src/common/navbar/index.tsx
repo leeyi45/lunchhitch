@@ -59,7 +59,7 @@ export default function NavBar({ user }: NavbarProps) {
               >
                 Lunch Hitch
                 <Button style={{ color: 'white', paddingInline: '30px' }}><Link href="/">Home</Link></Button>
-                <Button style={{ color: 'white' }}><Link href="http://localhost:3000/orders">New Orders</Link></Button>
+                <Button style={{ color: 'white' }}><Link href="/orders">New Orders</Link></Button>
               </Typography>
             </>
           ) : (
@@ -115,7 +115,7 @@ export default function NavBar({ user }: NavbarProps) {
               ? (
                 <>
                   <MenuItem onClick={handleClose}>
-                    <Button><Link href="./profile">Profile</Link></Button>
+                    <Button><Link href="/profile">Profile</Link></Button>
                   </MenuItem>
                   <MenuItem>
                     <Button onClick={() => {
@@ -130,10 +130,10 @@ export default function NavBar({ user }: NavbarProps) {
               : (
                 <>
                   <MenuItem>
-                    <Button href="./login">Log In</Button>
+                    <Button href="/auth/login">Log In</Button>
                   </MenuItem>
                   <MenuItem>
-                    <Button href="./signup">Sign Up</Button>
+                    <Button href="/auth/signup">Sign Up</Button>
                   </MenuItem>
                 </>
               )}
