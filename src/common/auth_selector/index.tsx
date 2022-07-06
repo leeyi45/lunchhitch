@@ -38,13 +38,25 @@ type Props = ({
 export default function AuthSelector({ unauthenticated, loading, ...props }: Props) {
   const router = useRouter();
   const { user, status } = useSession();
+  // Wrap router usage in useEffect
+  React.useEffect(() => {
+    if (status === 'unauthenticated') {
+      if (!unauthenticated) {
+        router.push(`/auth/login?callback=${router.pathname}`);
+      } else if (typeof unauthenticated === 'string') {
+        router.push(unauthenticated);
+      }
+    } else if (status === 'loading' && typeof loading === 'string') {
+      router.push(loading);
+    } else if (status === 'authenticated' && typeof props.authenticated === 'string') {
+      router.push(props.authenticated);
+    }
+  }, [status, router]);
 
   switch (status) {
     case 'authenticated': {
       if (props.authenticated) {
-        if (typeof props.authenticated === 'string') router.push(props.authenticated);
-        else props.authenticated();
-
+        if (typeof props.authenticated !== 'string') props.authenticated();
         return null as never;
       } else if (typeof props.children === 'function') {
         return props.children(user);
@@ -53,21 +65,16 @@ export default function AuthSelector({ unauthenticated, loading, ...props }: Pro
       }
     }
     case 'unauthenticated': {
-      if (!unauthenticated) {
-        router.push(`/auth/login?callback=${router.pathname}`);
-        return null as never;
-      } else if (typeof unauthenticated === 'string') {
-        router.push(unauthenticated);
-        return null as never;
-      } else return unauthenticated;
+      if (unauthenticated && typeof unauthenticated !== 'string') {
+        return unauthenticated;
+      } else return null as never;
     }
     case 'loading': {
       if (!loading) {
         return <LoadingScreen />;
-      } else if (typeof loading === 'string') {
-        router.push(loading);
-        return null as never;
-      } else return loading;
+      } else if (typeof loading !== 'string') {
+        return loading;
+      } else return null as never;
     }
     default: return null as never;
   }
