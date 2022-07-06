@@ -1,13 +1,16 @@
 import React from 'react';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import {
-  Button,
-  ClickAwayListener, List, ListItem, Popover,
-} from '@mui/material';
+import Button from '@mui/material/Button';
+import CircularProgress from '@mui/material/CircularProgress';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import Grid from '@mui/material/Grid';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import Popover from '@mui/material/Popover';
 import { Order, Shop } from '@prisma/client';
 
+import { LunchHitchUser } from '../../auth';
 import useAsync from '../../common/async';
-import LoadingScreen from '../../common/auth_selector/loading_screen';
 import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
 
@@ -19,12 +22,15 @@ type Props = {
   isSubmitting: boolean;
 };
 
-async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
+async function getOrders(shop: Shop, user: LunchHitchUser): Promise<LunchHitchOrder[]> {
   const result = await fetch('api/prisma?collection=order&method=findMany', {
     method: 'POST',
     body: JSON.stringify({
       where: {
         shop: shop.id,
+        fromId: {
+          not: user.username, // Exclude the orders the user has placed
+        },
       },
       include: {
         from: true,
@@ -92,10 +98,25 @@ export default function FulFillForm({
     }
 
     switch (orders.state) {
-      case 'loading': return (<LoadingScreen />);
+      case 'loading': return (<CircularProgress />);
       case 'errored': return <>An error occurred, please refresh the page and try again</>;
       case 'done': {
-        if (orders.result.length === 0) return <>No Orders</>;
+        if (orders.result.length === 0) {
+          return (
+            <div>
+              <p
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  width: '100%',
+                  height: '100%',
+                }}
+              >No Orders
+              </p>
+            </div>
+          );
+        }
         return (
           <>
             Displaying orders from {shop.name}
@@ -121,11 +142,7 @@ export default function FulFillForm({
 
   return (
     <>
-      <div
-        style={{
-          display: 'inline',
-        }}
-      >
+      <Grid direction="row" spacing={1}>
         <h2 style={{ color: '#47b16a' }}>Fulfill an Order!</h2>
         <TooltipButton
           style={{
@@ -137,7 +154,7 @@ export default function FulFillForm({
         >
           <RefreshIcon />
         </TooltipButton>
-      </div>
+      </Grid>
       <Popover
         open={popover}
         anchorReference="none"

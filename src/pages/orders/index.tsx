@@ -7,7 +7,6 @@ import { Form, Formik } from 'formik';
 import { GetServerSideProps } from 'next';
 
 import { LunchHitchUser } from '../../auth';
-// import { GetServerSideProps } from 'next';
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/components/navbar';
@@ -125,14 +124,12 @@ export default function OrdersPage({ communities }: Props) {
                 }}
                 onSubmit={async (values) => {
                   setSuccessPopover('Successfully placed your order!');
-                  await fetch('/api/prisma?collection=orders&method=create', {
+                  await fetch('/api/orders/create', {
                     method: 'POST',
                     body: JSON.stringify({
-                      where: {
-                        from: user!.username,
-                        orders: values.orders,
-                        shop: shop!.id,
-                      },
+                      orders: values.orders,
+                      shopId: shop!.id,
+                      deliverBy: 1000,
                     }),
                   });
                 }}

@@ -3,9 +3,7 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import {
-  Form, Formik,
-} from 'formik';
+import { Form, Formik } from 'formik';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import * as yup from 'yup';
@@ -16,16 +14,24 @@ import NavBar from '../../common/components/navbar';
 import PasswordField from '../../common/formik_wrapper/password_field';
 import { firebaseErrorHandler } from '../../firebase';
 
+/**
+ * Login page for users. If a callback URL is specified in the params, then
+ * the user will be redirected to that page when the login is complete. Else
+ * the user will automatically be directed to `/profile`
+ */
 export default function LoginPage() {
   const router = useRouter();
   const { status } = useSession();
 
-  if (status === 'authenticated') {
-    const redirectUrl = router.query.callbackUrl;
-    if (redirectUrl === undefined) router.push('/profile');
-    else if (typeof redirectUrl === 'string') router.push(redirectUrl);
-    else router.push(redirectUrl[0]);
-  }
+  React.useEffect(() => {
+    if (status === 'authenticated') {
+      const redirectUrl = router.query.callback;
+      console.log('Redirect url is ', redirectUrl);
+      if (redirectUrl === undefined) router.push('/profile');
+      else if (typeof redirectUrl === 'string') router.push(redirectUrl);
+      else router.push(redirectUrl[0]);
+    }
+  }, []);
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
 

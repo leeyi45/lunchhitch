@@ -80,9 +80,10 @@ const SignUpForm = (props: SignUpFormProps) => {
         }
       }}
       validationSchema={yup.object({
-        displayName: yup.string().required(),
-        email: yup.string().email().required(),
-        username: yup.string().required(),
+        displayName: yup.string().required('Please enter a display name'),
+        email: yup.string().email().required('Please enter a valid email'),
+        // TODO username validation (stuff like cannot have @s or whatever)
+        username: yup.string().required('Please enter a valid username'),
         password: yup.string().required(),
         repeatPass: yup.string().required(),
       })}
