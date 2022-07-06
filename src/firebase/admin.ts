@@ -1,8 +1,13 @@
 import * as firebaseAdmin from 'firebase-admin';
 
 if (firebaseAdmin.apps.length === 0) {
+  const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n');
   firebaseAdmin.initializeApp({
-    credential: firebaseAdmin.credential.applicationDefault(),
+    credential: firebaseAdmin.credential.cert({
+      privateKey,
+      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+      projectId: 'lunchhitch',
+    }),
   });
 }
 

@@ -17,6 +17,8 @@ import FulFillForm from './fulfill_form';
 import MadeDisplay from './made_display';
 import MakeForm from './make_form';
 import ShopSelector from './shop_selector';
+import { GetServerSideProps } from 'next';
+import { getSession } from '../../firebase/admin';
 
 type Props = {
   communities: LunchHitchCommunity[];
@@ -158,7 +160,11 @@ export default function OrdersPage({ communities }: Props) {
     </div>
   );
 }
-export async function getServerSideProps() {
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const user = await getSession(req.cookies.token);
+  console.log('User in api route is ', user);
+
   const communities = await prisma.community.findMany({
     include: {
       shops: true,
@@ -170,4 +176,4 @@ export async function getServerSideProps() {
       communities,
     },
   };
-}
+};
