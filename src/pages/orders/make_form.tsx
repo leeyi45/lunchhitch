@@ -3,15 +3,21 @@ import AddIcon from '@mui/icons-material/Add';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import ErrorIcon from '@mui/icons-material/Error';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { ClickAwayListener } from '@mui/material';
 import Button from '@mui/material/Button';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 import InputAdornment from '@mui/material/InputAdornment';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Popover from '@mui/material/Popover';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Shop } from '@prisma/client';
+import moment, { Moment } from 'moment';
 
+import Box from '../../common/components/Box/Box';
 import TooltipButton from '../../common/components/tooltip_button';
 
 const MAX_ORDERS = 10;
@@ -65,13 +71,14 @@ const OrderListItem = ({
 type MakeFormProps = {
   isSubmitting: boolean;
   onChange: (newValue: string[]) => void;
-  onSubmit: (orders: string[]) => void;
+  onDateChange: (newDate: Date) => void;
+  onSubmit: (orders: string[], deliverBy: Date) => void;
   shop: Shop | null;
   onPopoverChange: (opened: boolean) => void;
 };
 
 const MakeForm = ({
-  isSubmitting, onChange, onSubmit, shop, onPopoverChange,
+  isSubmitting, onChange, onDateChange, onSubmit, shop, onPopoverChange,
 }: MakeFormProps) => {
   const [orderField, setOrderField] = React.useState({
     value: '',
@@ -82,8 +89,10 @@ const MakeForm = ({
   const [clearPopover, setClearOpen] = React.useState(false);
   const [confirmPopover, setConfirmOpen] = React.useState(false);
   const [orders, setOrdersValue] = React.useState<string[]>([]);
+  const [deliverDate, setDeliverDate] = React.useState<Moment>(moment());
 
   React.useEffect(() => onPopoverChange(clearPopover || confirmPopover), [clearPopover, confirmPopover, onPopoverChange]);
+  React.useEffect(() => onDateChange(deliverDate!.toDate()), [onDateChange, deliverDate]);
 
   const setOrders = (value: string[]) => {
     setOrdersValue(value);
@@ -184,7 +193,7 @@ const MakeForm = ({
               color="success"
               onClick={() => {
                 setConfirmOpen(false);
-                onSubmit(orders);
+                onSubmit(orders, deliverDate!.toDate());
               }}
             >
               Confirm
@@ -198,11 +207,9 @@ const MakeForm = ({
           </div>
         </ClickAwayListener>
       </Popover>
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-        }}
+      <Stack
+        direction="row"
+        spacing={1}
       >
         <TextField
           variant="standard"
@@ -237,40 +244,51 @@ const MakeForm = ({
             ),
           }}
         />
-        <p
-          style={{
-            paddingLeft: '10px',
-          }}
-        >
-          {orders.length}/{MAX_ORDERS} Orders
-        </p>
-        <TextField
-          style={{
-            paddingLeft: '10px',
-          }}
-          variant="standard"
-          type="datetime-local"
-          defaultValue={Date.now()}
-        />
-      </div>
-      <List>
-        {orders.map((order, i) => (
-          <OrderListItem
-            key={i}
-            onChange={(newValue) => changeOrder(newValue, i)}
-            onRemove={() => {
-              removeOrder(i);
-              setOrderField({
-                ...orderField,
-                error: false,
-                helper: `Removed ${order}`,
-              });
+        <LocalizationProvider dateAdapter={AdapterMoment}>
+          <DateTimePicker
+            label="Deliver By"
+            value={deliverDate}
+            onChange={(value) => {
+              if (value) setDeliverDate(value);
             }}
-            onDuplicate={() => addOrder(order, i)}
-            order={order}
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            renderInput={({ error, variant, ...params }) => (<TextField variant="standard" {...params} />)}
+            minDateTime={moment()}
           />
-        ))}
-      </List>
+        </LocalizationProvider>
+      </Stack>
+      <Box>
+        {orders.length === 0 ? (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          >
+            <p>Add Some Orders to begin!</p>
+          </div>
+        ) : (
+          <List>
+            {orders.map((order, i) => (
+              <OrderListItem
+                key={i}
+                onChange={(newValue) => changeOrder(newValue, i)}
+                onRemove={() => {
+                  removeOrder(i);
+                  setOrderField({
+                    ...orderField,
+                    error: false,
+                    helper: `Removed ${order}`,
+                  });
+                }}
+                onDuplicate={() => addOrder(order, i)}
+                order={order}
+              />
+            ))}
+          </List>
+        )}
+      </Box>
       <div>
         <Button
           disabled={orders.length === 0}
@@ -287,6 +305,7 @@ const MakeForm = ({
         >
           Place Orders
         </TooltipButton>
+        <p style={{ float: 'right' }}>{orders.length}/{MAX_ORDERS} Orders</p>
       </div>
     </>
   );

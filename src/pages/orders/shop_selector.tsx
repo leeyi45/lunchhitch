@@ -2,9 +2,11 @@
 import React from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import ListItem from '@mui/material/ListItem';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import { Shop } from '@prisma/client';
 
+import { useNullableState } from '../../common';
 import { LunchHitchCommunity } from '../../prisma';
 
 type Props = {
@@ -28,13 +30,18 @@ type Props = {
  * Autocomplete selectors to select a community and shop
  */
 export default function ShopSelector({ communities, onChange, value }: Props) {
-  const [community, setCommunity] = React.useState<LunchHitchCommunity | null>(null);
-  const [shop, setShop] = React.useState<Shop | null>(value);
+  const [community, setCommunity] = useNullableState<LunchHitchCommunity>();
+  const [shop, setShop] = useNullableState<Shop>();
 
   React.useEffect(() => setShop(value), [value]);
 
   return (
-    <>
+    <Stack
+      direction="column"
+      style={{
+        margin: '10px, 10px, 10px, 10px',
+      }}
+    >
       <Autocomplete
         style={{
           paddingTop: '20px',
@@ -66,7 +73,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
           setShop(value);
           onChange(value);
         }}
-        options={community !== null ? community.shops : []}
+        options={community?.shops ?? []}
         renderInput={(params) => (<TextField {...params} label="Shop" />)}
         renderOption={(liProps, option) => (
           <ListItem {...liProps}>
@@ -75,6 +82,6 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         )}
         value={shop}
       />
-    </>
+    </Stack>
   );
 }

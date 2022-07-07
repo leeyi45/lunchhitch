@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 /**
  * Some functions may return a regular value or a Promise. Use this function to wrap the result of such a function as a Promise
  * @param result Result to wrap
@@ -12,3 +14,5 @@ export type KeysOfType<T, K = any> = { [P in keyof T]: T[P] extends K ? P : neve
 export function entries<T extends { [key: string]: any }>(obj: T) {
   return Object.entries(obj) as [KeysOfType<T, string>, T[string]][];
 }
+
+export const useNullableState = <T>(defaultVal?: T) => useState<T | null>(defaultVal ?? null);

@@ -1,4 +1,8 @@
-/** API route for managing orders */
+/**
+ * API route for creating orders. Requires authentication.\
+ * POST to the API route with the order data and the order will be created
+ * under the currently logged in user.
+ */
 import { Order } from '@prisma/client';
 
 import { wrapWithAuth } from '../../../api_wrappers';
@@ -12,4 +16,5 @@ export default wrapWithAuth([], async (req, _res, { username }) => {
       fromId: username,
     },
   });
+  return { result: 'success' };
 });

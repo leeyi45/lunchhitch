@@ -4,9 +4,9 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { Button, ClickAwayListener, Popover } from '@mui/material';
 import { Order, Shop } from '@prisma/client';
 import { Form, Formik } from 'formik';
+import moment from 'moment';
 import { GetServerSideProps } from 'next';
 
-import { LunchHitchUser } from '../../auth';
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/components/navbar';
@@ -35,7 +35,7 @@ export default function OrdersPage({ communities }: Props) {
         filter: popoverOpened || !!successPopover ? 'blur(3px)' : '',
       }}
     >
-      <NavBar user={user as LunchHitchUser} />
+      <NavBar user={user} />
       <ShopSelector
         communities={communities}
         value={shop}
@@ -121,15 +121,16 @@ export default function OrdersPage({ communities }: Props) {
               <Formik
                 initialValues={{
                   orders: [],
+                  deliverBy: moment(),
                 }}
-                onSubmit={async (values) => {
+                onSubmit={async ({ orders, deliverBy }) => {
                   setSuccessPopover('Successfully placed your order!');
                   await fetch('/api/orders/create', {
                     method: 'POST',
                     body: JSON.stringify({
-                      orders: values.orders,
+                      orders,
                       shopId: shop!.id,
-                      deliverBy: 1000,
+                      deliverBy,
                     }),
                   });
                 }}
@@ -139,6 +140,7 @@ export default function OrdersPage({ communities }: Props) {
                     <MakeForm
                       isSubmitting={isSubmitting}
                       onSubmit={() => formik.handleSubmit()}
+                      onDateChange={(newDate) => formik.setFieldValue('deliverby', newDate)}
                       onChange={(newValue) => formik.setFieldValue('orders', newValue)}
                       onPopoverChange={setPopoverOpened}
                       shop={shop}
@@ -174,16 +176,23 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   // TODO:
   // Honestly not sure if we should fetch ALL communities server side
   // or load communities as the user types
+  try {
+    const communities = await prisma.community.findMany({
+      include: {
+        shops: true,
+      },
+    });
 
-  const communities = await prisma.community.findMany({
-    include: {
-      shops: true,
-    },
-  });
-
-  return {
-    props: {
-      communities,
-    },
-  };
+    return {
+      props: {
+        communities,
+      },
+    };
+  } catch (error) {
+    return {
+      props: {
+        communities: [],
+      },
+    };
+  }
 };
