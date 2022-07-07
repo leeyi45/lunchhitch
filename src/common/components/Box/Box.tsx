@@ -1,15 +1,20 @@
 import React from 'react';
-import { Paper } from '@mui/material';
+import { Paper, PaperProps } from '@mui/material';
 
 import styles from './Box.module.css';
 
-function Box(props: { children: any; }) {
-  const { children } = props;
+type Props = Omit<PaperProps, 'elevation'> & {
+  elevation?: number;
+};
+
+export default function Box({ children, ...props }: Props) {
   return (
-    <Paper className={styles.box} elevation={3}>
+    <Paper className={styles.box} {...props}>
       {children}
     </Paper>
   );
 }
 
-export default Box;
+Box.defaultProps = {
+  elevation: 3,
+};

@@ -112,31 +112,29 @@ export default function NavBar({ user }: NavbarProps) {
             onClose={handleClose}
           >
             { user
-              ? (
-                <>
-                  <MenuItem onClick={handleClose}>
-                    <Button><Link href="/profile">Profile</Link></Button>
-                  </MenuItem>
-                  <MenuItem>
-                    <Button onClick={() => {
-                      signOut();
-                      router.push('/');
-                    }}
-                    >Log out
-                    </Button>
-                  </MenuItem>
-                </>
-              )
-              : (
-                <>
-                  <MenuItem>
-                    <Button href={`./auth/login?callback=${router.pathname}`}>Log In</Button>
-                  </MenuItem>
-                  <MenuItem>
-                    <Button href="/auth/signup">Sign Up</Button>
-                  </MenuItem>
-                </>
-              )}
+              ? [(
+                <MenuItem key={0} onClick={handleClose}>
+                  <Link href="/profile">Profile</Link>
+                </MenuItem>),
+              (
+                <MenuItem key={1}>
+                  <Button onClick={() => {
+                    signOut();
+                    router.push('/');
+                  }}
+                  >Log out
+                  </Button>
+                </MenuItem>
+              )]
+              : [(
+                <MenuItem key={0}>
+                  <Link href={`./auth/login?callback=${router.pathname}`}>Log In</Link>
+                </MenuItem>
+              ), (
+                <MenuItem key={1}>
+                  <Link href="/auth/signup">Sign Up</Link>
+                </MenuItem>
+              )]}
           </Menu>
         </div>
       </Toolbar>

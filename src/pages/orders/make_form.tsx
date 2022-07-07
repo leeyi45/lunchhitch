@@ -91,8 +91,8 @@ const MakeForm = ({
   const [orders, setOrdersValue] = React.useState<string[]>([]);
   const [deliverDate, setDeliverDate] = React.useState<Moment>(moment());
 
-  React.useEffect(() => onPopoverChange(clearPopover || confirmPopover), [clearPopover, confirmPopover, onPopoverChange]);
-  React.useEffect(() => onDateChange(deliverDate!.toDate()), [onDateChange, deliverDate]);
+  React.useEffect(() => { onPopoverChange(clearPopover || confirmPopover); }, [clearPopover, confirmPopover, onPopoverChange]);
+  React.useEffect(() => { onDateChange(deliverDate!.toDate()); }, [onDateChange, deliverDate]);
 
   const setOrders = (value: string[]) => {
     setOrdersValue(value);

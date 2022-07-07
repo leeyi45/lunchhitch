@@ -17,24 +17,23 @@ export default prisma;
 
 if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
 
-// type Collections = {
-//   [K in keyof PrismaClient]: (PrismaClient[K] extends Function ? never : PrismaClient[K]);
-// }[keyof PrismaClient];
-
-type Collections = KeysOfType<PrismaClient, any>;
+type PrismaFuncs = KeysOfType<PrismaClient, Function>;
+type Collection = KeysOfType<Omit<PrismaClient, PrismaFuncs>>;
+type Method = KeysOfType<PrismaClient[Collection]>
 
 export const prismaFetch = (
-  collection: Collections,
-  method: string,
-  args: any,
+  collection: Collection,
+  method: Method,
+  args?: Parameters<PrismaClient[Collection][Method]>,
 ) => fetch(`/api/prisma?collection=${collection}&method=${method}`, {
   method: 'POST',
-  body: JSON.stringify(args),
+  body: JSON.stringify(args ?? {}),
 });
 
 export type LunchHitchOrder = {
   from: UserInfo;
   shop: Shop;
+  fulfiller: UserInfo | null;
 } & Order;
 
 export type LunchHitchCommunity = {
