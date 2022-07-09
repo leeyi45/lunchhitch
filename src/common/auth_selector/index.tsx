@@ -30,16 +30,23 @@ type Props = ({
    * Set to null or undefined to display the default loading screen
    */
   loading?: React.ReactElement<any> | string | null;
+
+  force?: boolean;
 };
 
 /**
  * Component for displaying different results based on the current authentication status
  */
-export default function AuthSelector({ unauthenticated, loading, ...props }: Props) {
+export default function AuthSelector({
+  unauthenticated, loading, force, ...props
+}: Props) {
   const router = useRouter();
   const { user, status } = useSession();
+
   // Wrap router usage in useEffect
   React.useEffect(() => {
+    if (force) return;
+
     if (status === 'unauthenticated') {
       if (!unauthenticated) {
         router.push(`/auth/login?callback=${router.pathname}`);
@@ -51,23 +58,22 @@ export default function AuthSelector({ unauthenticated, loading, ...props }: Pro
     } else if (status === 'authenticated' && typeof props.authenticated === 'string') {
       router.push(props.authenticated);
     }
-  }, [status, router]);
+  }, [status, router, force]);
 
-  // Wrap router usage in useEffect
-  React.useEffect(() => {
-    if (status === 'unauthenticated') {
-      if (!unauthenticated) {
-        router.push(`/auth/login?callback=${router.pathname}`);
-      } else if (typeof unauthenticated === 'string') {
-        router.push(unauthenticated);
-      }
-    } else if (status === 'loading' && typeof loading === 'string') {
-      router.push(loading);
-    } else if (status === 'authenticated' && typeof props.authenticated === 'string') {
-      router.push(props.authenticated);
+  if (force) {
+    if (props.authenticated) {
+      if (typeof props.authenticated !== 'string') props.authenticated();
+      return null as never;
+    } else if (typeof props.children === 'function') {
+      return props.children({
+        username: 'TestUser',
+        email: 'test@test.com',
+        displayName: 'Test Man',
+      });
+    } else {
+      return props.children!;
     }
-  }, [status, router]);
-
+  }
   switch (status) {
     case 'authenticated': {
       if (props.authenticated) {
@@ -100,4 +106,5 @@ AuthSelector.defaultProps = {
   authenticated: undefined,
   unauthenticated: null,
   loading: null,
+  force: false,
 };

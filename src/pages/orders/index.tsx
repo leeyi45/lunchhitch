@@ -1,15 +1,19 @@
 /* eslint-disable no-empty-pattern */
 import React from 'react';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import { Button, ClickAwayListener, Popover } from '@mui/material';
+import {
+  Button, ClickAwayListener, Popover, Stack,
+} from '@mui/material';
 import { Order, Shop } from '@prisma/client';
 import { Form, Formik } from 'formik';
 import moment from 'moment';
 import { GetServerSideProps } from 'next';
 
 import { useSession } from '../../auth/auth_provider';
+import AuthSelector from '../../common/auth_selector';
 import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/components/navbar';
+import { LinkedPopover, PopoverContainer } from '../../common/popovers';
 import { getSession } from '../../firebase/admin';
 import prisma, { LunchHitchCommunity } from '../../prisma';
 
@@ -22,7 +26,123 @@ type Props = {
   communities: LunchHitchCommunity[];
 }
 
-export default function OrdersPage({ communities }: Props) {
+const OrdersPage = ({ communities }: Props) => {
+  const [shop, setShop] = React.useState<Shop | null>(null);
+
+  return (
+    <AuthSelector force>
+      {(user) => (
+        <>
+          <NavBar user={user} />
+          <PopoverContainer
+            popovers={{
+              successPopover: (
+                <LinkedPopover
+                  name="successPopover"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                  anchorReference="none"
+                >
+                  {(setOpen) => (
+                    <div
+                      style={{
+                        padding: '10px, 10px, 10px, 10px',
+                      }}
+                    >
+                      <CheckCircleIcon />
+                      <p>Successfully placed your order!</p>
+                      <Button
+                        onClick={() => setOpen(false)}
+                      >
+                        Done
+                      </Button>
+                    </div>
+                  )}
+                </LinkedPopover>
+              ),
+              fulfillPopover: false,
+            }}
+          >
+            {(values, setPopover) => (
+              <Stack direction="column">
+                <ShopSelector
+                  communities={communities}
+                  value={shop}
+                  onChange={setShop}
+                />
+                <Stack direction="row">
+                  <Box>
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      paddingRight: '10px',
+                    }}
+                    >
+                      <FulFillForm
+                        onSubmit={(order) => {
+                          // TODO figure out how to accept orders
+                        }}
+                        shop={shop}
+                      />
+                    </div>
+                  </Box>
+                  <Box>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignContent: 'center',
+                      }}
+                    >
+                      <h2 style={{ color: '#47b16a' }}>Place an Order!</h2>
+                      <Formik
+                        initialValues={{
+                          orders: [],
+                          deliverBy: moment(),
+                        }}
+                        onSubmit={async ({ orders, deliverBy }) => {
+                          await fetch('/api/orders/create', {
+                            method: 'POST',
+                            body: JSON.stringify({
+                              orders,
+                              shopId: shop!.id,
+                              deliverBy,
+                            }),
+                          });
+                          setPopover('successPopover', true);
+                        }}
+                      >
+                        {({ isSubmitting, ...formik }) => (
+                          <Form>
+                            <MakeForm
+                              isSubmitting={isSubmitting}
+                              onSubmit={() => formik.handleSubmit()}
+                              onDateChange={(newDate) => formik.setFieldValue('deliverby', newDate)}
+                              onChange={(newValue) => formik.setFieldValue('orders', newValue)}
+                              shop={shop}
+                            />
+                          </Form>
+                        )}
+                      </Formik>
+                    </div>
+                  </Box>
+                </Stack>
+                <MadeDisplay user={user} />
+              </Stack>
+            )}
+          </PopoverContainer>
+        </>
+      )}
+    </AuthSelector>
+  );
+};
+
+export default OrdersPage;
+
+export function OrdersPage2({ communities }: Props) {
   const [shop, setShop] = React.useState<Shop | null>(null);
   const [popoverOpened, setPopoverOpened] = React.useState(false);
   const [successPopover, setSuccessPopover] = React.useState<string | null>(null);

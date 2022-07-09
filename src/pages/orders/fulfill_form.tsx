@@ -2,25 +2,22 @@ import React from 'react';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import Popover from '@mui/material/Popover';
 import Stack from '@mui/material/Stack';
 import { Order, Shop } from '@prisma/client';
+import { useFormik } from 'formik';
 
-import { useNullableState } from '../../common';
 import useAsync from '../../common/async';
 import Box from '../../common/components/Box/Box';
 import TooltipButton from '../../common/components/tooltip_button';
+import { LinkedClickAwayPopover } from '../../common/popovers';
+import { usePopoverContext } from '../../common/popovers/linked_popovers';
 import { LunchHitchOrder } from '../../prisma';
 
 type Props = {
-  onSubmit: () => void;
-  onSelect: (order: LunchHitchOrder) => void;
-  onPopoverChanged: (opened: boolean) => void;
   shop: Shop | null;
-  isSubmitting: boolean;
+  onSubmit: (order: Order) => (any | Promise<any>);
 };
 
 async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
@@ -58,36 +55,34 @@ const OrderListItem = ({ order, onSelect }: OrderItemProps) => {
   );
 };
 
-/**
- * Component to display orders that need to be fulfilled to the user
- */
-export default function FulFillForm({
-  shop, onSelect, onSubmit, isSubmitting, onPopoverChanged,
-}: Props) {
-  const [popover, setPopover] = React.useState(false);
-  const [selected, setSelected] = useNullableState<Order>();
-
-  const orders = useAsync(getOrders);
+const FulFillForm = ({ shop, onSubmit }: Props) => {
+  const { setPopover } = usePopoverContext();
+  const ordersAsync = useAsync(getOrders);
+  const {
+    values: { order }, submitForm, setFieldValue, isSubmitting, handleBlur, handleSubmit,
+  } = useFormik<{ order: null | Order}>({
+    initialValues: {
+      order: null,
+    },
+    onSubmit: ({ order }) => onSubmit(order!),
+  });
 
   React.useEffect(() => {
-    if (shop) orders.call(shop);
-    setSelected(null);
-    return orders.cancel;
-  }, [shop]);
+    if (shop) ordersAsync.call(shop);
+    setFieldValue('order', null);
+    return ordersAsync.cancel;
+  }, [shop, setFieldValue, ordersAsync]);
 
-  React.useEffect(() => { onPopoverChanged(popover); }, [popover, onPopoverChanged]);
-
-  // Get the form content depending on the result of the getOrders operation
   const getForm = React.useCallback(() => {
     if (!shop) {
       return <>Select a community and shop to show orders!</>;
     }
 
-    switch (orders.state) {
+    switch (ordersAsync.state) {
       case 'loading': return (<CircularProgress />);
       case 'errored': return <>An error occurred, please refresh the page and try again</>;
       case 'done': {
-        if (orders.result.length === 0) {
+        if (ordersAsync.result.length === 0) {
           return (
             <div>
               <p
@@ -107,14 +102,13 @@ export default function FulFillForm({
           <>
             Displaying orders from {shop.name}
             <List>
-              {orders.result.map((order, i) => (
+              {ordersAsync.result.map((order, i) => (
                 <OrderListItem
                   order={order}
                   key={i}
                   onSelect={() => {
-                    onSelect(order);
-                    setPopover(true);
-                    setSelected(order);
+                    setFieldValue('order', order);
+                    setPopover('fulfillPopover', true);
                   }}
                 />
               ))}
@@ -124,10 +118,13 @@ export default function FulFillForm({
       }
       default: return null as never;
     }
-  }, [orders, shop]);
+  }, [ordersAsync, shop, setPopover, setFieldValue]);
 
   return (
-    <>
+    <form
+      onBlur={handleBlur}
+      onSubmit={handleSubmit}
+    >
       <Stack direction="row" spacing={1}>
         <h2 style={{ color: '#47b16a' }}>Fulfill an Order!</h2>
         <TooltipButton
@@ -135,24 +132,16 @@ export default function FulFillForm({
             float: 'right',
           }}
           tooltip="Refresh orders"
-          onClick={() => orders.call(shop!)}
+          onClick={() => ordersAsync.call(shop!)}
           disabled={shop === null}
         >
           <RefreshIcon />
         </TooltipButton>
       </Stack>
-      <Popover
-        open={popover}
-        anchorReference="none"
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
+      <LinkedClickAwayPopover
+        name="fulfillPopover"
       >
-        <ClickAwayListener
-          onClickAway={() => setPopover(false)}
-        >
+        {(setPopoverOpen) => (
           <div
             style={{
               padding: '10px 10px 10px 10px',
@@ -160,14 +149,14 @@ export default function FulFillForm({
           >
             <h3>Accept the following order?</h3>
             <ol>
-              {selected?.orders.map((order, i) => <li key={i}>{order}</li>)}
+              {order?.orders.map((entry, i) => <li key={i}>{entry}</li>)}
             </ol>
             <Button
               color="success"
               onClick={() => {
                 if (!isSubmitting) {
-                  setPopover(false);
-                  onSubmit();
+                  setPopoverOpen(false);
+                  submitForm();
                 }
               }}
             >
@@ -175,15 +164,16 @@ export default function FulFillForm({
             </Button>
             <Button
               color="error"
-              onClick={() => setPopover(false)}
+              onClick={() => setPopoverOpen(false)}
             >
               Cancel
             </Button>
-
           </div>
-        </ClickAwayListener>
-      </Popover>
+        )}
+      </LinkedClickAwayPopover>
       {getForm()}
-    </>
+    </form>
   );
-}
+};
+
+export default FulFillForm;
