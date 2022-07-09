@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 
 import { LunchHitchUser } from '../../auth';
 import { useSession } from '../../auth/auth_provider';
+import testUser from '../../auth/test_user';
 
 import LoadingScreen from './loading_screen';
 
@@ -65,11 +66,7 @@ export default function AuthSelector({
       if (typeof props.authenticated !== 'string') props.authenticated();
       return null as never;
     } else if (typeof props.children === 'function') {
-      return props.children({
-        username: 'TestUser',
-        email: 'test@test.com',
-        displayName: 'Test Man',
-      });
+      return props.children(testUser);
     } else {
       return props.children!;
     }

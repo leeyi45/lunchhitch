@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
+import testUser from './auth/test_user';
 import { getSession } from './firebase/admin';
 import { wrapIntoPromise } from './common';
 
@@ -47,7 +48,7 @@ export const wrapWithQuery = (
   } else {
     try {
       const result = await wrapIntoPromise(handler(req, res, queryParams));
-      res.status(200).json(result);
+      if (result !== undefined) res.status(200).json(result);
     } catch (error) {
       if (errorHandler) errorHandler(error, res);
       else if (process.env.NODE_ENV === 'production') {
@@ -64,6 +65,10 @@ export const wrapWithAuth = (
   handler: Handler,
   errorHandler?: ErrorHandler,
 ) => wrapWithQuery(paramStrs, async (request, response, params) => {
+  if (request.query.force === '') {
+    return wrapIntoPromise(handler(request, response, { username: testUser.username, ...params }));
+  }
+
   const username = await getSession(request.cookies.token);
   if (!username) {
     response.status(401).json({ error: 'Must be logged in' });

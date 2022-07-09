@@ -20,5 +20,5 @@ export default wrapWithAuth(['shopId'], async (req, res, { shopId }) => {
       fulfiller: true,
     },
   });
-  return { orders, result: 'success' };
+  return { orders: orders ?? [], result: 'success' };
 });

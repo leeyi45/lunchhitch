@@ -17,12 +17,14 @@ import { LunchHitchOrder } from '../../prisma';
 
 type Props = {
   shop: Shop | null;
-  onSubmit: (order: Order) => (any | Promise<any>);
 };
 
 async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
-  const resp = await fetch(`api/orders?shop=${shop.id}`);
-  return resp.json();
+  const resp = await fetch(`api/orders?shopId=${shop.id}&force=`);
+  const res = await resp.json();
+
+  if (res.result === 'success') return res.orders;
+  else throw new Error(res.error);
 }
 
 type OrderItemProps = {
@@ -45,7 +47,7 @@ const OrderListItem = ({ order, onSelect }: OrderItemProps) => {
       <Box elevation={hover ? 5 : 3}>
         <div>
           <h3>From {order.from.displayName}</h3>
-          <p>Delivery by {order.deliverBy.toISOString()}</p>
+          <p>Delivery by {order.deliverBy.toString()}</p>
           <ol>
             {order.orders.map((x, j) => (<li key={j}>{x}</li>))}
           </ol>
@@ -55,7 +57,7 @@ const OrderListItem = ({ order, onSelect }: OrderItemProps) => {
   );
 };
 
-const FulFillForm = ({ shop, onSubmit }: Props) => {
+const FulFillForm = ({ shop }: Props) => {
   const { setPopover } = usePopoverContext();
   const ordersAsync = useAsync(getOrders);
   const {
@@ -64,14 +66,14 @@ const FulFillForm = ({ shop, onSubmit }: Props) => {
     initialValues: {
       order: null,
     },
-    onSubmit: ({ order }) => onSubmit(order!),
+    onSubmit: ({ order }) => {},
   });
 
   React.useEffect(() => {
     if (shop) ordersAsync.call(shop);
     setFieldValue('order', null);
     return ordersAsync.cancel;
-  }, [shop, setFieldValue, ordersAsync]);
+  }, [shop]);
 
   const getForm = React.useCallback(() => {
     if (!shop) {

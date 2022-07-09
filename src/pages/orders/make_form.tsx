@@ -11,11 +11,10 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Shop } from '@prisma/client';
 import {
-  Field, FieldArray, FieldProps, Form, useFormikContext, withFormik,
+  Field, FieldArray, FieldProps, Form, Formik,
 } from 'formik';
 import moment, { Moment } from 'moment';
 
-import { LunchHitchUser } from '../../auth';
 import Box from '../../common/components/Box/Box';
 import TooltipButton from '../../common/components/tooltip_button';
 import { LinkedClickAwayPopover } from '../../common/popovers';
@@ -28,37 +27,34 @@ type MakeFormValues = {
 
 const MAX_ORDERS = 10;
 
-export default function MakeForm({ user, shop }: { user: LunchHitchUser, shop: Shop | null }) {
-  const WrappedForm = withFormik<{}, MakeFormValues>({
-    mapPropsToValues: () => ({
-      orders: [],
-      deliverBy: moment(),
-    }),
-    handleSubmit: (values) => fetch('/api/prisma?collection=orders&method=create', {
-      method: 'POST',
-      body: JSON.stringify({
-        where: {
-          from: user!.username,
-          orders: values.orders,
-          shop: shop!.id,
-        },
-      }),
-    }),
-    validateOnBlur: false,
-    validateOnMount: false,
-  })(() => {
-    const { values: { orders }, isSubmitting, setFieldValue } = useFormikContext<MakeFormValues>();
-    const { setPopover } = usePopoverContext();
+export default function MakeForm({ shop }: { shop: Shop | null }) {
+  const { setPopover } = usePopoverContext();
 
-    const [orderField, setOrderField] = React.useState({
-      value: '',
-      error: false,
-      helperText: '',
-    });
+  const [orderField, setOrderField] = React.useState({
+    value: '',
+    error: false,
+    helperText: '',
+  });
 
-    return (
-      <Form>
-        <>
+  return (
+    <Formik<MakeFormValues>
+      initialValues={{
+        orders: [],
+        deliverBy: moment(),
+      }}
+      onSubmit={({ orders, deliverBy }) => fetch('/api/orders/create?force=', {
+        method: 'POST',
+        body: JSON.stringify({
+          orders,
+          shopId: shop!.id,
+          deliverBy: deliverBy.toDate(),
+        }),
+      })}
+    >
+      {({
+        values: { orders }, isSubmitting, setFieldValue, submitForm,
+      }) => (
+        <Form>
           <FieldArray name="orders">
             {(ordersHelpers) => {
               const addOrder = (order: string, index?: number) => {
@@ -171,7 +167,11 @@ export default function MakeForm({ user, shop }: { user: LunchHitchUser, shop: S
                       Clear Orders
                     </TooltipButton>
                     <TooltipButton
-                      disabled={orders.length === 0 || isSubmitting}
+                      disabled={
+                        orders.length === 0
+                        || isSubmitting
+                        || !shop
+                      }
                       tooltip="Submit this order!"
                       onClick={() => setPopover('makeFormConfirm', true)}
                     >
@@ -183,57 +183,68 @@ export default function MakeForm({ user, shop }: { user: LunchHitchUser, shop: S
               );
             }}
           </FieldArray>
-          <LinkedClickAwayPopover name="makeFormClear">
+          <LinkedClickAwayPopover
+            anchorReference="none"
+            name="makeFormClear"
+          >
             {(setOpen) => (
-              <div>
-                Are you sure you want to clear all orders?
-                <Button
-                  color="success"
-                  onClick={() => {
-                    setFieldValue('orders', []);
-                    setOrderField({
-                      ...orderField,
-                      error: false,
-                      helperText: 'Orders cleared',
-                    });
-                    setOpen(false);
-                  }}
-                >
-                  Yes
-                </Button>
-                <Button
-                  color="error"
-                  onClick={() => setOpen(false)}
-                >
-                  No
-                </Button>
-              </div>
+              <Stack direction="column">
+                <h3>Are you sure you want to clear all orders?</h3>
+                <Stack direction="row">
+                  <Button
+                    color="success"
+                    onClick={() => {
+                      setFieldValue('orders', []);
+                      setOrderField({
+                        ...orderField,
+                        error: false,
+                        helperText: 'Orders cleared',
+                      });
+                      setOpen(false);
+                    }}
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    color="error"
+                    onClick={() => setOpen(false)}
+                  >
+                    No
+                  </Button>
+                </Stack>
+              </Stack>
             )}
           </LinkedClickAwayPopover>
           <LinkedClickAwayPopover name="makeFormConfirm">
             {(setOpen) => (
-              <div>
-                Confirm your order from {shop?.name}
-                <Button
-                  color="success"
-                  type="submit"
-                  onClick={() => setOpen(false)}
-                >
-                  Confirm
-                </Button>
-                <Button
-                  color="error"
-                  onClick={() => setOpen(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
+              <Stack direction="column">
+                <h3>Confirm the following order from {shop?.name}</h3>
+                <ol>
+                  {orders.map((order, i) => (<li key={i}>{order}</li>))}
+                </ol>
+                <Stack direction="row">
+                  <Button
+                    color="success"
+                    type="submit"
+                    onClick={() => {
+                      setOpen(false);
+                      submitForm();
+                    }}
+                  >
+                    Confirm
+                  </Button>
+                  <Button
+                    color="error"
+                    onClick={() => setOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                </Stack>
+              </Stack>
             )}
           </LinkedClickAwayPopover>
-        </>
-      </Form>
-    );
-  });
-
-  return <WrappedForm />;
+        </Form>
+      )}
+    </Formik>
+  );
 }
