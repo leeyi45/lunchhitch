@@ -15,4 +15,4 @@ export function entries<T extends { [key: string]: any }>(obj: T) {
   return Object.entries(obj) as [KeysOfType<T, string>, T[string]][];
 }
 
-export const useNullableState = <T>(defaultVal?: T) => useState<T | null>(defaultVal ?? null);
+export const useNullableState = <T>(defaultVal?: (T | null)) => useState<T | null>(defaultVal ?? null);

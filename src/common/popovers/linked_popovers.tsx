@@ -9,10 +9,22 @@ export type PopoverContextType = {
   setPopover: (name: keyof Values, value: boolean) => void;
 };
 
-const PopoverContext = React.createContext<PopoverContextType>({
-  popovers: {},
-  setPopover: () => {},
-});
+const PopoverContext = React.createContext<PopoverContextType | null>(null);
+
+export const usePopoverContext = () => {
+  const ctx = React.useContext(PopoverContext);
+  if (!ctx) throw new Error('usePopoverContext requires the PopoverContainer!');
+
+  return ctx;
+};
+
+export const usePopover = (name: string) => {
+  const ctx = React.useContext(PopoverContext);
+  if (!ctx) throw new Error('usePopover requires the PopoverContainer!');
+  else if (ctx.popovers[name] === undefined) throw new Error(`Could not find popover with the key ${name}`);
+
+  return [ctx.popovers[name], (state: boolean) => ctx.setPopover(name, state)];
+};
 
 export type PopoverContainerProps = {
   popovers: { [name: string]: React.ReactNode | boolean },
@@ -20,15 +32,13 @@ export type PopoverContainerProps = {
   blurDist?: number;
 };
 
-export const usePopoverContext = () => React.useContext(PopoverContext);
-
 export const PopoverContainer = React.forwardRef<HTMLDivElement, PopoverContainerProps>(({ blurDist, children, popovers }, ref) => {
   const [popoverStates, setPopoversState] = React.useState(() => Object.entries(popovers)
     .reduce((res, [key, value]) => ({ ...res, [key]: typeof value === 'boolean' ? value : false }), {}));
   const setPopover = React.useCallback((name: keyof Values, value: boolean) => setPopoversState({ ...popoverStates, [name]: value }), [popoverStates]);
   const ctxObj = React.useMemo(() => ({
-    values: popoverStates,
-    setOpen: setPopover,
+    popovers: popoverStates,
+    setPopover,
   }), [popoverStates]);
 
   return (
@@ -54,7 +64,11 @@ PopoverContainer.defaultProps = {
 
 export type LinkedPopoverProps = {
   name: string;
+  // For some reason eslint can't detect the fact that the defaultProps and displayName have already been set
+  // on this component, so the errors are disabled here
+  // eslint-disable-next-line react/require-default-props
   open?: boolean;
+  // eslint-disable-next-line react/require-default-props
   children?: React.ReactNode | ((setOpen: (newValue: boolean) => void) => React.ReactNode);
 } & Omit<PopoverProps, 'children' | 'open'>;
 

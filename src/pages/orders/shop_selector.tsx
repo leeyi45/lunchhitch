@@ -31,7 +31,7 @@ type Props = {
  */
 export default function ShopSelector({ communities, onChange, value }: Props) {
   const [community, setCommunity] = useNullableState<LunchHitchCommunity>();
-  const [shop, setShop] = useNullableState<Shop>();
+  const [shop, setShop] = useNullableState<Shop>(value);
 
   React.useEffect(() => setShop(value), [value]);
 

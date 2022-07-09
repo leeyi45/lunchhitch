@@ -64,6 +64,8 @@ const OrdersPage = ({ communities }: Props) => {
                 </LinkedPopover>
               ),
               fulfillPopover: false,
+              makeFormClear: false,
+              makeFormSuccess: false,
             }}
           >
             {(values, setPopover) => (
@@ -115,17 +117,7 @@ const OrdersPage = ({ communities }: Props) => {
                           setPopover('successPopover', true);
                         }}
                       >
-                        {({ isSubmitting, ...formik }) => (
-                          <Form>
-                            <MakeForm
-                              isSubmitting={isSubmitting}
-                              onSubmit={() => formik.handleSubmit()}
-                              onDateChange={(newDate) => formik.setFieldValue('deliverby', newDate)}
-                              onChange={(newValue) => formik.setFieldValue('orders', newValue)}
-                              shop={shop}
-                            />
-                          </Form>
-                        )}
+                        <MakeForm user={user} shop={shop} />
                       </Formik>
                     </div>
                   </Box>
