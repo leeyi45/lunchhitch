@@ -7,12 +7,14 @@ import {
 import { Shop } from '@prisma/client';
 import { GetServerSideProps } from 'next';
 
+import testUser from '../../auth/test_user';
+import { APIResult, wrapApiResult } from '../../common';
 import AuthSelector from '../../common/auth_selector';
 import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/components/navbar';
 import { LinkedPopover, PopoverContainer } from '../../common/components/popovers';
 import { getSession } from '../../firebase/admin';
-import prisma, { LunchHitchCommunity, LunchHitchOrder } from '../../prisma';
+import prisma, { LunchHitchCommunity } from '../../prisma';
 
 import FulFillForm from './fulfill_form';
 import MadeDisplay from './made_display';
@@ -20,11 +22,10 @@ import MakeForm from './make_form';
 import ShopSelector from './shop_selector';
 
 type Props = {
-  communities: LunchHitchCommunity[];
-  userOrders: LunchHitchOrder[];
+  communities: APIResult<LunchHitchCommunity[]>;
 }
 
-const OrdersPage = ({ communities, userOrders }: Props) => {
+const OrdersPage = ({ communities }: Props) => {
   const [shop, setShop] = React.useState<Shop | null>(null);
 
   return (
@@ -34,41 +35,27 @@ const OrdersPage = ({ communities, userOrders }: Props) => {
           <NavBar user={user} />
           <PopoverContainer
             popovers={{
-              successPopover: (
-                <LinkedPopover
-                  name="successPopover"
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  }}
-                  anchorReference="none"
-                >
-                  {(setOpen) => (
-                    <div
-                      style={{
-                        padding: '10px, 10px, 10px, 10px',
-                      }}
-                    >
-                      <CheckCircleIcon />
-                      <p>Successfully placed your order!</p>
-                      <Button
-                        onClick={() => setOpen(false)}
-                      >
-                        Done
-                      </Button>
-                    </div>
-                  )}
-                </LinkedPopover>
-              ),
+              errorPopover: communities.result === 'error',
               fulfillPopover: false,
               makeFormClear: false,
               makeFormConfirm: false,
             }}
           >
+            <LinkedPopover
+              name="errorPopover"
+            >
+              <p style={{
+                textAlign: 'center',
+              }}
+              >
+                An error occurred<br />
+                Reload the page to try again<br />
+                {communities.result === 'error' && communities.value}<br />
+              </p>
+            </LinkedPopover>
             <Stack direction="column">
               <ShopSelector
-                communities={communities}
+                communities={communities.value}
                 value={shop}
                 onChange={setShop}
               />
@@ -107,53 +94,22 @@ const OrdersPage = ({ communities, userOrders }: Props) => {
 
 export default OrdersPage;
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const user = await getSession(req.cookies.token);
+export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
+  // const user = await getSession(req.cookies.token);
+  const user = testUser.username;
   console.log('User is', user);
-
-  // if (!user) {
-  //   return {
-  //     redirect: {
-  //       permanent: false,
-  //       destination: '/auth/login?callback=orders',
-  //     },
-  //     props: {},
-  //   };
-  // }
-
   // TODO:
   // Honestly not sure if we should fetch ALL communities server side
   // or load communities as the user types
-  try {
-    const userOrders = await prisma.order.findMany({
-      where: {
-        fromId: user!,
-      },
-      include: {
-        from: true,
-        shop: true,
-        fulfiller: true,
-      },
-    });
+  const communities = await wrapApiResult(() => prisma.community.findMany({
+    include: {
+      shops: true,
+    },
+  }));
 
-    const communities = await prisma.community.findMany({
-      include: {
-        shops: true,
-      },
-    });
-
-    return {
-      props: {
-        communities,
-        userOrders,
-      },
-    };
-  } catch (error) {
-    return {
-      props: {
-        communities: [],
-        userOders: [],
-      },
-    };
-  }
+  return {
+    props: {
+      communities,
+    },
+  };
 };

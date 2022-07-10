@@ -9,7 +9,7 @@ import TextField from '@mui/material/TextField';
 import { LunchHitchUser } from '../../auth';
 import { useNullableState } from '../../common';
 import useAsync from '../../common/async';
-import ConfirmPopover from '../../common/components/popovers/confirm_popover';
+import { ConfirmPopover } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
 

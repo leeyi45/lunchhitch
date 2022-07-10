@@ -15,8 +15,7 @@ import {
 import moment, { Moment } from 'moment';
 
 import Box from '../../common/components/Box/Box';
-import ConfirmPopover from '../../common/components/popovers/confirm_popover';
-import { usePopoverContext } from '../../common/components/popovers/linked_popovers';
+import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 
 type MakeFormValues = {
@@ -80,9 +79,27 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
 
               return (
                 <Stack direction="column">
-                  <Stack direction="row">
+                  <Stack direction="row" spacing={1}>
                     <TextField
                       {...orderField}
+                      disabled={shop === null}
+                      variant="standard"
+                      placeholder="Enter your order here"
+                      onKeyUp={(event) => {
+                        if (event.key === 'Escape') {
+                          if (orderField.value === '') {
+                            (event.target as any).blur();
+                          } else {
+                            setOrderField({
+                              value: '',
+                              error: false,
+                              helperText: '',
+                            });
+                          }
+
+                          event.preventDefault();
+                        }
+                      }}
                       onChange={(event) => setOrderField({
                         ...orderField,
                         value: event.target.value,
@@ -98,6 +115,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                                 if (orderField.value) addOrder(orderField.value);
                               }}
                               tooltip={`Add ${orderField.value}`}
+                              disabled={!orderField.value || !shop}
                             >
                               <AddIcon />
                             </TooltipButton>
@@ -106,12 +124,22 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       }}
                     />
                     <LocalizationProvider dateAdapter={AdapterMoment}>
-                      <Field name="deliverBy">
-                        {({ field }: FieldProps<MakeFormValues>) => (
+                      <Field
+                        name="deliverBy"
+                      >
+                        {({ field, meta: { touched } }: FieldProps<MakeFormValues>) => (
                           <DateTimePicker
                             {...field}
                             minDateTime={moment()}
-                            renderInput={(params) => <TextField {...params} />}
+                            disabled={!shop}
+                            renderInput={({ error, ...params }) => (
+                              <TextField
+                                placeholder="Deliver By Time"
+                                variant="standard"
+                                error={error && touched}
+                                {...params}
+                              />
+                            )}
                           />
                         )}
                       </Field>
@@ -119,7 +147,19 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                   </Stack>
                   <Box>
                     {orders.length === 0 ? (
-                      <p>Add some orders to begin!</p>
+                      <div
+                        style={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <p style={{
+                          color: '#c5c9c6',
+                        }}
+                        >Add some orders to begin!
+                        </p>
+                      </div>
                     ) : (
                       <Stack>
                         {orders.map((order, i) => (
@@ -157,8 +197,14 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       </Stack>
                     )}
                   </Box>
-                  <Stack direction="row">
+                  <div style={{
+                    display: 'inline',
+                  }}
+                  >
                     <TooltipButton
+                      style={{
+                        paddingLeft: '10px',
+                      }}
                       disabled={orders.length === 0}
                       tooltip="Remove all orders"
                       onClick={() => setPopover('makeFormClear', true)}
@@ -176,8 +222,8 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                     >
                       Submit Orders
                     </TooltipButton>
-                    <p style={{ float: 'right' }}>{orders.length}/{MAX_ORDERS} Orders</p>
-                  </Stack>
+                    <p style={{ float: 'right', paddingRight: '20px' }}>{orders.length}/{MAX_ORDERS} Orders</p>
+                  </div>
                 </Stack>
               );
             }}

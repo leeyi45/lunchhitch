@@ -10,8 +10,7 @@ import { useFormik } from 'formik';
 
 import useAsync from '../../common/async';
 import Box from '../../common/components/Box/Box';
-import ConfirmPopover from '../../common/components/popovers/confirm_popover';
-import { usePopoverContext } from '../../common/components/popovers/linked_popovers';
+import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
 
@@ -61,7 +60,7 @@ const FulFillForm = ({ shop }: Props) => {
   const { setPopover } = usePopoverContext();
   const ordersAsync = useAsync(getOrders);
   const {
-    values: { order }, submitForm, setFieldValue, isSubmitting, handleBlur,
+    values: { order }, submitForm, setFieldValue, isSubmitting,
   } = useFormik<{ order: null | Order}>({
     initialValues: {
       order: null,
@@ -137,7 +136,6 @@ const FulFillForm = ({ shop }: Props) => {
 
   return (
     <form
-      onBlur={handleBlur}
       onSubmit={submitForm}
     >
       <Stack direction="row" spacing={1}>
@@ -147,7 +145,10 @@ const FulFillForm = ({ shop }: Props) => {
             float: 'right',
           }}
           tooltip="Refresh orders"
-          onClick={() => ordersAsync.call(shop!)}
+          onClick={() => {
+            ordersAsync.call(shop!);
+            setFieldValue('order', null);
+          }}
           disabled={shop === null}
         >
           <RefreshIcon />
