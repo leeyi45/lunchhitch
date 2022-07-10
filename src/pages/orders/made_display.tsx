@@ -1,18 +1,15 @@
 import React from 'react';
 import CancelIcon from '@mui/icons-material/Cancel';
 import Autocomplete from '@mui/material/Autocomplete';
-import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
-import Popover from '@mui/material/Popover';
 import TextField from '@mui/material/TextField';
-import { Order } from '@prisma/client';
 
 import { LunchHitchUser } from '../../auth';
 import { useNullableState } from '../../common';
 import useAsync from '../../common/async';
+import ConfirmPopover from '../../common/components/popovers/confirm_popover';
 import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
 
@@ -41,28 +38,18 @@ type OrderDisplayProps = {
 const OrderDisplay = ({ orders, onRemove }: OrderDisplayProps) => {
   const shops = Array.from(new Set(orders.map((order) => order.shop)));
   const [selectedShop, setSelectedShop] = useNullableState<string>();
-  const [removePopover, setRemovePopover] = useNullableState<Order>();
   const filteredOrders = selectedShop ? orders.filter((order) => order.shop.name.match(selectedShop)) : orders;
 
   return (
     <div>
-      <Popover
-        open={!!removePopover}
+      <ConfirmPopover
+        name="madeRemovePopover"
+        confirmAction={() => {
+
+        }}
       >
-        <ClickAwayListener
-          onClickAway={() => setRemovePopover(null)}
-        >
-          <div>
-            Remove this order?
-            <Button>Confirm</Button>
-            <Button
-              onClick={() => setRemovePopover(null)}
-            >
-              Cancel
-            </Button>
-          </div>
-        </ClickAwayListener>
-      </Popover>
+        Remove this order?
+      </ConfirmPopover>
       <Autocomplete
         options={shops}
         value={selectedShop}

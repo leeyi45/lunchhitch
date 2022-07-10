@@ -1,6 +1,6 @@
+/* eslint-disable no-shadow */
 import React from 'react';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -10,9 +10,9 @@ import { useFormik } from 'formik';
 
 import useAsync from '../../common/async';
 import Box from '../../common/components/Box/Box';
+import ConfirmPopover from '../../common/components/popovers/confirm_popover';
+import { usePopoverContext } from '../../common/components/popovers/linked_popovers';
 import TooltipButton from '../../common/components/tooltip_button';
-import { LinkedClickAwayPopover } from '../../common/popovers';
-import { usePopoverContext } from '../../common/popovers/linked_popovers';
 import { LunchHitchOrder } from '../../prisma';
 
 type Props = {
@@ -20,7 +20,7 @@ type Props = {
 };
 
 async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
-  const resp = await fetch(`api/orders?shopId=${shop.id}&force=`);
+  const resp = await fetch(`api/orders?shopId=${shop.id}&force=&fulfilled=false`);
   const res = await resp.json();
 
   if (res.result === 'success') return res.orders;
@@ -61,12 +61,20 @@ const FulFillForm = ({ shop }: Props) => {
   const { setPopover } = usePopoverContext();
   const ordersAsync = useAsync(getOrders);
   const {
-    values: { order }, submitForm, setFieldValue, isSubmitting, handleBlur, handleSubmit,
+    values: { order }, submitForm, setFieldValue, isSubmitting, handleBlur,
   } = useFormik<{ order: null | Order}>({
     initialValues: {
       order: null,
     },
-    onSubmit: ({ order }) => {},
+    onSubmit: async ({ order }) => {
+      await fetch('/api/orders/fulfill?force=', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: order!.id,
+        }),
+      });
+    }
+    ,
   });
 
   React.useEffect(() => {
@@ -82,7 +90,12 @@ const FulFillForm = ({ shop }: Props) => {
 
     switch (ordersAsync.state) {
       case 'loading': return (<CircularProgress />);
-      case 'errored': return <>An error occurred, please refresh the page and try again</>;
+      case 'errored': return (
+        <div>
+          An error occurred, please refresh the page and try again.<br />
+          {ordersAsync.result.toString()}
+        </div>
+      );
       case 'done': {
         if (ordersAsync.result.length === 0) {
           return (
@@ -120,12 +133,12 @@ const FulFillForm = ({ shop }: Props) => {
       }
       default: return null as never;
     }
-  }, [ordersAsync, shop, setPopover, setFieldValue]);
+  }, [ordersAsync, shop]);
 
   return (
     <form
       onBlur={handleBlur}
-      onSubmit={handleSubmit}
+      onSubmit={submitForm}
     >
       <Stack direction="row" spacing={1}>
         <h2 style={{ color: '#47b16a' }}>Fulfill an Order!</h2>
@@ -140,39 +153,18 @@ const FulFillForm = ({ shop }: Props) => {
           <RefreshIcon />
         </TooltipButton>
       </Stack>
-      <LinkedClickAwayPopover
+      <ConfirmPopover
         name="fulfillPopover"
+        confirmButton="Accept Order"
+        confirmAction={() => {
+          if (!isSubmitting) submitForm();
+        }}
       >
-        {(setPopoverOpen) => (
-          <div
-            style={{
-              padding: '10px 10px 10px 10px',
-            }}
-          >
-            <h3>Accept the following order?</h3>
-            <ol>
-              {order?.orders.map((entry, i) => <li key={i}>{entry}</li>)}
-            </ol>
-            <Button
-              color="success"
-              onClick={() => {
-                if (!isSubmitting) {
-                  setPopoverOpen(false);
-                  submitForm();
-                }
-              }}
-            >
-              Accept order
-            </Button>
-            <Button
-              color="error"
-              onClick={() => setPopoverOpen(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        )}
-      </LinkedClickAwayPopover>
+        <h3>Accept the following order?</h3>
+        <ol>
+          {order?.orders.map((entry, i) => <li key={i}>{entry}</li>)}
+        </ol>
+      </ConfirmPopover>
       {getForm()}
     </form>
   );

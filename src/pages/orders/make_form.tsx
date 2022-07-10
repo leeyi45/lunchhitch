@@ -2,7 +2,6 @@ import React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RemoveIcon from '@mui/icons-material/Remove';
-import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -16,9 +15,9 @@ import {
 import moment, { Moment } from 'moment';
 
 import Box from '../../common/components/Box/Box';
+import ConfirmPopover from '../../common/components/popovers/confirm_popover';
+import { usePopoverContext } from '../../common/components/popovers/linked_popovers';
 import TooltipButton from '../../common/components/tooltip_button';
-import { LinkedClickAwayPopover } from '../../common/popovers';
-import { usePopoverContext } from '../../common/popovers/linked_popovers';
 
 type MakeFormValues = {
   orders: string[];
@@ -183,66 +182,30 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               );
             }}
           </FieldArray>
-          <LinkedClickAwayPopover
-            anchorReference="none"
+          <ConfirmPopover
             name="makeFormClear"
+            confirmAction={() => {
+              setFieldValue('orders', []);
+              setOrderField({
+                ...orderField,
+                error: false,
+                helperText: 'Orders cleared',
+              });
+            }}
           >
-            {(setOpen) => (
-              <Stack direction="column">
-                <h3>Are you sure you want to clear all orders?</h3>
-                <Stack direction="row">
-                  <Button
-                    color="success"
-                    onClick={() => {
-                      setFieldValue('orders', []);
-                      setOrderField({
-                        ...orderField,
-                        error: false,
-                        helperText: 'Orders cleared',
-                      });
-                      setOpen(false);
-                    }}
-                  >
-                    Yes
-                  </Button>
-                  <Button
-                    color="error"
-                    onClick={() => setOpen(false)}
-                  >
-                    No
-                  </Button>
-                </Stack>
-              </Stack>
-            )}
-          </LinkedClickAwayPopover>
-          <LinkedClickAwayPopover name="makeFormConfirm">
-            {(setOpen) => (
-              <Stack direction="column">
-                <h3>Confirm the following order from {shop?.name}</h3>
-                <ol>
-                  {orders.map((order, i) => (<li key={i}>{order}</li>))}
-                </ol>
-                <Stack direction="row">
-                  <Button
-                    color="success"
-                    type="submit"
-                    onClick={() => {
-                      setOpen(false);
-                      submitForm();
-                    }}
-                  >
-                    Confirm
-                  </Button>
-                  <Button
-                    color="error"
-                    onClick={() => setOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                </Stack>
-              </Stack>
-            )}
-          </LinkedClickAwayPopover>
+            <h3>Are you sure you want to clear all orders?</h3>
+          </ConfirmPopover>
+          <ConfirmPopover
+            name="makeFormConfirm"
+            confirmAction={submitForm}
+          >
+            <Stack direction="column">
+              <h3>Confirm the following order from {shop?.name}</h3>
+              <ol>
+                {orders.map((order, i) => (<li key={i}>{order}</li>))}
+              </ol>
+            </Stack>
+          </ConfirmPopover>
         </Form>
       )}
     </Formik>

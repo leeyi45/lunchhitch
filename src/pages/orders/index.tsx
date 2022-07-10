@@ -10,9 +10,9 @@ import { GetServerSideProps } from 'next';
 import AuthSelector from '../../common/auth_selector';
 import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/components/navbar';
-import { LinkedPopover, PopoverContainer } from '../../common/popovers';
+import { LinkedPopover, PopoverContainer } from '../../common/components/popovers';
 import { getSession } from '../../firebase/admin';
-import prisma, { LunchHitchCommunity } from '../../prisma';
+import prisma, { LunchHitchCommunity, LunchHitchOrder } from '../../prisma';
 
 import FulFillForm from './fulfill_form';
 import MadeDisplay from './made_display';
@@ -21,9 +21,10 @@ import ShopSelector from './shop_selector';
 
 type Props = {
   communities: LunchHitchCommunity[];
+  userOrders: LunchHitchOrder[];
 }
 
-const OrdersPage = ({ communities }: Props) => {
+const OrdersPage = ({ communities, userOrders }: Props) => {
   const [shop, setShop] = React.useState<Shop | null>(null);
 
   return (
@@ -62,7 +63,7 @@ const OrdersPage = ({ communities }: Props) => {
               ),
               fulfillPopover: false,
               makeFormClear: false,
-              makeFormSuccess: false,
+              makeFormConfirm: false,
             }}
           >
             <Stack direction="column">
@@ -124,6 +125,17 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   // Honestly not sure if we should fetch ALL communities server side
   // or load communities as the user types
   try {
+    const userOrders = await prisma.order.findMany({
+      where: {
+        fromId: user!,
+      },
+      include: {
+        from: true,
+        shop: true,
+        fulfiller: true,
+      },
+    });
+
     const communities = await prisma.community.findMany({
       include: {
         shops: true,
@@ -133,12 +145,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     return {
       props: {
         communities,
+        userOrders,
       },
     };
   } catch (error) {
     return {
       props: {
         communities: [],
+        userOders: [],
       },
     };
   }

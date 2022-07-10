@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-/**
+/** ./components/popovers
  * Some functions may return a regular value or a Promise. Use this function to wrap the result of such a function as a Promise
  * @param result Result to wrap
  * @returns Promise that resolves to the result
