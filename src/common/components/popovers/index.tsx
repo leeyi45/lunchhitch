@@ -3,7 +3,9 @@ import Button, { ButtonProps } from '@mui/material/Button';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Stack from '@mui/material/Stack';
 
-import Popover, { PopoverProps } from './popover';
+import { KeysOfType } from '../..';
+
+import Popover from './popover';
 
 type Values = { [name: string ]: boolean };
 export type PopoverContextType = {
@@ -105,28 +107,33 @@ export function withPopover<OuterProps>(popoverKeys: { [key: string ]: boolean |
   return newComp;
 }
 
+type PopoverWrapperProps = {
+  name: string;
+  children: React.ReactNode | ((args: { open: boolean, setState: (newValue: boolean) => void }) => React.ReactNode);
+};
+
+type RequiredPopoverProps = {
+  open: boolean;
+  children: React.ReactNode;
+}
+
 /**
- * Component to wrap Popover components and connect them to the
+ * Component to wrap Popover components and connect them to a PopoverContext
  */
-export function connectPopover(Component: React.ComponentType<PopoverProps>, displayName?: string) {
-  const newComp = ({ name, children, ...props }: Omit<PopoverProps, 'open' | 'children'> & {
-    /**
-     * Name of the popover
-     */
-    name: string;
-    /**
-     * Content of the component
-     */
-    children: React.ReactNode | ((args: { open: boolean, setState: (newValue: boolean) => void }) => React.ReactNode);
-  }) => {
+export function connectPopover<P extends RequiredPopoverProps>(Component: React.ComponentType<P>, displayName?: string) {
+  const newComp = React.forwardRef<HTMLDivElement, Omit<P, KeysOfType<RequiredPopoverProps>> & PopoverWrapperProps>(({ name, children, ...props }, ref) => {
     const [open, setState] = usePopover(name);
+    const newProps = {
+      ...props,
+      open,
+    } as unknown as P;
 
     return (
-      <Component open={open} {...props}>
+      <Component ref={ref} {...newProps}>
         {typeof children === 'function' ? children({ open, setState }) : children}
       </Component>
     );
-  };
+  });
 
   newComp.displayName = displayName ?? Component.displayName;
   return newComp;
@@ -135,9 +142,9 @@ export function connectPopover(Component: React.ComponentType<PopoverProps>, dis
 export const LinkedPopover = connectPopover(Popover);
 export type LinkedPopoverProps = React.ComponentProps<typeof LinkedPopover> & { name: string };
 
-export const LinkedClickAwayPopover = ({
+export const LinkedClickAwayPopover = React.forwardRef<HTMLDivElement, LinkedPopoverProps & { onClickAway?:() => void}>(({
   name, children, onClickAway, ...props
-}: LinkedPopoverProps & { onClickAway?: () => void }) => (
+}, ref) => (
   <LinkedPopover name={name} {...props}>
     {({ open, setState }) => (
       <ClickAwayListener
@@ -146,14 +153,15 @@ export const LinkedClickAwayPopover = ({
           if (onClickAway) onClickAway();
         }}
       >
-        <div>
+        <div ref={ref}>
           {typeof children === 'function' ? children({ open, setState }) : children}
         </div>
       </ClickAwayListener>
     )}
   </LinkedPopover>
-);
+));
 
+LinkedClickAwayPopover.displayName = 'LinkedClickAwayPopover';
 LinkedClickAwayPopover.defaultProps = {
   onClickAway: undefined,
 };
@@ -163,12 +171,12 @@ export type ConfirmPopoverProps = {
   confirmAction?: () => void;
   cancelButton?: boolean | string | React.ComponentType<ButtonProps>;
   cancelAction?: () => void;
-  name: string;
+name: string;
 } & React.ComponentProps<typeof LinkedClickAwayPopover>;
 
-export const ConfirmPopover = ({
+export const ConfirmPopover = React.forwardRef<HTMLDivElement, ConfirmPopoverProps>(({
   children, confirmButton, confirmAction, cancelButton, cancelAction, name, ...props
-}: ConfirmPopoverProps) => (
+}, ref) => (
   <LinkedClickAwayPopover name={name} {...props}>
     {({ open, setState }) => {
       const confirmProps: ButtonProps = {
@@ -196,7 +204,7 @@ export const ConfirmPopover = ({
       };
 
       return (
-        <Stack direction="column">
+        <Stack direction="column" ref={ref}>
           {typeof children === 'function' ? children({ open, setState }) : children}
           {confirmButton || cancelButton ? (
             <Stack direction="row">
@@ -208,8 +216,9 @@ export const ConfirmPopover = ({
       );
     }}
   </LinkedClickAwayPopover>
-);
+));
 
+ConfirmPopover.displayName = 'ConfirmPopover';
 ConfirmPopover.defaultProps = {
   confirmButton: true,
   confirmAction: undefined,

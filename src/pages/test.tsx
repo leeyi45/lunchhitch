@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { PopoverContainer } from '../common/popovers';
+import { PopoverContainer } from '../common/components/popovers';
 
 import MakeForm from './orders/make_form';
 

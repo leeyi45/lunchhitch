@@ -43,6 +43,8 @@ Popover.defaultProps = {
     left: '50%',
     justifyContent: 'center',
     alignItems: 'center',
+    transform: 'translate(-50%, -50%)',
+    position: 'absolute',
   },
 };
 

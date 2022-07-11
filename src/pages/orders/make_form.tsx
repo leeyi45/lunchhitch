@@ -13,6 +13,7 @@ import {
   Field, FieldArray, FieldProps, Form, Formik,
 } from 'formik';
 import moment, { Moment } from 'moment';
+import * as yup from 'yup';
 
 import Box from '../../common/components/Box/Box';
 import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
@@ -48,9 +49,12 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
           deliverBy: deliverBy.toDate(),
         }),
       })}
+      validationSchema={yup.object({
+        orders: yup.array().of(yup.string().required('Order cannot be empty!')),
+      })}
     >
       {({
-        values: { orders }, isSubmitting, setFieldValue, submitForm,
+        values: { orders }, errors, isSubmitting, setFieldValue, submitForm,
       }) => (
         <Form>
           <FieldArray name="orders">
@@ -97,6 +101,9 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                             });
                           }
 
+                          event.preventDefault();
+                        } else if (event.key === 'Enter' && orderField.value !== '') {
+                          addOrder(orderField.value);
                           event.preventDefault();
                         }
                       }}
@@ -189,6 +196,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                                   variant="standard"
                                   {...field}
                                   error={meta.touched && !!meta.error}
+                                  helperText={meta.error}
                                 />
                               )}
                             </Field>
@@ -216,6 +224,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                         orders.length === 0
                         || isSubmitting
                         || !shop
+                        || Object.values(errors).length > 0
                       }
                       tooltip="Submit this order!"
                       onClick={() => setPopover('makeFormConfirm', true)}
