@@ -21,6 +21,7 @@ export type LunchHitchUser = {
   username: string;
   email: string;
   displayName: string;
+  phoneNumber: string;
   // Because there is a limit to the size of the JWT, we can't store the firebase user
   // object here
   // firebaseObj: User;

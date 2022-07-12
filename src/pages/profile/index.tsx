@@ -32,6 +32,8 @@ const ProfileDisplay = ({ user }: Props) => (
       <Item>{user.username}</Item>
       <h3>Email:</h3>
       <Item>{user.email}</Item>
+      <h3>Phone Number:</h3>
+      <Item>{user.phoneNumber}</Item>
     </Stack>
   </>
 );

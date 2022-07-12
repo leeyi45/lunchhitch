@@ -136,6 +136,11 @@ const SignUpForm = (props: SignUpFormProps) => {
               type="text"
               name="email"
             />
+            <SignUpField
+              labelText="Phone Number"
+              type="text"
+              name="phoneNumber"
+            />
             <PasswordField
               style={{
                 marginTop: '20px',
