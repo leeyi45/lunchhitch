@@ -86,7 +86,7 @@ export default function LoginPage() {
           onSubmit={async (values, actions) => {
             try {
               await signIn(values);
-              // router.push('/profile');
+              router.push('/');
             } catch (error: any) {
               actions.setFieldValue('password', '');
               setLoginError(firebaseErrorHandler(error, {
@@ -102,6 +102,7 @@ export default function LoginPage() {
               <Stack
                 direction="column"
                 spacing={1.5}
+                style={{ fontFamily: 'Raleway' }}
               >
                 {loginError || Object.values(errors).at(0)}<br />
                 <TextField
@@ -127,8 +128,11 @@ export default function LoginPage() {
             </Form>
           )}
         </Formik>
-        <Link href="/auth/signup">Sign Up</Link>
-        <Link href="/auth/reset">Forgot your password?</Link>
+        <div style={{ fontFamily: 'Raleway', textAlign: 'center' }}>
+          <Link href="/auth/signup">Sign Up</Link>
+          <p />
+          <Link href="/auth/reset">Forgot your password?</Link>
+        </div>
       </Stack>
     </div>
   );
