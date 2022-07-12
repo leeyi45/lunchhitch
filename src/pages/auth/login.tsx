@@ -54,7 +54,6 @@ export default function LoginPage() {
         spacing={2}
       >
         <div style={{
-          background: '#50C878',
           width: '100%',
         }}
         >
@@ -65,7 +64,8 @@ export default function LoginPage() {
               flexGrow: 1,
               textAlign: 'center',
               fontFamily: 'Raleway',
-              color: 'white',
+              color: '#50C878',
+              fontWeight: 'bold',
             }}
           >
             Log In to Lunch Hitch
