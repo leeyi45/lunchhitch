@@ -1,6 +1,8 @@
 /* eslint-disable no-shadow */
 import React from 'react';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import SearchIcon from '@mui/icons-material/Search';
+import { Autocomplete, InputAdornment, TextField } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -9,7 +11,7 @@ import { Order, Shop } from '@prisma/client';
 import { useFormik } from 'formik';
 
 import useAsync from '../../common/async';
-import Box from '../../common/components/Box/Box';
+import Box from '../../common/components/Box';
 import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
@@ -66,15 +68,22 @@ const FulFillForm = ({ shop }: Props) => {
       order: null,
     },
     onSubmit: async ({ order }) => {
-      await fetch('/api/orders/fulfill?force=', {
-        method: 'POST',
-        body: JSON.stringify({
-          id: order!.id,
-        }),
-      });
+      try {
+        await fetch('/api/orders/fulfill?force=', {
+          method: 'POST',
+          body: JSON.stringify({
+            id: order!.id,
+          }),
+        });
+        setPopover('fulfillSuccess', true);
+      } catch (error) {
+        // TODO fulfill error handling
+      }
     }
     ,
   });
+
+  const [searchField, setSearchField] = React.useState('');
 
   React.useEffect(() => {
     if (shop) ordersAsync.call(shop);
@@ -115,8 +124,38 @@ const FulFillForm = ({ shop }: Props) => {
         return (
           <>
             Displaying orders from {shop.name}
+            <Autocomplete
+              options={ordersAsync.result}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <SearchIcon />
+                      </InputAdornment>),
+                  }}
+                />
+              )}
+            />
+            <TextField
+              value={searchField}
+              placeholder="Search"
+              variant="standard"
+              onChange={(e) => setSearchField(e.target.value)}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <SearchIcon />
+                  </InputAdornment>
+                ),
+              }}
+            />
             <List>
-              {ordersAsync.result.map((order, i) => (
+              {(searchField === '' ? ordersAsync.result : ordersAsync.result.filter((order) => (
+                order.from.displayName.includes(searchField) // Search display name
+                || order.orders.find((each) => each.includes(searchField)) // Search each entry
+              ))).map((order, i) => (
                 <OrderListItem
                   order={order}
                   key={i}
@@ -165,6 +204,13 @@ const FulFillForm = ({ shop }: Props) => {
         <ol>
           {order?.orders.map((entry, i) => <li key={i}>{entry}</li>)}
         </ol>
+      </ConfirmPopover>
+      <ConfirmPopover
+        confirmButton="Close"
+        cancelButton={false}
+        name="fulfillSuccess"
+      >
+        Accepted the order!
       </ConfirmPopover>
       {getForm()}
     </form>

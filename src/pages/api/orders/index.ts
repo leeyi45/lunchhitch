@@ -6,7 +6,7 @@
 import { wrapWithAuth } from '../../../api_wrappers';
 import prisma from '../../../prisma';
 
-export default wrapWithAuth(['shopId', 'fulfilled'], async (req, res, { shopId, fulfilled }) => {
+export default wrapWithAuth(['shopId', 'fulfilled'], async (req, res, { username, shopId, fulfilled }) => {
   if (req.method !== 'GET') {
     res.status(405).end();
     return undefined as never;
@@ -14,7 +14,8 @@ export default wrapWithAuth(['shopId', 'fulfilled'], async (req, res, { shopId, 
 
   const orders = await prisma.order.findMany({
     where: {
-      shopId,
+      shopId: shopId === '' ? undefined : shopId,
+      fromId: req.query.userOnly !== undefined ? username : undefined,
       fulfillerId: !fulfilled ? undefined : {
         not: null,
       },

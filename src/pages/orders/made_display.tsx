@@ -13,20 +13,8 @@ import { ConfirmPopover } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
 
-const getOrdersMade = async (user: LunchHitchUser) => {
-  const result = await fetch('api/prisma?collection=order&method=findMany', {
-    method: 'POST',
-    body: JSON.stringify({
-      where: {
-        from: user.username,
-      },
-      include: {
-        from: true,
-        shop: true,
-      },
-    }),
-  });
-
+const getOrdersMade = async () => {
+  const result = await fetch('api/orders?fulfiller=true&userOnly=');
   return result.json() as unknown as LunchHitchOrder[];
 };
 

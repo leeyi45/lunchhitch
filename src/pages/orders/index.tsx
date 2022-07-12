@@ -1,16 +1,17 @@
 /* eslint-disable no-empty-pattern */
 import React from 'react';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import {
   Button, Stack,
 } from '@mui/material';
 import { Shop } from '@prisma/client';
 import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 
 import testUser from '../../auth/test_user';
 import { APIResult, wrapApiResult } from '../../common';
 import AuthSelector from '../../common/auth_selector';
-import Box from '../../common/components/Box/Box';
+import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
 import { LinkedPopover, PopoverContainer } from '../../common/components/popovers';
 import { getSession } from '../../firebase/admin';
@@ -27,6 +28,7 @@ type Props = {
 
 const OrdersPage = ({ communities }: Props) => {
   const [shop, setShop] = React.useState<Shop | null>(null);
+  const router = useRouter();
 
   return (
     <AuthSelector force>
@@ -39,23 +41,29 @@ const OrdersPage = ({ communities }: Props) => {
               fulfillPopover: false,
               makeFormClear: false,
               makeFormConfirm: false,
+              makeSuccess: false,
             }}
           >
             <LinkedPopover
               name="errorPopover"
             >
-              <p style={{
-                textAlign: 'center',
-              }}
-              >
-                An error occurred<br />
-                Reload the page to try again<br />
-                {communities.result === 'error' && communities.value}<br />
-              </p>
+              <Stack direction="column">
+                <p style={{
+                  textAlign: 'center',
+                }}
+                >
+                  An error occurred<br />
+                  Reload the page to try again<br />
+                  {communities.result === 'error' && communities.value}<br />
+                </p>
+                <Button onClick={() => router.replace(router.pathname)}>
+                  <RefreshIcon />
+                </Button>
+              </Stack>
             </LinkedPopover>
             <Stack direction="column">
               <ShopSelector
-                communities={communities.value}
+                communities={communities.result === 'success' ? communities.value : []}
                 value={shop}
                 onChange={setShop}
               />

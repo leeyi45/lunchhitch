@@ -1,5 +1,6 @@
 import React from 'react';
 import AddIcon from '@mui/icons-material/Add';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import RemoveIcon from '@mui/icons-material/Remove';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -15,8 +16,8 @@ import {
 import moment, { Moment } from 'moment';
 import * as yup from 'yup';
 
-import Box from '../../common/components/Box/Box';
-import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
+import Box from '../../common/components/Box';
+import { ConfirmPopover, LinkedClickAwayPopover, usePopoverContext } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 
 type MakeFormValues = {
@@ -41,14 +42,27 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
         orders: [],
         deliverBy: moment(),
       }}
-      onSubmit={({ orders, deliverBy }) => fetch('/api/orders/create?force=', {
-        method: 'POST',
-        body: JSON.stringify({
-          orders,
-          shopId: shop!.id,
-          deliverBy: deliverBy.toDate(),
-        }),
-      })}
+      onSubmit={async ({ orders, deliverBy }, { setFieldValue }) => {
+        try {
+          await fetch('/api/orders/create?force=', {
+            method: 'POST',
+            body: JSON.stringify({
+              orders,
+              shopId: shop!.id,
+              deliverBy: deliverBy.toDate(),
+            }),
+          });
+          setOrderField({
+            value: '',
+            error: false,
+            helperText: 'Placed order!',
+          });
+          setFieldValue('orders', [], false);
+          setPopover('makeSuccess', true);
+        } catch (error) {
+          // TODO submit error handling
+        }
+      }}
       validationSchema={yup.object({
         orders: yup.array().of(yup.string().required('Order cannot be empty!')),
       })}
@@ -261,6 +275,12 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               </ol>
             </Stack>
           </ConfirmPopover>
+          <LinkedClickAwayPopover
+            name="makeSuccess"
+          >
+            Successfully placed your order!
+            <CheckCircleIcon />
+          </LinkedClickAwayPopover>
         </Form>
       )}
     </Formik>
