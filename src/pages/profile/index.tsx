@@ -24,7 +24,7 @@ const Item = styled(Paper)(({ theme }) => ({
 const ProfileDisplay = ({ user }: Props) => (
   <>
     <NavBar user={user} />
-    <Stack spacing={1} style={{ alignItems: 'center', color: '#47b16a' }}>
+    <Stack spacing={2} style={{ alignItems: 'center', color: '#47b16a' }}>
       <h1>My Profile</h1>
       <h3>Name:</h3>
       <Item>{user.displayName}</Item>

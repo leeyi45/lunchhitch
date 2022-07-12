@@ -56,6 +56,7 @@ type SignUpParams = {
   password: string;
   displayName: string;
   email: string;
+  phoneNumber: string;
 };
 
 /**
@@ -64,10 +65,11 @@ type SignUpParams = {
  * @param password Password of the new user
  * @param displayName Display name of the new user
  * @param email Email to be associated with the account
+ * @param phoneNumber Phone number of the new user
  * @returns Created user
  */
 export async function signUp({
-  username, password, displayName, email,
+  username, password, displayName, email, phoneNumber,
 }: SignUpParams): Promise<void> {
   const result = await createUserWithEmailAndPassword(FIREBASE_AUTH, `${username}@${DEFAULT_DOMAIN}`, password);
   await updateFirebaseProfile(result.user, { displayName });
@@ -75,12 +77,13 @@ export async function signUp({
     data: {
       id: username,
       email,
+      phoneNumber,
     },
   });
   await firebaseSignOut(FIREBASE_AUTH);
 }
 
-export function updateProfile(user: LunchHitchUser, { email, displayName }: Record<'email' | 'displayName', string | undefined>) {
+export function updateProfile(user: LunchHitchUser, { email, displayName, phoneNumber }: Record<'email' | 'displayName' | 'phoneNumber', string | undefined | string>) {
   const tasks: Promise<any>[] = [];
   const firebaseObj = FIREBASE_AUTH.currentUser;
 
@@ -95,6 +98,17 @@ export function updateProfile(user: LunchHitchUser, { email, displayName }: Reco
       },
       data: {
         email,
+      },
+    }));
+  }
+
+  if (phoneNumber) {
+    tasks.push(prismaFetch(user.username, 'update', {
+      where: {
+        id: user.username,
+      },
+      data: {
+        phoneNumber,
       },
     }));
   }

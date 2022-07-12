@@ -38,6 +38,7 @@ model UserInfo {
   username    String  @id @map("_id")
   email       String
   displayName String
+  phoneNumber String
   Orderer     Order[] @relation("orderer")
   Fulfiller   Order[] @relation("fulfiller")
 }

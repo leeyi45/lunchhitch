@@ -77,6 +77,7 @@ export function AuthProvider({ children }: any) {
             username,
             displayName: user.displayName!,
             email: emailResult.email,
+            phoneNumber: user.phoneNumber,
           },
           status: 'authenticated',
         });
