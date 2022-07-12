@@ -114,7 +114,7 @@ export default function NavBar({ user }: NavbarProps) {
             { user
               ? [(
                 <MenuItem key={0} onClick={handleClose}>
-                  <Button><Link href="/profile">Profile</Link></Button>
+                  <Link href="/profile"><Button>Profile</Button></Link>
                 </MenuItem>),
               (
                 <MenuItem key={1}>
@@ -128,11 +128,11 @@ export default function NavBar({ user }: NavbarProps) {
               )]
               : [(
                 <MenuItem key={0}>
-                  <Button><Link href={`./auth/login?callback=${router.pathname}`}>Log In</Link></Button>
+                  <Link href={`./auth/login?callback=${router.pathname}`}><Button>Log In</Button></Link>
                 </MenuItem>
               ), (
                 <MenuItem key={1}>
-                  <Button><Link href="/auth/signup">Sign Up</Link></Button>
+                  <Link href="/auth/signup"><Button>Sign Up</Button></Link>
                 </MenuItem>
               )]}
           </Menu>
