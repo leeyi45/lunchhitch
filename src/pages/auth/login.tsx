@@ -102,7 +102,6 @@ export default function LoginPage() {
               <Stack
                 direction="column"
                 spacing={1.5}
-                style={{ fontFamily: 'Raleway' }}
               >
                 {loginError || Object.values(errors).at(0)}<br />
                 <TextField
