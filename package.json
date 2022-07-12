@@ -15,7 +15,8 @@
     "db:generate": "prisma generate",
     "dev": "cross-env NODE_OPTIONS='--inspect' next dev",
     "start": "next start",
-    "lint": "next lint && eslint -c .eslintrc.js"
+    "lint": "next lint && eslint -c .eslintrc.js",
+    "test": "jest --coverage"
   },
   "dependencies": {
     "@date-io/moment": "^2.14.0",
@@ -30,6 +31,7 @@
     "firebase": "^9.8.2",
     "firebase-admin": "^11.0.0",
     "formik": "^2.2.9",
+    "jest": "^28.1.2",
     "moment": "^2.29.4",
     "next": "12.1.6",
     "nookies": "^2.5.2",
