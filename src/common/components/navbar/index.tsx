@@ -13,6 +13,7 @@ import { useRouter } from 'next/router';
 
 import { LunchHitchUser, signOut } from '../../../auth';
 import Logo from '../../media/logo.png';
+import LunchHitch from '../../media/lunchhitch2.png';
 
 export type NavbarProps = {
   user?: LunchHitchUser | null;
@@ -43,41 +44,47 @@ export default function NavBar({ user }: NavbarProps) {
       <Toolbar>
         { user
           ? (
-            <>
+            <Typography
+              variant="h5"
+              component="div"
+              style={{
+                flexGrow: 1, textAlign: 'left', paddingLeft: '10px', paddingRight: '20px',
+              }}
+            >
               <Image
                 src={Logo}
                 alt="logo"
-                width={60}
-                height={50}
+                width={50}
+                height={40}
               />
-              <Typography
-                variant="h5"
-                component="div"
-                style={{
-                  flexGrow: 1, textAlign: 'left', paddingLeft: '10px', paddingRight: '20px',
-                }}
-              >
-                Lunch Hitch
-                <Button style={{ color: 'white', paddingInline: '30px' }}><Link href="/">Home</Link></Button>
-                <Button style={{ color: 'white' }}><Link href="/orders">New Orders</Link></Button>
-              </Typography>
-            </>
+              <Image
+                src={LunchHitch}
+                alt="Lunch Hitch"
+                height="35px"
+                width="250px"
+              />
+              <Button style={{ color: 'white', paddingInline: '30px' }}><Link href="/">Home</Link></Button>
+              <Button style={{ color: 'white' }}><Link href="/orders">New Orders</Link></Button>
+            </Typography>
           ) : (
-            <>
+            <Typography
+              variant="h5"
+              component="div"
+              style={{ flexGrow: 1, justifyContent: 'left' }}
+            >
               <Image
                 src={Logo}
                 alt="logo"
-                width={60}
-                height={50}
+                width={50}
+                height={40}
               />
-              <Typography
-                variant="h5"
-                component="div"
-                style={{ flexGrow: 1, textAlign: 'left', paddingLeft: '10px' }}
-              >
-                Lunch Hitch
-              </Typography>
-            </>
+              <Image
+                src={LunchHitch}
+                alt="Lunch Hitch"
+                height="35px"
+                width="250px"
+              />
+            </Typography>
           )}
         <div>
           <IconButton
@@ -91,6 +98,7 @@ export default function NavBar({ user }: NavbarProps) {
             <AccountCircle />
             <text style={{
               paddingLeft: '5px',
+              fontFamily: 'raleway',
             }}
             >
               {usernameText}

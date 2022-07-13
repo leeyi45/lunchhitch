@@ -108,7 +108,7 @@ const SignUpForm = (props: SignUpFormProps) => {
             direction="column"
             spacing={1}
           >
-            <Box style={{ paddingBottom: '30px' }}>
+            <Box style={{ padding: '30px' }}>
               <p style={{
                 color: '#50C878', fontSize: '30px', textAlign: 'center',
               }}

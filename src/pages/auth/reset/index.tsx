@@ -10,6 +10,7 @@ import * as yup from 'yup';
 
 import { LunchHitchUser } from '../../../auth';
 import AuthSelector from '../../../common/auth_selector';
+import Box from '../../../common/components/Box';
 import NavBar from '../../../common/components/navbar';
 import FormikWrapper from '../../../common/formik_wrapper/formik_wrapper';
 import PasswordField from '../../../common/formik_wrapper/password_field';
@@ -48,29 +49,32 @@ function NoUserResetPage() {
     : (
       <>
         {resetError}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: '100%',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'absolute',
-          paddingBottom: '100px',
-          border: '5px solid #50C878',
-        }}
-        >
-          <p style={{ color: '#50C878', fontSize: '20px' }}>Enter your email and we&apos;ll send you a link to reset your password.</p>
-          <FormikWrapper
-            fields={{
-              email: {
-                type: 'text', labelText: 'Email', required: true, initialValue: '',
-              },
-            }}
-            onSubmit={emailCallback}
-            submitButtonText="Send Reset Email"
-          />
-          <Link href="/auth/login">Back to Login</Link>
+        <div>
+          <Box style={{
+            display: 'flex',
+            flexDirection: 'column',
+            width: '35%',
+            height: '30%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute',
+            left: '32.5%',
+            top: '30%',
+          }}
+          >
+            <p style={{ color: '#50C878', fontSize: '20px' }}>Enter your email and we&apos;ll send you a link to reset your password.</p>
+            <FormikWrapper
+              fields={{
+                email: {
+                  type: 'text', labelText: 'Email', required: true, initialValue: '',
+                },
+              }}
+              onSubmit={emailCallback}
+              submitButtonText="Send Reset Email"
+            />
+            <p />
+            <Link href="/auth/login">Back to Login</Link>
+          </Box>
         </div>
       </>
     );
