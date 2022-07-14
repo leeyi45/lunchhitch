@@ -1,4 +1,5 @@
 import React, { HTMLInputTypeAttribute } from 'react';
+import DoneIcon from '@mui/icons-material/Done';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -12,7 +13,9 @@ import { signUp } from '../../auth';
 import { useSession } from '../../auth/auth_provider';
 import LoadingScreen from '../../common/auth_selector/loading_screen';
 import NavBar from '../../common/components/navbar';
-import Redirecter from '../../common/components/redirecter';
+import {
+  ConfirmPopover, PopoverContainer, usePopover,
+} from '../../common/components/popovers';
 import PasswordField from '../../common/formik_wrapper/password_field';
 
 type SignupFieldProps = {
@@ -43,15 +46,12 @@ const SignUpField = ({
   );
 };
 
-type SignUpFormProps = {
-  onSubmitSuccess: () => void;
-};
-
 /**
  * The actual signup form
  */
-const SignUpForm = (props: SignUpFormProps) => {
+const SignUpForm = () => {
   const [signUpError, setSignUpError] = React.useState<string | null>(null);
+  const { setState: setPopover } = usePopover('signupSuccess');
 
   return (
     <Formik
@@ -63,14 +63,15 @@ const SignUpForm = (props: SignUpFormProps) => {
         password: '',
         repeatPass: '',
       }}
-      onSubmit={async (values) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      onSubmit={async ({ repeatPass, ...values }, { setFieldError }) => {
         try {
           await signUp(values);
-          props.onSubmitSuccess();
+          setPopover(true);
         } catch (error: any) {
           switch ((error as FirebaseError).code) {
             case 'auth/email-already-exists': {
-              setSignUpError('An account with this username already exists');
+              setFieldError('username', 'An account with this username already exists');
               break;
             }
             default: {
@@ -183,7 +184,6 @@ const SignUpForm = (props: SignUpFormProps) => {
  * Signup page to be displayed to the user
  */
 export default function SignUpPage() {
-  const [signUpSuccess, setSignUpSuccess] = React.useState(false);
   const { status } = useSession();
   const router = useRouter();
 
@@ -191,15 +191,24 @@ export default function SignUpPage() {
   else if (status === 'loading') return <LoadingScreen />;
 
   return (
-    <Stack>
-      <NavBar />
-      {signUpSuccess
-        ? (
-          <Redirecter redirect="/auth/login" duration={5}>
-            <p>Sign up successful! Redirecting you to the login page</p>
-          </Redirecter>
-        )
-        : (<SignUpForm onSubmitSuccess={() => setSignUpSuccess(true)} />)}
-    </Stack>
+    <PopoverContainer
+      popovers={{
+        signupSuccess: false,
+      }}
+    >
+      <ConfirmPopover
+        name="signupSuccess"
+        confirmButton={false}
+        cancelButton="Close"
+        onClickAway={() => router.push('/profile')}
+      >
+        <DoneIcon />
+        <p>Successfully signed up!</p>
+      </ConfirmPopover>
+      <Stack>
+        <NavBar />
+        <SignUpForm />
+      </Stack>
+    </PopoverContainer>
   );
 }

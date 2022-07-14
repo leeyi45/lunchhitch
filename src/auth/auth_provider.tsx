@@ -1,5 +1,6 @@
 /* eslint-disable no-shadow */
 import React from 'react';
+import { UserInfo } from '@prisma/client';
 import nookies from 'nookies';
 
 import { FIREBASE_AUTH } from '../firebase';
@@ -29,59 +30,44 @@ export function AuthProvider({ children }: any) {
     status: 'unauthenticated',
   });
 
+  React.useEffect(() => FIREBASE_AUTH.onAuthStateChanged(async (user) => {
+    if (!user) {
+      setContextObj({
+        user: null,
+        status: 'unauthenticated',
+      });
+    } else {
+      setContextObj({
+        user: null,
+        status: 'loading',
+      });
+
+      const usernameMatch = user.email?.match(
+        /(.+)@lunchhitch.firebaseapp.com/,
+      );
+
+      if (!usernameMatch) throw new Error(); // TODO Error handling
+
+      const userInfoResp = await fetch('/api/userinfo');
+      const userInfoResult: UserInfo = await userInfoResp.json();
+
+      if (!userInfoResult) {
+        // TODO error handling
+        throw new Error('Prisma did not return userinfo for this account');
+      }
+
+      setContextObj({
+        user: userInfoResult,
+        status: 'authenticated',
+      });
+    }
+  }), []);
+
   React.useEffect(
     () => FIREBASE_AUTH.onIdTokenChanged(async (user) => {
-      if (!user) {
-        setContextObj({
-          user: null,
-          status: 'unauthenticated',
-        });
-        nookies.set(undefined, 'token', '', { path: '/' });
-      } else {
-        setContextObj({
-          user: null,
-          status: 'loading',
-        });
-
-        nookies.set(undefined, 'token', await user.getIdToken(), {
-          path: '/',
-        });
-        const usernameMatch = user.email?.match(
-          /(.+)@lunchhitch.firebaseapp.com/,
-        );
-
-        if (!usernameMatch) throw new Error(); // TODO Error handling
-        const username = usernameMatch[1];
-
-        const emailResp = await fetch(
-          '/api/prisma?collection=userInfo&method=findFirst',
-          {
-            method: 'POST',
-            body: JSON.stringify({
-              where: {
-                id: username,
-              },
-            }),
-          },
-        );
-
-        const emailResult = await emailResp.json();
-
-        if (!emailResult) {
-        // TODO error handling
-          throw new Error('Prisma did not return an email for this account');
-        }
-
-        setContextObj({
-          user: {
-            username,
-            displayName: user.displayName!,
-            email: emailResult.email,
-            phoneNumber: user.phoneNumber!,
-          },
-          status: 'authenticated',
-        });
-      }
+      nookies.set(undefined, 'token', user ? await user.getIdToken() : '', {
+        path: '/',
+      });
     }),
     [],
   );
