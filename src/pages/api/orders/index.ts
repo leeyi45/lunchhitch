@@ -3,7 +3,7 @@
  * Send the request with fulfilled=true query parameter to include/exclude orders that have
  * already been fulfilled
  */
-import { wrapWithAuth } from '../../../api_wrappers';
+import { wrapWithAuth } from '../../../api_helpers/api_wrappers';
 import prisma from '../../../prisma';
 
 export default wrapWithAuth({

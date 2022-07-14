@@ -82,7 +82,7 @@ export default function MadeDisplay({ user }: { user: LunchHitchUser }) {
   const orders = useAsync(getOrdersMade);
 
   React.useEffect(() => {
-    orders.call(user);
+    orders.call();
     return orders.cancel;
   }, [user]);
 

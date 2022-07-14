@@ -1,9 +1,7 @@
 import React from 'react';
 import { Typography } from '@mui/material';
 
-// import { LunchHitchUser } from '../../../auth';
-// import { useSession } from '../../../auth/auth_provider';
-import SwipeableEdgeDrawer from '../../../common/components/SwipeableEdgeDrawer/SwipeableEdgeDrawer';
+import SwipeableEdgeDrawer from '../../../common/components/SwipeableEdgeDrawer';
 
 import styles from './UserHomePage.module.css';
 

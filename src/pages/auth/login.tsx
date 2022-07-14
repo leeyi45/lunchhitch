@@ -85,12 +85,12 @@ export default function LoginPage() {
               username: yup.string().required('Username is required!'),
               password: yup.string().required('Password is required!'),
             })}
-            onSubmit={async (values, actions) => {
+            onSubmit={async (values, { setFieldValue }) => {
               try {
                 await signIn(values);
                 router.push('/');
               } catch (error: any) {
-                actions.setFieldValue('password', '');
+                setFieldValue('password', '');
                 setLoginError(firebaseErrorHandler(error, {
                   'user-not-found': 'Incorrect username or password',
                   'wrong-password': 'Incorrect username or password',

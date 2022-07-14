@@ -1,18 +1,18 @@
+/**
+ * Because this file imports functions from firebase admin, this file cannot be imported
+ * by anything that is required client-side
+ */
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import testUser from './auth/test_user';
-import { getSession } from './firebase/admin';
-import { APIResult, wrapIntoPromise } from './common';
+import testUser from '../auth/test_user';
+import { wrapIntoPromise } from '../common';
+import { getSession } from '../firebase/admin';
+
+import { APIParams, APIResult } from './types';
 
 type Params = {
   [name: string]: string;
 };
-
-export type APIParams<T> = {
-  params?: string[];
-  handler: (args: {req: NextApiRequest, res: NextApiResponse, params: Params}) => Promise<APIResult<T>>;
-  errorHandler?: (error: any, res: NextApiResponse) => void;
-}
 
 /**
  * Wrap API routes to automatically return HTTP 400 if the desired query parameters are not given

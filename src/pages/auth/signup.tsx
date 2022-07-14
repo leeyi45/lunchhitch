@@ -87,6 +87,7 @@ const SignUpForm = () => {
         email: yup.string().email().required('Please enter a valid email'),
         // TODO username validation (stuff like cannot have @s or whatever)
         username: yup.string().required('Please enter a valid username'),
+        // TODO add phone number validation
         phoneNumber: yup.string().required('Please enter a valid phone number'),
         password: yup.string().required(),
         repeatPass: yup.string().required(),

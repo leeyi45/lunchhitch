@@ -8,13 +8,11 @@ import { Shop } from '@prisma/client';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 
-import testUser from '../../auth/test_user';
-import { APIResult, wrapApiResult } from '../../common';
+import { APIResult, wrapApiResult } from '../../api_helpers';
 import AuthSelector from '../../common/auth_selector';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
 import { LinkedPopover, PopoverContainer } from '../../common/components/popovers';
-import { getSession } from '../../firebase/admin';
 import prisma, { LunchHitchCommunity } from '../../prisma';
 
 import FulFillForm from './fulfill_form';
@@ -39,6 +37,7 @@ const OrdersPage = ({ communities }: Props) => {
             popovers={{
               errorPopover: communities.result === 'error',
               fulfillPopover: false,
+              fulfillSuccess: false,
               makeFormClear: false,
               makeFormConfirm: false,
               makeSuccess: false,
@@ -102,10 +101,7 @@ const OrdersPage = ({ communities }: Props) => {
 
 export default OrdersPage;
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({ req }) => {
-  // const user = await getSession(req.cookies.token);
-  const user = testUser.username;
-  console.log('User is', user);
+export const getServerSideProps: GetServerSideProps<Props> = async () => {
   // TODO:
   // Honestly not sure if we should fetch ALL communities server side
   // or load communities as the user types

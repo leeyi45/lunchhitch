@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack';
 import { Order, Shop } from '@prisma/client';
 import { useFormik } from 'formik';
 
+import { fetchApi } from '../../api_helpers';
 import useAsync from '../../common/async';
 import Box from '../../common/components/Box';
 import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
@@ -69,12 +70,7 @@ const FulFillForm = ({ shop }: Props) => {
     },
     onSubmit: async ({ order }) => {
       try {
-        await fetch('/api/orders/fulfill?force=', {
-          method: 'POST',
-          body: JSON.stringify({
-            id: order!.id,
-          }),
-        });
+        await fetchApi('orders/fulfill', { id: order!.id });
         setPopover('fulfillSuccess', true);
       } catch (error) {
         // TODO fulfill error handling
@@ -174,9 +170,7 @@ const FulFillForm = ({ shop }: Props) => {
   }, [ordersAsync, shop]);
 
   return (
-    <form
-      onSubmit={submitForm}
-    >
+    <form>
       <Stack direction="row" spacing={1}>
         <h2 style={{ color: '#47b16a' }}>Fulfill an Order!</h2>
         <TooltipButton

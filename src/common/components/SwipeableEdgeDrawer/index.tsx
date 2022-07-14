@@ -104,3 +104,7 @@ export default function SwipeableEdgeDrawer(props: Props) {
     </Root>
   );
 }
+
+SwipeableEdgeDrawer.defaultProps = {
+  window: undefined,
+};

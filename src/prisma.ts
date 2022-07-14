@@ -21,15 +21,6 @@ type PrismaFuncs = KeysOfType<PrismaClient, Function>;
 type Collection = KeysOfType<Omit<PrismaClient, PrismaFuncs>>;
 type Method = KeysOfType<PrismaClient[Collection]>
 
-export const prismaFetch = (
-  collection: Collection,
-  method: Method,
-  args?: Parameters<PrismaClient[Collection][Method]>,
-) => fetch(`/api/prisma?collection=${collection}&method=${method}`, {
-  method: 'POST',
-  body: JSON.stringify(args ?? {}),
-});
-
 export type LunchHitchOrder = {
   from: UserInfo;
   shop: Shop;

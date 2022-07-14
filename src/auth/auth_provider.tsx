@@ -3,6 +3,7 @@ import React from 'react';
 import { UserInfo } from '@prisma/client';
 import nookies from 'nookies';
 
+import { fetchApi } from '../api_helpers';
 import { FIREBASE_AUTH } from '../firebase';
 
 import { LunchHitchUser } from '.';
@@ -48,16 +49,15 @@ export function AuthProvider({ children }: any) {
 
       if (!usernameMatch) throw new Error(); // TODO Error handling
 
-      const userInfoResp = await fetch('/api/userinfo');
-      const userInfoResult: UserInfo = await userInfoResp.json();
+      const userInfoResult = await fetchApi<UserInfo>('userinfo');
 
-      if (!userInfoResult) {
+      if (userInfoResult.result === 'error') {
         // TODO error handling
         throw new Error('Prisma did not return userinfo for this account');
       }
 
       setContextObj({
-        user: userInfoResult,
+        user: userInfoResult.value,
         status: 'authenticated',
       });
     }

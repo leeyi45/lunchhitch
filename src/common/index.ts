@@ -1,25 +1,6 @@
 import { useState } from 'react';
 
 export type KeysOfType<T, K = any> = { [P in keyof T]: T[P] extends K ? P : never }[keyof T];
-export type APIResult<Result> = {
-  result: 'success';
-  value: Result;
-} | {
-  result: 'error';
-  value: any;
-}
-
-export function asApiSuccess<T>(value: T): APIResult<T> { return { result: 'success', value }; }
-export function asApiError<T>(value: any): APIResult<T> { return { result: 'error', value }; }
-
-export async function wrapApiResult<T>(func: () => Promise<T>): Promise<APIResult<T>> {
-  try {
-    return asApiSuccess(await func());
-  } catch (error: any) {
-    return asApiError(error.toString());
-  }
-}
-
 /**
  * Some functions may return a regular value or a Promise. Use this function to wrap the result of such a function as a Promise
  * @param result Result to wrap

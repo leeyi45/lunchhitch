@@ -16,6 +16,7 @@ import {
 import moment, { Moment } from 'moment';
 import * as yup from 'yup';
 
+import { fetchApi } from '../../api_helpers';
 import Box from '../../common/components/Box';
 import { ConfirmPopover, LinkedClickAwayPopover, usePopoverContext } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
@@ -44,13 +45,12 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
       }}
       onSubmit={async ({ orders, deliverBy }, { setFieldValue }) => {
         try {
-          await fetch('/api/orders/create?force=', {
-            method: 'POST',
-            body: JSON.stringify({
+          await fetchApi('orders/create', {
+            data: {
               orders,
               shopId: shop!.id,
               deliverBy: deliverBy.toDate(),
-            }),
+            },
           });
           setOrderField({
             value: '',
@@ -65,6 +65,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
       }}
       validationSchema={yup.object({
         orders: yup.array().of(yup.string().required('Order cannot be empty!')),
+        deliverBy: yup.date().min(moment(), 'Invalid deliver by time!'),
       })}
     >
       {({
@@ -151,7 +152,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                         {({ field, meta: { touched } }: FieldProps<MakeFormValues>) => (
                           <DateTimePicker
                             {...field}
-                            minDateTime={moment()}
+                            // minDateTime={moment()}
                             disabled={!shop}
                             renderInput={({ error, ...params }) => (
                               <TextField

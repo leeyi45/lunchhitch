@@ -7,9 +7,8 @@ import {
 } from '@firebase/auth';
 import { UserInfo } from '@prisma/client';
 
-// import { useRouter } from 'next/router';
+import { fetchApi } from '../api_helpers';
 import { FIREBASE_AUTH } from '../firebase';
-// import prisma from './prisma';
 
 const DEFAULT_DOMAIN = 'lunchhitch.firebaseapp.com';
 
@@ -31,7 +30,7 @@ export type LunchHitchUser = {
 export const signIn = ({ username, password }: Credential) => signInWithEmailAndPassword(FIREBASE_AUTH, `${username}@${DEFAULT_DOMAIN}`, password);
 
 /**
- * Sign out the current user. Wraps around both the NextAuth signOut and Firebase signOut methods
+ * Sign out the current user.
  */
 export const signOut = () => firebaseSignOut(FIREBASE_AUTH);
 
@@ -45,10 +44,7 @@ export const signOut = () => firebaseSignOut(FIREBASE_AUTH);
  * @returns Created user
  */
 export async function signUp({ password, ...params }: UserInfo & { password: string }): Promise<void> {
-  await fetch('/api/userinfo/create', {
-    method: 'POST',
-    body: JSON.stringify(params as UserInfo),
-  });
+  await fetchApi('userinfo/create', params);
   await createUserWithEmailAndPassword(FIREBASE_AUTH, `${params.username}@${DEFAULT_DOMAIN}`, password);
   // await firebaseSignOut(FIREBASE_AUTH);
 }
