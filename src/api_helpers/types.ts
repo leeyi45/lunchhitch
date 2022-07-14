@@ -1,5 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
+/**
+ * Type returned by API routes
+ */
 export type APIResult<Result> = {
   result: 'success';
   value: Result;
@@ -8,6 +11,9 @@ export type APIResult<Result> = {
   value: any;
 }
 
+/**
+ * Configuration parameters for API route handlers.
+ */
 export type APIParams<T> = {
   params?: string[];
   handler: (args: {req: NextApiRequest, res: NextApiResponse, params: { [name: string]: string }}) => Promise<APIResult<T>>;

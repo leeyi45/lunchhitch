@@ -41,11 +41,11 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
       style={{
         margin: '10px, 10px, 10px, 10px',
       }}
+      spacing={1}
     >
       <Autocomplete
         style={{
           paddingTop: '20px',
-          paddingBottom: '20px',
         }}
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
@@ -63,9 +63,6 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         value={community}
       />
       <Autocomplete
-        style={{
-          paddingBottom: '20px',
-        }}
         disabled={community === null}
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}

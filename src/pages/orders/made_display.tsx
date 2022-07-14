@@ -1,21 +1,26 @@
 import React from 'react';
 import CancelIcon from '@mui/icons-material/Cancel';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
+import { fetchApi } from '../../api_helpers';
 import { LunchHitchUser } from '../../auth';
 import { useNullableState } from '../../common';
 import useAsync from '../../common/async';
+import Box from '../../common/components/Box';
 import { ConfirmPopover } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
 
 const getOrdersMade = async () => {
-  const result = await fetch('api/orders?fulfiller=true&userOnly=');
-  return result.json() as unknown as LunchHitchOrder[];
+  const result = await fetchApi<LunchHitchOrder[]>('orders?fulfilled=true');
+  if (result.result === 'error') throw result.value;
+  return result.value;
 };
 
 type OrderDisplayProps = {
@@ -118,9 +123,17 @@ export default function MadeDisplay({ user }: { user: LunchHitchUser }) {
   }, [user, orders.state]);
 
   return (
-    <>
-      <h2 style={{ color: '#47b16a' }}>My Pending Orders</h2>
+    <Box>
+      <Stack direction="row" spacing={1}>
+        <h2 style={{ color: '#47b16a' }}>My Pending Orders</h2>
+        <TooltipButton
+          tooltip="Refresh"
+          onClick={() => orders.call()}
+        >
+          <RefreshIcon />
+        </TooltipButton>
+      </Stack>
       {getDisp()}
-    </>
+    </Box>
   );
 }

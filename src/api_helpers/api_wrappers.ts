@@ -15,9 +15,7 @@ type Params = {
 };
 
 /**
- * Wrap API routes to automatically return HTTP 400 if the desired query parameters are not given
- * @param handler API route handler
- * @param params Array containing the keys of the desired parameters
+ * Wrap API routes handlers to automatically return HTTP 400 if the desired query parameters are not given
  * @returns Wrapped API route handler
  */
 export const wrapWithQuery = <T>({
@@ -62,6 +60,9 @@ export const wrapWithQuery = <T>({
     }
   };
 
+/**
+ * Wrap an API route handler to require authentication. The API route will return a 401 if the user is unauthorized
+ */
 export const wrapWithAuth = <T>({ handler: apiHandler, ...apiParams }: APIParams<T>) => wrapWithQuery<T>({
   ...apiParams,
   async handler({ req, res, params }) {

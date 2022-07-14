@@ -61,11 +61,17 @@ const OrdersPage = ({ communities }: Props) => {
               </Stack>
             </LinkedPopover>
             <Stack direction="column">
-              <ShopSelector
-                communities={communities.result === 'success' ? communities.value : []}
-                value={shop}
-                onChange={setShop}
-              />
+              <div style={{
+                paddingLeft: '20px',
+                paddingRight: '20px',
+              }}
+              >
+                <ShopSelector
+                  communities={communities.result === 'success' ? communities.value : []}
+                  value={shop}
+                  onChange={setShop}
+                />
+              </div>
               <Stack direction="row">
                 <Box>
                   <div style={{
@@ -90,7 +96,7 @@ const OrdersPage = ({ communities }: Props) => {
                   </div>
                 </Box>
               </Stack>
-              {/* <MadeDisplay user={user} /> */}
+              <MadeDisplay user={user} />
             </Stack>
           </PopoverContainer>
         </>

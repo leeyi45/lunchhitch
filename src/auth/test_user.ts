@@ -1,5 +1,8 @@
 import { LunchHitchUser } from '.';
 
+/**
+ * A set of credentials that can be used for testing without signing in
+ */
 const testUser: LunchHitchUser = {
   email: 'test@test.com',
   displayName: 'Test Man',

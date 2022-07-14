@@ -35,13 +35,7 @@ export const signIn = ({ username, password }: Credential) => signInWithEmailAnd
 export const signOut = () => firebaseSignOut(FIREBASE_AUTH);
 
 /**
- * Ask the Firebase API to create a new account
- * @param username Username of the new user
- * @param password Password of the new user
- * @param displayName Display name of the new user
- * @param email Email to be associated with the account
- * @param phoneNumber Phone number of the new user
- * @returns Created user
+ * Ask the Firebase API to create a new account and update the database
  */
 export async function signUp({ password, ...params }: UserInfo & { password: string }): Promise<void> {
   await fetchApi('userinfo/create', params);
