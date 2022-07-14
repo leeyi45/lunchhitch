@@ -5,9 +5,7 @@ import { FIREBASE_AUTH } from '../../../firebase';
 import prisma from '../../../prisma';
 
 export default wrapWithAuth({
-  async handler({ req }) {
-    const { email } = JSON.parse(req.body);
-
+  async handler({ data: { email } }) {
     const result = await prisma.userInfo.findFirst({
       where: {
         email,

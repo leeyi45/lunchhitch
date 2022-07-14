@@ -14,8 +14,8 @@ export type APIResult<Result> = {
 /**
  * Configuration parameters for API route handlers.
  */
-export type APIParams<T> = {
+export type APIParams<T, U = any> = {
   params?: string[];
-  handler: (args: {req: NextApiRequest, res: NextApiResponse, params: { [name: string]: string }}) => Promise<APIResult<T>>;
+  handler: (args: {data: U, req: NextApiRequest, res: NextApiResponse, params: { [name: string]: string }}) => Promise<APIResult<T>>;
   errorHandler?: (error: any, res: NextApiResponse) => void;
 }

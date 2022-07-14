@@ -18,7 +18,7 @@ type Params = {
  * Wrap API routes handlers to automatically return HTTP 400 if the desired query parameters are not given
  * @returns Wrapped API route handler
  */
-export const wrapWithQuery = <T>({
+export const wrapWithQuery = <T, U = any>({
   params,
   handler,
   errorHandler,
@@ -47,7 +47,9 @@ export const wrapWithQuery = <T>({
       res.status(400).json({ result: 'error', value: `Missing required query params: ${errors.join(', ')}` } as APIResult<T>);
     } else {
       try {
-        const result = await wrapIntoPromise(handler({ req, res, params: queryParams }));
+        const result = await wrapIntoPromise(handler({
+          data: JSON.parse(req.body) as U, req, res, params: queryParams,
+        }));
         if (result !== undefined) res.status(200).json(result);
       } catch (error) {
         if (errorHandler) errorHandler(error, res);
@@ -63,18 +65,24 @@ export const wrapWithQuery = <T>({
 /**
  * Wrap an API route handler to require authentication. The API route will return a 401 if the user is unauthorized
  */
-export const wrapWithAuth = <T>({ handler: apiHandler, ...apiParams }: APIParams<T>) => wrapWithQuery<T>({
+export const wrapWithAuth = <T, U = any>({ handler: apiHandler, ...apiParams }: APIParams<T>) => wrapWithQuery<T, U>({
   ...apiParams,
-  async handler({ req, res, params }) {
+  async handler({
+    data, req, res, params,
+  }) {
     if (req.query.force === '') {
-      return wrapIntoPromise(apiHandler({ req, res, params: { username: testUser.username, ...params } }));
+      return wrapIntoPromise(apiHandler({
+        data, req, res, params: { username: testUser.username, ...params },
+      }));
     }
 
     const username = await getSession(req.cookies.token);
     if (!username) {
-      res.status(401).json({ error: 'Must be logged in' });
+      res.status(401).json({ result: 'error', value: 'Must be logged in' });
       return undefined as never;
     }
-    return wrapIntoPromise(apiHandler({ req, res, params: { username, ...params } }));
+    return wrapIntoPromise(apiHandler({
+      data, req, res, params: { username, ...params },
+    }));
   },
 });
