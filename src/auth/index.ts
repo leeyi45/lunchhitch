@@ -3,8 +3,9 @@
  * Functions for managing users
  */
 import {
-  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, updateProfile as updateFirebaseProfile,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut,
 } from '@firebase/auth';
+import { UserInfo } from '@prisma/client';
 
 // import { useRouter } from 'next/router';
 import { FIREBASE_AUTH } from '../firebase';
@@ -22,24 +23,7 @@ export type LunchHitchUser = {
   email: string;
   displayName: string;
   phoneNumber: string;
-  // Because there is a limit to the size of the JWT, we can't store the firebase user
-  // object here
-  // firebaseObj: User;
 };
-
-async function prismaFetch(username: string, method: string, args: any) {
-  const resp = await fetch(`/api/userinfo?username=${username}&method=${method}`, {
-    method: 'POST',
-    body: JSON.stringify(args),
-  });
-
-  const result = await resp.json();
-  if (resp.status !== 200) {
-    throw result.error;
-  }
-
-  return result;
-}
 
 /**
  * Sign in with the given username and password
@@ -51,14 +35,6 @@ export const signIn = ({ username, password }: Credential) => signInWithEmailAnd
  */
 export const signOut = () => firebaseSignOut(FIREBASE_AUTH);
 
-type SignUpParams = {
-  username: string;
-  password: string;
-  displayName: string;
-  email: string;
-  phoneNumber: string;
-};
-
 /**
  * Ask the Firebase API to create a new account
  * @param username Username of the new user
@@ -68,50 +44,11 @@ type SignUpParams = {
  * @param phoneNumber Phone number of the new user
  * @returns Created user
  */
-export async function signUp({
-  username, password, displayName, email, phoneNumber,
-}: SignUpParams): Promise<void> {
-  const result = await createUserWithEmailAndPassword(FIREBASE_AUTH, `${username}@${DEFAULT_DOMAIN}`, password);
-  await updateFirebaseProfile(result.user, { displayName });
-  await prismaFetch(username, 'create', {
-    data: {
-      id: username,
-      email,
-      phoneNumber,
-    },
+export async function signUp({ password, ...params }: UserInfo & { password: string }): Promise<void> {
+  await fetch('/api/userinfo/create', {
+    method: 'POST',
+    body: JSON.stringify(params as UserInfo),
   });
-  await firebaseSignOut(FIREBASE_AUTH);
-}
-
-export function updateProfile(user: LunchHitchUser, { email, displayName, phoneNumber }: Record<'email' | 'displayName' | 'phoneNumber', string | undefined | string>) {
-  const tasks: Promise<any>[] = [];
-  const firebaseObj = FIREBASE_AUTH.currentUser;
-
-  if (!firebaseObj) throw new Error('Firebase was not logged in');
-
-  if (displayName) tasks.push(updateFirebaseProfile(firebaseObj, { displayName }));
-
-  if (email) {
-    tasks.push(prismaFetch(user.username, 'update', {
-      where: {
-        id: user.username,
-      },
-      data: {
-        email,
-      },
-    }));
-  }
-
-  if (phoneNumber) {
-    tasks.push(prismaFetch(user.username, 'update', {
-      where: {
-        id: user.username,
-      },
-      data: {
-        phoneNumber,
-      },
-    }));
-  }
-
-  return Promise.all(tasks);
+  await createUserWithEmailAndPassword(FIREBASE_AUTH, `${params.username}@${DEFAULT_DOMAIN}`, password);
+  // await firebaseSignOut(FIREBASE_AUTH);
 }
