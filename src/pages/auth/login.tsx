@@ -31,7 +31,7 @@ export default function LoginPage() {
       else if (typeof redirectUrl === 'string') router.push(redirectUrl);
       else router.push(redirectUrl[0]);
     }
-  }, []);
+  }, [status]);
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
 
