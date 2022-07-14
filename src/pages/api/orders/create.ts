@@ -8,13 +8,15 @@ import { Order } from '@prisma/client';
 import { wrapWithAuth } from '../../../api_wrappers';
 import prisma from '../../../prisma';
 
-export default wrapWithAuth([], async (req, _res, { username }) => {
-  const orderInfo = JSON.parse(req.body) as Order;
-  await prisma.order.create({
-    data: {
-      ...orderInfo,
-      fromId: username,
-    },
-  });
-  return { result: 'success' };
+export default wrapWithAuth({
+  async handler({ req, params: { username } }) {
+    const orderInfo = JSON.parse(req.body) as Order;
+    const order = await prisma.order.create({
+      data: {
+        ...orderInfo,
+        fromId: username,
+      },
+    });
+    return { result: 'success', value: order };
+  },
 });

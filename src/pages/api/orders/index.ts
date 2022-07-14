@@ -6,25 +6,28 @@
 import { wrapWithAuth } from '../../../api_wrappers';
 import prisma from '../../../prisma';
 
-export default wrapWithAuth(['shopId', 'fulfilled'], async (req, res, { username, shopId, fulfilled }) => {
-  if (req.method !== 'GET') {
-    res.status(405).end();
-    return undefined as never;
-  }
+export default wrapWithAuth({
+  params: ['shopId', 'fulfilled'],
+  async handler({ req, res, params: { username, shopId, fulfilled } }) {
+    if (req.method !== 'GET') {
+      res.status(405).end();
+      return undefined as never;
+    }
 
-  const orders = await prisma.order.findMany({
-    where: {
-      shopId: shopId === '' ? undefined : shopId,
-      fromId: req.query.userOnly !== undefined ? username : undefined,
-      fulfillerId: !fulfilled ? undefined : {
-        not: null,
+    const orders = await prisma.order.findMany({
+      where: {
+        shopId: shopId === '' ? undefined : shopId,
+        fromId: req.query.userOnly !== undefined ? username : undefined,
+        fulfillerId: !fulfilled ? undefined : {
+          not: null,
+        },
       },
-    },
-    include: {
-      shop: true,
-      from: true,
-      fulfiller: true,
-    },
-  });
-  return { orders: orders ?? [], result: 'success' };
+      include: {
+        shop: true,
+        from: true,
+        fulfiller: true,
+      },
+    });
+    return { value: orders ?? [], result: 'success' };
+  },
 });
