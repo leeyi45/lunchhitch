@@ -10,13 +10,12 @@ export default function NoUserHomePage() {
     <div className={styles.NoUserHomePage}>
       <Typography
         variant="h1"
-        component="div"
       >
-        Welcome to LunchHitch
+        <div style={{ fontFamily: 'raleway', fontSize: '90px', fontWeight: 'bold' }}>Welcome to Lunch Hitch</div>
       </Typography>
       <p style={{ fontSize: '30px' }}>
         <DinnerDiningTwoToneIcon />
-        <b>Where food meets community{' '}</b>
+        Where food meets community{' '}
         <PeopleTwoToneIcon />
       </p>
     </div>

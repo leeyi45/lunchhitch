@@ -12,6 +12,7 @@ import * as yup from 'yup';
 import { signUp } from '../../auth';
 import { useSession } from '../../auth/auth_provider';
 import LoadingScreen from '../../common/auth_selector/loading_screen';
+import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
 import {
   ConfirmPopover, PopoverContainer, usePopover,
@@ -98,81 +99,89 @@ const SignUpForm = () => {
           <Stack
             style={{
               left: '50%',
+              height: '90%',
               position: 'absolute',
               transform: 'translateX(-50%)',
               width: '30%',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             direction="column"
-            spacing={1.5}
+            spacing={1}
           >
-            <p style={{
-              color: '#50C878', fontSize: '30px', lineHeight: '100px', textAlign: 'center',
-            }}
-            >
-              Sign up for a Lunch Hitch account
-            </p>
-            <Button
-              href="/auth/login"
-              style={{
-                float: 'left',
-                width: '20%',
+            <Box style={{ padding: '30px' }}>
+              <p style={{
+                color: '#50C878', fontSize: '30px', textAlign: 'center',
               }}
-            >
-              <Stack direction="row">
-                <KeyboardBackspaceIcon />
-                Back To Login
-              </Stack>
-            </Button>
-            {signUpError || Object.values(errors).at(0)}
-            <SignUpField
-              labelText="Display Name"
-              type="text"
-              name="displayName"
-            />
-            <SignUpField
-              labelText="Username"
-              type="text"
-              name="username"
-            />
-            <SignUpField
-              labelText="Email"
-              type="text"
-              name="email"
-            />
-            <SignUpField
-              labelText="Phone Number"
-              type="text"
-              name="phoneNumber"
-            />
-            <PasswordField
-              style={{
-                marginTop: '20px',
-              }}
-              label="Password"
-              name="password"
-              variant="standard"
-            />
-            <PasswordField
-              style={{
-                marginTop: '20px',
-                marginBottom: '20px',
-              }}
-              label="Repeat Password"
-              name="repeatPass"
-              variant="standard"
-            />
-            <Stack direction="row">
-              <Button
-                onClick={() => resetForm()}
               >
-                Clear Form
-              </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-              >Sign Up
-              </Button>
-            </Stack>
+                <b>Sign up for a Lunch Hitch account</b>
+              </p>
+              <Stack
+                direction="column"
+                spacing={1}
+              >
+                <Button
+                  href="./login"
+                  style={{
+                    justifyContent: 'left',
+                    width: '40%',
+                  }}
+                >
+                  <KeyboardBackspaceIcon />
+                  Back To Login
+                </Button>
+                {signUpError || Object.values(errors).at(0)}
+                <SignUpField
+                  labelText="Display Name"
+                  type="text"
+                  name="displayName"
+                />
+                <SignUpField
+                  labelText="Username"
+                  type="text"
+                  name="username"
+                />
+                <SignUpField
+                  labelText="Email"
+                  type="text"
+                  name="email"
+                />
+                <SignUpField
+                  labelText="Phone Number"
+                  type="text"
+                  name="phoneNumber"
+                />
+                <PasswordField
+                  style={{
+                    marginTop: '20px',
+                  }}
+                  label="Password"
+                  name="password"
+                  variant="standard"
+                />
+                <PasswordField
+                  style={{
+                    marginTop: '20px',
+                    marginBottom: '20px',
+                  }}
+                  label="Repeat Password"
+                  name="repeatPass"
+                  variant="standard"
+                />
+              </Stack>
+              <Stack direction="row">
+                <Button
+                  onClick={() => resetForm()}
+                >
+                  Clear Form
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                >Sign Up
+                </Button>
+              </Stack>
+            </Box>
           </Stack>
         </Form>
       )}
