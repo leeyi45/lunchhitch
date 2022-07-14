@@ -57,6 +57,7 @@ export default function NavBar({ user }: NavbarProps) {
                 width={50}
                 height={40}
               />
+              {'   '}
               <Image
                 src={LunchHitch}
                 alt="Lunch Hitch"
@@ -78,6 +79,7 @@ export default function NavBar({ user }: NavbarProps) {
                 width={50}
                 height={40}
               />
+              {'   '}
               <Image
                 src={LunchHitch}
                 alt="Lunch Hitch"
