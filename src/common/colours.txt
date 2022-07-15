@@ -6,4 +6,5 @@ dark: #25532a
 super dark: #1f4423
 slightly dark: #47b16a
 peach: rgba(255, 204, 204, 0.5)
+#ffcccc
 light orange: rgba(255, 204, 153, 0.5)
