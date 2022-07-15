@@ -48,43 +48,46 @@ export default function NavBar({ user }: NavbarProps) {
               variant="h5"
               component="div"
               style={{
-                flexGrow: 1, textAlign: 'left', paddingLeft: '10px', paddingRight: '20px',
+                flexGrow: 1, textAlign: 'left', paddingLeft: '10px',
               }}
             >
               <Image
                 src={Logo}
                 alt="logo"
-                width={50}
-                height={40}
+                width="50px"
+                height="30px"
               />
               {'   '}
               <Image
                 src={LunchHitch}
                 alt="Lunch Hitch"
-                height="35px"
-                width="250px"
+                height="30px"
+                width="225px"
+                style={{ paddingRight: '20px' }}
               />
-              <Button style={{ color: 'white', paddingInline: '30px' }}><Link href="/">Home</Link></Button>
-              <Button style={{ color: 'white' }}><Link href="/orders">New Orders</Link></Button>
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/">Home</Link></Button>
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/orders">New Orders</Link></Button>
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/suggestions">Suggestions</Link></Button>
             </Typography>
           ) : (
             <Typography
               variant="h5"
               component="div"
-              style={{ flexGrow: 1, justifyContent: 'left' }}
+              style={{ flexGrow: 1, justifyContent: 'left', paddingLeft: '10px' }}
             >
               <Image
                 src={Logo}
                 alt="logo"
-                width={50}
-                height={40}
+                width="50px"
+                height="30px"
               />
               {'   '}
               <Image
                 src={LunchHitch}
                 alt="Lunch Hitch"
-                height="35px"
-                width="250px"
+                height="30px"
+                width="225px"
+                style={{ paddingRight: '20px' }}
               />
             </Typography>
           )}
