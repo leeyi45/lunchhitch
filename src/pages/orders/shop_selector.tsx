@@ -12,6 +12,8 @@ import { Shop } from '@prisma/client';
 import { useNullableState } from '../../common';
 import { LunchHitchCommunity } from '../../prisma';
 
+import styles from './orders.module.css';
+
 type Props = {
   /**
    * Communities available to be selected
@@ -131,35 +133,69 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         onChange={(_event, value) => setCommunity(value)}
         renderInput={(params) => (<TextField {...params} label="Community" />)}
         renderOption={(liProps, option) => (
-          <ListItem {...liProps}>
-            <ImageButton
-              focusRipple
-              key={eusoff.title}
-              style={{
-                fontFamily: 'raleway',
-              }}
-            >
-              <ImageSrc style={{ backgroundImage: `url(${eusoff.url})` }} />
-              <ImageBackdrop className="MuiImageBackdrop-root" />
-              <Image>
-                <Typography
-                  component="span"
-                  variant="subtitle1"
-                  color="inherit"
-                  sx={{
-                    position: 'relative',
-                    p: 4,
-                    pt: 2,
-                    pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
-                  }}
-                >
-                  <h1>{option.name}</h1>
-                  {option.address}
-                  <ImageMarked className="MuiImageMarked-root" />
-                </Typography>
-              </Image>
-            </ImageButton>
-          </ListItem>
+          <Stack direction="row">
+            <ListItem {...liProps}>
+              <ImageButton
+                focusRipple
+                key={eusoff.title}
+                style={{
+                  fontFamily: 'raleway',
+                  height: '325px',
+                  width: '100%',
+                }}
+              >
+                <ImageSrc className={styles.eusoff} />
+                <ImageBackdrop className="MuiImageBackdrop-root" />
+                <Image>
+                  <Typography
+                    component="span"
+                    variant="subtitle1"
+                    color="inherit"
+                    sx={{
+                      position: 'relative',
+                      p: 4,
+                      pt: 2,
+                      pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                    }}
+                  >
+                    <h1>{option.name}</h1>
+                    {option.address}
+                    <ImageMarked className="MuiImageMarked-root" />
+                  </Typography>
+                </Image>
+              </ImageButton>
+            </ListItem>
+            <ListItem>
+              <ImageButton
+                focusRipple
+                key="coming soon"
+                style={{
+                  fontFamily: 'raleway',
+                  height: '325px',
+                  width: '50%',
+                }}
+              >
+                <ImageSrc className={styles.comingSoon} />
+                <ImageBackdrop className="MuiImageBackdrop-root" />
+                <Image>
+                  <Typography
+                    component="span"
+                    variant="subtitle1"
+                    color="inherit"
+                    sx={{
+                      position: 'relative',
+                      p: 4,
+                      pt: 2,
+                      pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                    }}
+                  >
+                    <h1>More coming soon</h1>
+                    <ImageMarked className="MuiImageMarked-root" />
+                  </Typography>
+                </Image>
+              </ImageButton>
+            </ListItem>
+          </Stack>
         )}
         value={community}
       />
@@ -174,34 +210,68 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         options={community?.shops ?? []}
         renderInput={(params) => (<TextField {...params} label="Shop" />)}
         renderOption={(liProps, option) => (
-          <ListItem {...liProps}>
-            <ImageButton
-              focusRipple
-              key={niqqis.title}
-              style={{
-                fontFamily: 'raleway',
-              }}
-            >
-              <ImageSrc style={{ backgroundImage: `url(${niqqis.url})` }} />
-              <ImageBackdrop className="MuiImageBackdrop-root" />
-              <Image>
-                <Typography
-                  component="span"
-                  variant="subtitle1"
-                  color="inherit"
-                  sx={{
-                    position: 'relative',
-                    p: 4,
-                    pt: 2,
-                    pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
-                  }}
-                >
-                  {option.name}
-                  <ImageMarked className="MuiImageMarked-root" />
-                </Typography>
-              </Image>
-            </ImageButton>
-          </ListItem>
+          <Stack direction="row">
+            <ListItem {...liProps} style={{ width: '30%' }}>
+              <ImageButton
+                focusRipple
+                key={niqqis.title}
+                style={{
+                  fontFamily: 'raleway',
+                  height: '290px',
+                  width: '100%',
+                }}
+              >
+                <ImageSrc className={styles.niqqis} />
+                <ImageBackdrop className="MuiImageBackdrop-root" />
+                <Image>
+                  <Typography
+                    component="span"
+                    variant="subtitle1"
+                    color="inherit"
+                    sx={{
+                      position: 'relative',
+                      p: 4,
+                      pt: 2,
+                      pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                    }}
+                  >
+                    {option.name}
+                    <ImageMarked className="MuiImageMarked-root" />
+                  </Typography>
+                </Image>
+              </ImageButton>
+            </ListItem>
+            <ListItem style={{ width: '30%' }}>
+              <ImageButton
+                focusRipple
+                key="coming soon"
+                style={{
+                  fontFamily: 'raleway',
+                  height: '290px',
+                  width: '80%',
+                }}
+              >
+                <ImageSrc className={styles.comingSoon} />
+                <ImageBackdrop className="MuiImageBackdrop-root" />
+                <Image>
+                  <Typography
+                    component="span"
+                    variant="subtitle1"
+                    color="inherit"
+                    sx={{
+                      position: 'relative',
+                      p: 4,
+                      pt: 2,
+                      pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
+                    }}
+                  >
+                    <h1>More coming soon</h1>
+                    <ImageMarked className="MuiImageMarked-root" />
+                  </Typography>
+                </Image>
+              </ImageButton>
+            </ListItem>
+          </Stack>
         )}
         value={shop}
       />

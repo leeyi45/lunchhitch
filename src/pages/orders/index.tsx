@@ -19,6 +19,8 @@ import MadeDisplay from './made_display';
 import MakeForm from './make_form';
 import ShopSelector from './shop_selector';
 
+import styles from './orders.module.css';
+
 type Props = {
   communities: APIResult<LunchHitchCommunity[]>;
 }
@@ -28,79 +30,81 @@ const OrdersPage = ({ communities }: Props) => {
   const router = useRouter();
 
   return (
-    <AuthSelector force>
-      {(user) => (
-        <>
-          <NavBar user={user} />
-          <PopoverContainer
-            popovers={{
-              errorPopover: communities.result === 'error',
-              fulfillPopover: false,
-              fulfillSuccess: false,
-              makeFormClear: false,
-              makeFormConfirm: false,
-              makeSuccess: false,
-            }}
-          >
-            <LinkedPopover
-              name="errorPopover"
-            >
-              <Stack direction="column">
-                <p style={{
-                  textAlign: 'center',
-                }}
-                >
-                  An error occurred<br />
-                  Reload the page to try again<br />
-                  {communities.result === 'error' && communities.value}<br />
-                </p>
-                <Button onClick={() => router.replace(router.pathname)}>
-                  <RefreshIcon />
-                </Button>
-              </Stack>
-            </LinkedPopover>
-            <Stack direction="column">
-              <div style={{
-                paddingLeft: '20px',
-                paddingRight: '20px',
+    <div className={styles.orders}>
+      <AuthSelector force>
+        {(user) => (
+          <>
+            <NavBar user={user} />
+            <PopoverContainer
+              popovers={{
+                errorPopover: communities.result === 'error',
+                fulfillPopover: false,
+                fulfillSuccess: false,
+                makeFormClear: false,
+                makeFormConfirm: false,
+                makeSuccess: false,
               }}
+            >
+              <LinkedPopover
+                name="errorPopover"
               >
-                <ShopSelector
-                  communities={communities.result === 'success' ? communities.value : []}
-                  value={shop}
-                  onChange={setShop}
-                />
-              </div>
-              <Stack direction="row">
-                <Box>
-                  <div style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    paddingRight: '10px',
+                <Stack direction="column">
+                  <p style={{
+                    textAlign: 'center',
                   }}
                   >
-                    <FulFillForm shop={shop} />
-                  </div>
-                </Box>
-                <Box>
-                  <div
-                    style={{
+                    An error occurred<br />
+                    Reload the page to try again<br />
+                    {communities.result === 'error' && communities.value}<br />
+                  </p>
+                  <Button onClick={() => router.replace(router.pathname)}>
+                    <RefreshIcon />
+                  </Button>
+                </Stack>
+              </LinkedPopover>
+              <Stack direction="column">
+                <div style={{
+                  paddingLeft: '20px',
+                  paddingRight: '20px',
+                }}
+                >
+                  <ShopSelector
+                    communities={communities.result === 'success' ? communities.value : []}
+                    value={shop}
+                    onChange={setShop}
+                  />
+                </div>
+                <Stack direction="row">
+                  <Box>
+                    <div style={{
                       display: 'flex',
                       flexDirection: 'column',
-                      alignContent: 'center',
+                      paddingRight: '10px',
                     }}
-                  >
-                    <h2 style={{ color: '#47b16a' }}>Place an Order!</h2>
-                    <MakeForm shop={shop} />
-                  </div>
-                </Box>
+                    >
+                      <FulFillForm shop={shop} />
+                    </div>
+                  </Box>
+                  <Box>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignContent: 'center',
+                      }}
+                    >
+                      <h2 style={{ color: '#47b16a' }}>Place an Order!</h2>
+                      <MakeForm shop={shop} />
+                    </div>
+                  </Box>
+                </Stack>
+                <MadeDisplay user={user} />
               </Stack>
-              <MadeDisplay user={user} />
-            </Stack>
-          </PopoverContainer>
-        </>
-      )}
-    </AuthSelector>
+            </PopoverContainer>
+          </>
+        )}
+      </AuthSelector>
+    </div>
   );
 };
 

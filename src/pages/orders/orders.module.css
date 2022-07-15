@@ -1,0 +1,21 @@
+.orders {
+    background: url('../../common/media/user.jpeg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.eusoff {
+    background: url('../../common/media/eusoff.jpg');
+}
+
+.niqqis {
+    background: url('../../common/media/niqqis.jpg');
+}
+
+.comingSoon {
+    background: url('../../common/media/coming.gif');
+    background-position: center;
+    background-size: cover;
+}
