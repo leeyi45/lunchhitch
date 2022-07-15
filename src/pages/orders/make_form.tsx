@@ -4,7 +4,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveIcon from '@mui/icons-material/Remove';
-import SendIcon from '@mui/icons-material/Send';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import Badge from '@mui/material/Badge';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -242,11 +243,15 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                         orders.length === 0
                         || isSubmitting
                         || !shop
-                        || Object.values(errors).length > 0
+                        || Object.values(errors).length > 1
                       }
                       tooltip="Submit this order!"
                       onClick={() => setPopover('makeFormConfirm', true)}
-                      endIcon={<SendIcon />}
+                      endIcon={(
+                        <Badge color="primary" badgeContent={orders.length}>
+                          <ShoppingCartCheckoutIcon />
+                        </Badge>
+)}
                     >
                       Submit Orders
                     </TooltipButton>
