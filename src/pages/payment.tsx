@@ -48,7 +48,6 @@ export default function PaymentPage() {
         <Typography sx={{ fontFamily: 'raleway' }}>Ordering</Typography>
         <EventNoteIcon />
         <OrderSwitch
-          defaultChecked
           inputProps={{ 'aria-label': 'ant design' }}
           color="secondary"
         />
