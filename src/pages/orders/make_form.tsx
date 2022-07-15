@@ -2,7 +2,9 @@ import React from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveIcon from '@mui/icons-material/Remove';
+import SendIcon from '@mui/icons-material/Send';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -231,6 +233,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       disabled={orders.length === 0}
                       tooltip="Remove all orders"
                       onClick={() => setPopover('makeFormClear', true)}
+                      startIcon={<DeleteIcon />}
                     >
                       Clear Orders
                     </TooltipButton>
@@ -243,6 +246,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       }
                       tooltip="Submit this order!"
                       onClick={() => setPopover('makeFormConfirm', true)}
+                      endIcon={<SendIcon />}
                     >
                       Submit Orders
                     </TooltipButton>
@@ -263,14 +267,14 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               });
             }}
           >
-            <h3>Are you sure you want to clear all orders?</h3>
+            <h3 style={{ fontFamily: 'Raleway', padding: '20px' }}>Are you sure you want to clear all orders?</h3>
           </ConfirmPopover>
           <ConfirmPopover
             name="makeFormConfirm"
             confirmAction={submitForm}
           >
             <Stack direction="column">
-              <h3>Confirm the following order from {shop?.name}</h3>
+              <h3 style={{ fontFamily: 'Raleway', padding: '20px' }}>Confirm the following order from {shop?.name}</h3>
               <ol>
                 {orders.map((order, i) => (<li key={i}>{order}</li>))}
               </ol>

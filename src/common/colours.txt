@@ -1,5 +1,9 @@
 emerald: #50C878
+rgb(80, 200, 120)
 light: #8BE796
+rgb(139, 231, 150)
 dark: #25532a
 super dark: #1f4423
 slightly dark: #47b16a
+peach: rgba(255, 204, 204, 0.5)
+light orange: rgba(255, 204, 153, 0.5)

@@ -2,12 +2,13 @@ import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import Stack from '@mui/material/Stack';
 
+import Box from '../components/Box';
+
 type Props = {
-  message?: string;
   maxCount?: number;
 };
 
-export default function LoadingScreen({ maxCount, message }: Props) {
+export default function LoadingScreen({ maxCount }: Props) {
   const [msgCount, setMsgCount] = React.useState(0);
 
   React.useEffect(() => {
@@ -31,18 +32,20 @@ export default function LoadingScreen({ maxCount, message }: Props) {
         alignItems: 'center',
       }}
     >
-      <CircularProgress size="100%" />
-      <h2
-        style={{
-          textAlign: 'center',
-        }}
-      >{message}{'.'.repeat(msgCount)}
-      </h2>
+      <Box style={{ height: '300px', backgroundColor: 'rgba(255, 204, 153, 0.5)' }}>
+        <CircularProgress size="100%" style={{ color: '#50C878' }} />
+        <h2
+          style={{
+            textAlign: 'center',
+            fontFamily: 'Raleway',
+          }}
+        >Hitching{'.'.repeat(msgCount)}
+        </h2>
+      </Box>
     </Stack>
   );
 }
 
 LoadingScreen.defaultProps = {
-  message: 'Loading',
   maxCount: 5,
 };
