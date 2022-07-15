@@ -2,8 +2,6 @@ import React from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import Stack from '@mui/material/Stack';
 
-import Box from '../components/Box';
-
 type Props = {
   maxCount?: number;
 };
@@ -32,16 +30,14 @@ export default function LoadingScreen({ maxCount }: Props) {
         alignItems: 'center',
       }}
     >
-      <Box style={{ height: '300px', backgroundColor: 'rgba(255, 204, 153, 0.5)' }}>
-        <CircularProgress size="100%" style={{ color: '#50C878' }} />
-        <h2
-          style={{
-            textAlign: 'center',
-            fontFamily: 'Raleway',
-          }}
-        >Hitching{'.'.repeat(msgCount)}
-        </h2>
-      </Box>
+      <CircularProgress size="100%" style={{ color: '#50C878' }} />
+      <h2
+        style={{
+          textAlign: 'center',
+          fontFamily: 'Raleway',
+        }}
+      >Hitching{'.'.repeat(msgCount)}
+      </h2>
     </Stack>
   );
 }
