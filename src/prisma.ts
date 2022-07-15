@@ -5,7 +5,7 @@ import {
   Community, Order, PrismaClient, Shop, UserInfo,
 } from '@prisma/client';
 
-import { KeysOfType } from './common';
+// import { KeysOfType } from './common';
 
 declare global {
   var prisma: PrismaClient | undefined;
@@ -17,9 +17,9 @@ export default prisma;
 
 if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
 
-type PrismaFuncs = KeysOfType<PrismaClient, Function>;
-type Collection = KeysOfType<Omit<PrismaClient, PrismaFuncs>>;
-type Method = KeysOfType<PrismaClient[Collection]>
+// type PrismaFuncs = KeysOfType<PrismaClient, Function>;
+// type Collection = KeysOfType<Omit<PrismaClient, PrismaFuncs>>;
+// type Method = KeysOfType<PrismaClient[Collection]>
 
 export type LunchHitchOrder = {
   from: UserInfo;
