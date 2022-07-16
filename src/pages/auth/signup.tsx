@@ -70,15 +70,19 @@ const SignUpForm = () => {
           await signUp(values);
           setPopover(true);
         } catch (error: any) {
-          switch ((error as FirebaseError).code) {
-            case 'auth/email-already-exists': {
-              setFieldError('username', 'An account with this username already exists');
-              break;
+          if (error instanceof FirebaseError) {
+            switch ((error as FirebaseError).code) {
+              case 'auth/email-already-exists': {
+                setFieldError('username', 'An account with this username already exists');
+                break;
+              }
+              default: {
+                setSignUpError(`Unknown error: ${error.code}`);
+                break;
+              }
             }
-            default: {
-              setSignUpError(`Unknown error: ${error.code}`);
-              break;
-            }
+          } else {
+            setSignUpError(`Non FirebaseError error: ${error.toString()}`);
           }
         }
       }}

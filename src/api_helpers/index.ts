@@ -19,11 +19,17 @@ export async function wrapApiResult<T>(func: () => Promise<T>): Promise<APIResul
  * @returns Reponse from the API route
  */
 export const fetchApi = async <T>(url: string, data?: any): Promise<APIResult<T>> => {
-  const resp = await fetch(`api/${url}`, {
+  const resp = await fetch(`${window.location.origin}/api/${url}`, {
+    headers: {
+      Accept: 'application/json',
+      ContentType: 'application/json',
+    },
     method: data !== undefined ? 'POST' : 'GET',
-    body: data === undefined ? undefined : JSON.stringify(data),
+    body: data || JSON.stringify(data),
   });
-  return resp.json();
+  const result = await resp.text();
+  console.log(result);
+  return JSON.parse(result);
 };
 
 export type { APIResult, APIParams };

@@ -10,6 +10,8 @@ import { UserInfo } from '@prisma/client';
 import { fetchApi } from '../api_helpers';
 import { FIREBASE_AUTH } from '../firebase';
 
+import { useSession } from './auth_provider';
+
 const DEFAULT_DOMAIN = 'lunchhitch.firebaseapp.com';
 
 export type Credential = {
@@ -42,3 +44,5 @@ export async function signUp({ password, ...params }: UserInfo & { password: str
   await createUserWithEmailAndPassword(FIREBASE_AUTH, `${params.username}@${DEFAULT_DOMAIN}`, password);
   // await firebaseSignOut(FIREBASE_AUTH);
 }
+
+export { useSession };

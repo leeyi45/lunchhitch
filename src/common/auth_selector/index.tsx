@@ -5,6 +5,7 @@ import { LunchHitchUser } from '../../auth';
 import { useSession } from '../../auth/auth_provider';
 import testUser from '../../auth/test_user';
 
+import ErrorScreen from './error_screen';
 import LoadingScreen from './loading_screen';
 
 type Props = ({
@@ -16,21 +17,21 @@ type Props = ({
   authenticated: undefined;
 } | {
   children: undefined;
-  authenticated: string | (() => void);
+  authenticated: URL | (() => void);
 }) & {
   /**
    * Provide a string to redirect the user when they are not logged in\
    * or a React component to display\
    * Set to null or undefined to redirect the user to the login page
    */
-  unauthenticated?: React.ReactElement<any> | string | null;
+  unauthenticated?: React.ReactElement<any> | URL | null;
 
   /**
    * Provide a string to redirect the user to while waiting for the session to load\
    * or a React component to display\
    * Set to null or undefined to display the default loading screen
    */
-  loading?: React.ReactElement<any> | string | null;
+  loading?: React.ReactElement<any> | URL | null;
 
   force?: boolean;
 };
@@ -38,32 +39,30 @@ type Props = ({
 /**
  * Component for displaying different results based on the current authentication status
  */
-export default function AuthSelector({
-  unauthenticated, loading, force, ...props
-}: Props) {
+export default function AuthSelector(props: Props) {
   const router = useRouter();
-  const { user, status } = useSession();
+  const { user, status, error } = useSession();
 
   // Wrap router usage in useEffect
   React.useEffect(() => {
-    if (force) return;
+    if (props.force) return;
 
     if (status === 'unauthenticated') {
-      if (!unauthenticated) {
-        router.push(`/auth/login?callback=${router.pathname}`);
-      } else if (typeof unauthenticated === 'string') {
-        router.push(unauthenticated);
+      if (!props.unauthenticated) {
+        router.push(`/auth/login?callback=${encodeURIComponent(router.pathname)}`);
+      } else if (props.unauthenticated instanceof URL) {
+        router.push(props.unauthenticated);
       }
-    } else if (status === 'loading' && typeof loading === 'string') {
-      router.push(loading);
-    } else if (status === 'authenticated' && typeof props.authenticated === 'string') {
+    } else if (status === 'loading' && props.loading instanceof URL) {
+      router.push(props.loading);
+    } else if (status === 'authenticated' && props.authenticated instanceof URL) {
       router.push(props.authenticated);
     }
-  }, [status, router, force]);
+  }, [status, props]);
 
-  if (force) {
+  if (props.force) {
     if (props.authenticated) {
-      if (typeof props.authenticated !== 'string') props.authenticated();
+      if (!(props.authenticated instanceof URL)) props.authenticated();
       return null as never;
     } else if (typeof props.children === 'function') {
       return props.children(testUser);
@@ -74,7 +73,7 @@ export default function AuthSelector({
   switch (status) {
     case 'authenticated': {
       if (props.authenticated) {
-        if (typeof props.authenticated !== 'string') props.authenticated();
+        if (!(props.authenticated instanceof URL)) props.authenticated();
         return null as never;
       } else if (typeof props.children === 'function') {
         return props.children(user);
@@ -83,17 +82,18 @@ export default function AuthSelector({
       }
     }
     case 'unauthenticated': {
-      if (unauthenticated && typeof unauthenticated !== 'string') {
-        return unauthenticated;
+      if (props.unauthenticated && !(props.unauthenticated instanceof URL)) {
+        return props.unauthenticated;
       } else return null as never;
     }
     case 'loading': {
-      if (!loading) {
+      if (!props.loading) {
         return <LoadingScreen />;
-      } else if (typeof loading !== 'string') {
-        return loading;
+      } else if (!(props.loading instanceof URL)) {
+        return props.loading;
       } else return null as never;
     }
+    case 'errored': return <ErrorScreen error={error.toString()} />;
     default: return null as never;
   }
 }

@@ -11,14 +11,21 @@ import { LunchHitchUser } from '.';
 export type Session = {
   user: LunchHitchUser;
   status: 'authenticated';
+  error: null;
 } | {
   user: null;
   status: 'loading' | 'unauthenticated';
+  error: null;
+} | {
+  user: null;
+  status: 'errored';
+  error: any;
 };
 
 const AuthContext = React.createContext<Session>({
   user: null,
   status: 'unauthenticated',
+  error: null,
 });
 
 /**
@@ -26,40 +33,56 @@ const AuthContext = React.createContext<Session>({
  * components
  */
 export function AuthProvider({ children }: any) {
-  const [contextObj, setContextObj] = React.useState<Session>({
+  const [contextObj, setContext] = React.useState<Session>({
     user: null,
     status: 'unauthenticated',
+    error: null,
   });
+
+  const setContextObj = (value: Session) => {
+    setContext(value);
+  };
 
   React.useEffect(() => FIREBASE_AUTH.onAuthStateChanged(async (user) => {
     if (!user) {
       setContextObj({
         user: null,
         status: 'unauthenticated',
+        error: null,
       });
     } else {
       setContextObj({
         user: null,
         status: 'loading',
+        error: null,
       });
 
-      const usernameMatch = user.email?.match(
-        /(.+)@lunchhitch.firebaseapp.com/,
-      );
+      try {
+        const usernameMatch = user.email!.match(
+          /(.+)@lunchhitch.firebaseapp.com/,
+        );
 
-      if (!usernameMatch) throw new Error(); // TODO Error handling
+        if (!usernameMatch) throw new Error(`Failed to match username: ${user.email}`);
 
-      const userInfoResult = await fetchApi<UserInfo>('userinfo');
+        const userInfoResult = await fetchApi<UserInfo>('userinfo');
+        console.log('userInfoResult was', userInfoResult);
 
-      if (userInfoResult.result === 'error') {
-        // TODO error handling
-        throw new Error('Prisma did not return userinfo for this account');
+        if (userInfoResult.result === 'error') {
+          throw new Error(`Prisma did not return userinfo for ${user.email}`);
+        }
+
+        setContextObj({
+          user: userInfoResult.value,
+          status: 'authenticated',
+          error: null,
+        });
+      } catch (error) {
+        setContextObj({
+          user: null,
+          status: 'errored',
+          error,
+        });
       }
-
-      setContextObj({
-        user: userInfoResult.value,
-        status: 'authenticated',
-      });
     }
   }), []);
 

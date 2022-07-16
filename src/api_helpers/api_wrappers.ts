@@ -48,7 +48,7 @@ export const wrapWithQuery = <T, U = any>({
     } else {
       try {
         const result = await wrapIntoPromise(handler({
-          data: JSON.parse(req.body) as U, req, res, params: queryParams,
+          data: (req.body === '' ? {} : JSON.parse(req.body)) as U, req, res, params: queryParams,
         }));
         if (result !== undefined) res.status(200).json(result);
       } catch (error) {
@@ -86,3 +86,8 @@ export const wrapWithAuth = <T, U = any>({ handler: apiHandler, ...apiParams }: 
     }));
   },
 });
+
+export const prismaHandler = <T>(func: (...args: Parameters<APIParams<T>['handler']>) => Promise<T | null>): APIParams<T>['handler'] => async (params) => {
+  const value = await func(params);
+  return value ? { result: 'success', value } : { result: 'error', value: 'No document matched the given criteria!' };
+};
