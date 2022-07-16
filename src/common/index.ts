@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { UserInfo } from '@prisma/client';
 
 export type KeysOfType<T, K = any> = { [P in keyof T]: T[P] extends K ? P : never }[keyof T];
 /**
@@ -21,5 +20,3 @@ export type SessionUser = {
   displayName: string;
   username: string;
 }
-
-export type SessionUserWithProfile = SessionUser & UserInfo;

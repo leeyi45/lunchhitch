@@ -31,7 +31,7 @@ const OrdersPage = ({ communities }: Props) => {
 
   return (
     <div className={styles.orders}>
-      <AuthSelector force>
+      <AuthSelector>
         {(user) => (
           <>
             <NavBar user={user} />

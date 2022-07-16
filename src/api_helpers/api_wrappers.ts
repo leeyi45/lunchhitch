@@ -18,7 +18,7 @@ type Params = {
  * Wrap API routes handlers to automatically return HTTP 400 if the desired query parameters are not given
  * @returns Wrapped API route handler
  */
-export const wrapWithQuery = <T>({
+export const wrapWithQuery = <T, U>({
   params,
   handler,
   errorHandler,
@@ -48,7 +48,7 @@ export const wrapWithQuery = <T>({
     } else {
       try {
         const result = await wrapIntoPromise(handler({
-          data: req.body, req, res, params: queryParams,
+          data: req.body as U, req, res, params: queryParams,
         }));
         if (result !== undefined) res.status(200).json(result);
       } catch (error) {
@@ -65,7 +65,7 @@ export const wrapWithQuery = <T>({
 /**
  * Wrap an API route handler to require authentication. The API route will return a 401 if the user is unauthorized
  */
-export const wrapWithAuth = <T>({ handler: apiHandler, ...apiParams }: APIParams<T>) => wrapWithQuery<T>({
+export const wrapWithAuth = <T, U>({ handler: apiHandler, ...apiParams }: APIParams<T>) => wrapWithQuery<T, U>({
   ...apiParams,
   async handler({
     data, req, res, params,

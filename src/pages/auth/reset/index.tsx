@@ -5,6 +5,7 @@ import {
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import { UserInfo } from '@prisma/client';
 import {
   Field, FieldProps, Form, Formik,
 } from 'formik';
@@ -13,7 +14,6 @@ import Link from 'next/link';
 import * as yup from 'yup';
 
 import { fetchApi } from '../../../api_helpers';
-import { SessionUserWithProfile } from '../../../common';
 import Box from '../../../common/components/Box';
 import NavBar from '../../../common/components/navbar';
 import PasswordField from '../../../common/formik_wrapper/password_field';
@@ -102,7 +102,7 @@ type UserResetFormValues = {
 /**
  * Password reset page displayed to logged in users
  */
-function UserResetPage({ user }: { user: SessionUserWithProfile }) {
+function UserResetPage({ user }: { user: UserInfo }) {
   const [resetDone, setResetDone] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
 
@@ -203,7 +203,7 @@ function UserResetPage({ user }: { user: SessionUserWithProfile }) {
 }
 
 type PageProps = {
-  user: SessionUserWithProfile | null;
+  user: UserInfo | null;
 }
 
 /**
@@ -228,26 +228,15 @@ export const getServerSideProps: GetServerSideProps<PageProps> = async (ctx) => 
       },
     };
   } else {
-    const userInfo = await prisma.userInfo.findFirst({
+    const user = await prisma.userInfo.findFirst({
       where: {
         username,
       },
     });
 
-    if (!userInfo) {
-      return {
-        props: {
-          user: null,
-        },
-      };
-    }
-
     return {
       props: {
-        user: {
-          ...userInfo,
-          username,
-        },
+        user,
       },
     };
   }

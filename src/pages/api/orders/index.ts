@@ -25,7 +25,12 @@ export default wrapWithAuth({
       include: {
         shop: true,
         from: true,
-        fulfiller: true,
+        fulfiller: {
+          select: {
+            displayName: true,
+            username: true,
+          },
+        },
       },
     });
     return { value: orders ?? [], result: 'success' };

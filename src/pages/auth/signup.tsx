@@ -64,8 +64,10 @@ const SignUpForm = () => {
         password: '',
         repeatPass: '',
       }}
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      onSubmit={async ({ repeatPass, ...values }, { setFieldError }) => {
+      onSubmit={async ({
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        repeatPass, ...values
+      }, { setFieldError }) => {
         try {
           await signUp(values);
           setPopover(true);

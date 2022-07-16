@@ -2,16 +2,16 @@ import React from 'react';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
+import { UserInfo } from '@prisma/client';
 import { GetServerSideProps } from 'next';
 
-import { SessionUserWithProfile } from '../../common';
 import ErrorScreen from '../../common/auth_selector/error_screen';
 import NavBar from '../../common/components/navbar';
 import { getSession } from '../../firebase/admin';
 import prisma from '../../prisma';
 
 type Props = {
-  user: SessionUserWithProfile | null;
+  user: UserInfo | null;
 };
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -24,7 +24,7 @@ const Item = styled(Paper)(({ theme }) => ({
   height: '30px',
 }));
 
-const ProfileDisplay = ({ user }: { user: SessionUserWithProfile }) => (
+const ProfileDisplay = ({ user }: { user: UserInfo }) => (
   <>
     <NavBar user={user} />
     <Stack spacing={2} style={{ alignItems: 'center', color: '#47b16a' }}>

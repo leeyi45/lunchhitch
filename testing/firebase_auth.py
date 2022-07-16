@@ -1,7 +1,7 @@
 import requests
 
 def main():
-    resp = requests.post('http://localhost:3000/api/userinfo/create', json={
+    resp = requests.post('http://localhost:3000/api/orders/fulfill', json={
         "displayName": "Lee Yi",
         "username": "leeyi",
         "email": "leeyi45@gmail.com",

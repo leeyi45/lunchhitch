@@ -2,7 +2,7 @@
 import React from 'react';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
-import { Autocomplete, InputAdornment, TextField } from '@mui/material';
+import { InputAdornment, TextField } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -22,11 +22,10 @@ type Props = {
 };
 
 async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
-  const resp = await fetch(`api/orders?shopId=${shop.id}&force=&fulfilled=false`);
-  const res = await resp.json();
+  const res = await fetchApi<LunchHitchOrder[]>(`orders?shopId=${shop.id}&force=&fulfilled=false`);
 
-  if (res.result === 'success') return res.orders;
-  else throw new Error(res.error);
+  if (res.result === 'success') return res.value;
+  else throw new Error(res.value);
 }
 
 type OrderItemProps = {
@@ -118,22 +117,8 @@ const FulFillForm = ({ shop }: Props) => {
           );
         }
         return (
-          <>
+          <Stack direction="column" spacing={1}>
             Displaying orders from {shop.name}
-            <Autocomplete
-              options={ordersAsync.result}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <SearchIcon />
-                      </InputAdornment>),
-                  }}
-                />
-              )}
-            />
             <TextField
               value={searchField}
               placeholder="Search"
@@ -162,7 +147,7 @@ const FulFillForm = ({ shop }: Props) => {
                 />
               ))}
             </List>
-          </>
+          </Stack>
         );
       }
       default: return null as never;
