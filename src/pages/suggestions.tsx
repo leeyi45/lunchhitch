@@ -28,7 +28,7 @@ export default function Suggestions() {
   };
   return (
     <div className={styles.Suggestions}>
-      <AuthSelector force>
+      <AuthSelector>
         {(user) => (
           <>
             <NavBar user={user} />
