@@ -9,4 +9,6 @@ slightly dark: #47b16a
 peach: rgba(255, 204, 204, 0.5)
 #ffcccc
 light orange: rgba(255, 204, 153, 0.5)
-lavenderblush: rgba(255, 240, 245, 0.5)
+lavender: rgba(230, 230, 250, 0.5)
+pretty blue: rgba(105, 135, 245, 0.5)
+mint: rgba(152, 255, 152, 0.3)
