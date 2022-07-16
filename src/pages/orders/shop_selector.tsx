@@ -139,7 +139,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
                 key={eusoff.title}
                 style={{
                   fontFamily: 'raleway',
-                  height: '325px',
+                  height: '260px',
                   width: '100%',
                 }}
               >
@@ -170,7 +170,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
                 key="coming soon"
                 style={{
                   fontFamily: 'raleway',
-                  height: '325px',
+                  height: '100%',
                   width: '50%',
                 }}
               >
@@ -188,7 +188,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
                       pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
                     }}
                   >
-                    <h1>More coming soon</h1>
+                    <h2>More coming soon</h2>
                     <ImageMarked className="MuiImageMarked-root" />
                   </Typography>
                 </Image>
@@ -217,7 +217,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
                 key={niqqis.title}
                 style={{
                   fontFamily: 'raleway',
-                  height: '290px',
+                  height: '230px',
                   width: '100%',
                 }}
               >
@@ -247,7 +247,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
                 key="coming soon"
                 style={{
                   fontFamily: 'raleway',
-                  height: '290px',
+                  height: '100%',
                   width: '80%',
                 }}
               >
@@ -265,7 +265,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
                       pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
                     }}
                   >
-                    <h1>More coming soon</h1>
+                    <h2>More coming soon</h2>
                     <ImageMarked className="MuiImageMarked-root" />
                   </Typography>
                 </Image>
