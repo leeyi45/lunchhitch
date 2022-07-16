@@ -26,10 +26,10 @@ type Props = {
 async function getOrders(shop: Shop, user: SessionUser): Promise<LunchHitchOrder[]> {
   const res = await fetchApi<LunchHitchOrder[]>('orders', {
     where: {
-      username: {
-        not: user.username,
+      NOT: {
+        fromId: user.username,
       },
-      fulfilled: null,
+      fulfillerId: null,
       shopId: shop.id,
     },
   });
@@ -143,7 +143,7 @@ const FulFillForm = ({ shop, user }: Props) => {
                 ),
               }}
             />
-            <List>
+            <List style={{ maxHeight: '100%', overflow: 'auto' }}>
               {(searchField === '' ? ordersAsync.result : ordersAsync.result.filter((order) => (
                 order.from.displayName.includes(searchField) // Search display name
                 || order.orders.find((each) => each.includes(searchField)) // Search each entry

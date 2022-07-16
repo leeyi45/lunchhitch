@@ -43,6 +43,7 @@ const OrdersPage = ({ communities }: Props) => {
                 makeFormClear: false,
                 makeFormConfirm: false,
                 makeSuccess: false,
+                madeRemove: false,
               }}
             >
               <LinkedPopover

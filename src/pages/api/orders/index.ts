@@ -3,10 +3,10 @@
  * Send the request with fulfilled=true query parameter to include/exclude orders that have
  * already been fulfilled
  */
-import { prismaHandler, wrapWithAuth } from '../../../api_helpers/api_wrappers';
+import { prismaHandler, wrapWithQuery } from '../../../api_helpers/api_wrappers';
 import prisma from '../../../prisma';
 
-export default wrapWithAuth({
+export default wrapWithQuery({
   handler: prismaHandler(({ data }) => prisma.order.findMany({
     ...data,
     include: {

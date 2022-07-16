@@ -46,24 +46,32 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
         orders: [],
         deliverBy: moment(),
       }}
-      onSubmit={async ({ orders, deliverBy }, { setFieldValue }) => {
+      onSubmit={async ({ orders, deliverBy }, { resetForm }) => {
         try {
-          await fetchApi('orders/create', {
-            data: {
-              orders,
-              shopId: shop!.id,
-              deliverBy: deliverBy.toDate(),
-            },
+          const { result, value } = await fetchApi('orders/create', {
+            orders,
+            shopId: shop!.id,
+            deliverBy: deliverBy.toDate(),
           });
+
+          console.log('Result and value are', result, value);
+
+          if (result === 'error') throw value;
+
           setOrderField({
             value: '',
             error: false,
             helperText: 'Placed order!',
           });
-          setFieldValue('orders', [], false);
+          resetForm();
           setPopover('makeSuccess', true);
-        } catch (error) {
+        } catch (error: any) {
           // TODO submit error handling
+          setOrderField({
+            value: orderField.value,
+            error: true,
+            helperText: error.toString(),
+          });
         }
       }}
       validationSchema={yup.object({
@@ -166,16 +174,26 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       <Field
                         name="deliverBy"
                       >
-                        {({ field, meta: { touched } }: FieldProps<MakeFormValues>) => (
+                        {({ field: { value, ...field }, meta }: FieldProps<MakeFormValues>) => (
                           <DateTimePicker
                             {...field}
-                            // minDateTime={moment()}
+                            value={value}
+                            onChange={(v) => {
+                              setOrderField({
+                                value: orderField.value,
+                                error: false,
+                                helperText: '',
+                              });
+                              setFieldValue('deliverBy', v, true);
+                            }}
                             disabled={!shop}
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             renderInput={({ error, ...params }) => (
                               <TextField
                                 placeholder="Deliver By Time"
                                 variant="standard"
-                                error={error && touched}
+                                error={!!meta.error && meta.touched}
+                                helperText={meta.error}
                                 {...params}
                               />
                             )}
@@ -257,7 +275,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                         orders.length === 0
                         || isSubmitting
                         || !shop
-                        || Object.values(errors).length > 1
+                        || Object.values(errors).length > 0
                       }
                       tooltip="Submit this order!"
                       onClick={() => setPopover('makeFormConfirm', true)}
@@ -265,7 +283,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                         <Badge color="primary" badgeContent={orders.length}>
                           <ShoppingCartCheckoutIcon />
                         </Badge>
-)}
+                      )}
                     >
                       Submit Orders
                     </TooltipButton>
@@ -290,7 +308,14 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
           </ConfirmPopover>
           <ConfirmPopover
             name="makeFormConfirm"
-            confirmAction={submitForm}
+            confirmAction={() => {
+              submitForm();
+              setOrderField({
+                value: '',
+                error: false,
+                helperText: '',
+              });
+            }}
           >
             <Stack direction="column">
               <h3 style={{ fontFamily: 'Raleway', padding: '20px' }}>Confirm the following order from {shop?.name}</h3>

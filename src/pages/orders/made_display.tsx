@@ -19,7 +19,7 @@ import { LunchHitchOrder } from '../../prisma';
 const getOrdersMade = async (user: SessionUser) => {
   const result = await fetchApi<LunchHitchOrder[]>('orders', {
     where: {
-      fromId: user.username,
+      OR: [{ fromId: user.username }, { fulfillerId: user.username }],
     },
   });
   if (result.result === 'error') throw result.value;
@@ -39,7 +39,7 @@ const OrderDisplay = ({ orders, onRemove }: OrderDisplayProps) => {
   return (
     <div>
       <ConfirmPopover
-        name="madeRemovePopover"
+        name="madeRemove"
         confirmAction={() => {
 
         }}
@@ -52,7 +52,7 @@ const OrderDisplay = ({ orders, onRemove }: OrderDisplayProps) => {
         getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
         onChange={(_event, value) => setSelectedShop(typeof value === 'string' ? value : (value?.name) ?? null)}
         freeSolo
-        renderInput={(params) => (<TextField {...params} placeholder="Shop" />)}
+        renderInput={(params) => (<TextField variant="standard" {...params} placeholder="Shop" />)}
       />
       <List>
         {filteredOrders.map((option, i) => (
