@@ -120,17 +120,16 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
       direction="column"
       style={{
         margin: '10px, 10px, 10px, 10px',
+        paddingTop: '20px',
       }}
       spacing={1}
     >
       <Autocomplete
-        style={{
-          paddingTop: '20px',
-        }}
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         options={communities}
         onChange={(_event, value) => setCommunity(value)}
+        style={{ backgroundColor: 'rgba(152, 255, 152, 0.3)' }}
         renderInput={(params) => (<TextField {...params} label="Community" />)}
         renderOption={(liProps, option) => (
           <Stack direction="row">
@@ -207,6 +206,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
           setShop(value);
           onChange(value);
         }}
+        style={{ backgroundColor: 'rgba(152, 255, 152, 0.3)' }}
         options={community?.shops ?? []}
         renderInput={(params) => (<TextField {...params} label="Shop" />)}
         renderOption={(liProps, option) => (

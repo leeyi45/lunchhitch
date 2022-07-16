@@ -1,6 +1,7 @@
 emerald: #50C878
 rgb(80, 200, 120)
 light: #8BE796
+superlight: #abebb3
 rgb(139, 231, 150)
 dark: #25532a
 super dark: #1f4423
@@ -8,3 +9,4 @@ slightly dark: #47b16a
 peach: rgba(255, 204, 204, 0.5)
 #ffcccc
 light orange: rgba(255, 204, 153, 0.5)
+lavenderblush: rgba(255, 240, 245, 0.5)

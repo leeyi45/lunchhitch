@@ -130,14 +130,28 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                         value: event.target.value,
                       })}
                       onSubmit={() => {
-                        if (orderField.value) addOrder(orderField.value);
+                        if (orderField.value) {
+                          addOrder(orderField.value);
+                          setOrderField({
+                            value: '',
+                            error: false,
+                            helperText: '',
+                          });
+                        }
                       }}
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
                             <TooltipButton
                               onClick={() => {
-                                if (orderField.value) addOrder(orderField.value);
+                                if (orderField.value) {
+                                  addOrder(orderField.value);
+                                  setOrderField({
+                                    value: '',
+                                    error: false,
+                                    helperText: '',
+                                  });
+                                }
                               }}
                               tooltip={`Add ${orderField.value}`}
                               disabled={!orderField.value || !shop}
@@ -170,7 +184,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       </Field>
                     </LocalizationProvider>
                   </Stack>
-                  <Box>
+                  <Box style={{ backgroundColor: 'rgba(255, 204, 204, 0.1)' }}>
                     {orders.length === 0 ? (
                       <div
                         style={{

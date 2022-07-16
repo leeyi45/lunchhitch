@@ -75,7 +75,7 @@ const OrdersPage = ({ communities }: Props) => {
                   />
                 </div>
                 <Stack direction="row">
-                  <Box>
+                  <Box style={{ backgroundColor: 'rgba(255, 204, 153, 0.5)' }}>
                     <div style={{
                       display: 'flex',
                       flexDirection: 'column',
@@ -85,7 +85,7 @@ const OrdersPage = ({ communities }: Props) => {
                       <FulFillForm shop={shop} />
                     </div>
                   </Box>
-                  <Box>
+                  <Box style={{ backgroundColor: 'rgba(255, 204, 204, 0.5)' }}>
                     <div
                       style={{
                         display: 'flex',
