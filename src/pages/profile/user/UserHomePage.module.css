@@ -1,5 +1,5 @@
 .UserHomePage {
-    background: url('../../../common/media/userBack.jpg') no-repeat;
+    background: url('../../../common/media/image.jpeg') no-repeat;
     background-size: cover;
     background-position: center;
     color: #1f4423 ;
@@ -8,6 +8,6 @@
     line-height: 40px;
     height: calc(100vh - 90px);
     overflow: hidden;
-    padding: 12%;
+    padding: 19%;
 
 }
