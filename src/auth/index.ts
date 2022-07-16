@@ -3,7 +3,7 @@
  * Functions for managing users
  */
 import {
-  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, updateProfile,
 } from '@firebase/auth';
 import { UserInfo } from '@prisma/client';
 
@@ -40,8 +40,11 @@ export const signOut = () => firebaseSignOut(FIREBASE_AUTH);
  * Ask the Firebase API to create a new account and update the database
  */
 export async function signUp({ password, ...params }: UserInfo & { password: string }): Promise<void> {
-  await fetchApi('userinfo/create', params);
   await createUserWithEmailAndPassword(FIREBASE_AUTH, `${params.username}@${DEFAULT_DOMAIN}`, password);
+  await updateProfile(FIREBASE_AUTH.currentUser!, {
+    displayName: params.displayName,
+  });
+  await fetchApi('userinfo/create', params);
   // await firebaseSignOut(FIREBASE_AUTH);
 }
 

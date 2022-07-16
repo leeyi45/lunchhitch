@@ -1,8 +1,7 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 
-import { LunchHitchUser } from '../../auth';
-import { useSession } from '../../auth/auth_provider';
+import { Session, useSession } from '../../auth/auth_provider';
 import testUser from '../../auth/test_user';
 
 import ErrorScreen from './error_screen';
@@ -13,7 +12,7 @@ type Props = ({
    * If provided a string, the user will be redirected to that page on authentication\
    * Otherwise a React component can be provided
    */
-  children: React.ReactElement<any> | ((user: LunchHitchUser) => React.ReactElement<any>);
+  children: React.ReactElement<any> | ((user: Session['user']) => React.ReactElement<any>);
   authenticated: undefined;
 } | {
   children: undefined;
@@ -41,7 +40,7 @@ type Props = ({
  */
 export default function AuthSelector(props: Props) {
   const router = useRouter();
-  const { user, status, error } = useSession();
+  const { user: username, status, error } = useSession();
 
   // Wrap router usage in useEffect
   React.useEffect(() => {
@@ -65,7 +64,10 @@ export default function AuthSelector(props: Props) {
       if (!(props.authenticated instanceof URL)) props.authenticated();
       return null as never;
     } else if (typeof props.children === 'function') {
-      return props.children(testUser);
+      return props.children({
+        username: testUser.username,
+        displayName: testUser.displayName,
+      });
     } else {
       return props.children!;
     }
@@ -76,7 +78,7 @@ export default function AuthSelector(props: Props) {
         if (!(props.authenticated instanceof URL)) props.authenticated();
         return null as never;
       } else if (typeof props.children === 'function') {
-        return props.children(user);
+        return props.children(username);
       } else {
         return props.children!;
       }

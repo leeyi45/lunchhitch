@@ -98,7 +98,7 @@ const OrdersPage = ({ communities }: Props) => {
                     </div>
                   </Box>
                 </Stack>
-                <MadeDisplay user={user} />
+                <MadeDisplay />
               </Stack>
             </PopoverContainer>
           </>

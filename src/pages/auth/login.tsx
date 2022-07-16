@@ -27,7 +27,6 @@ export default function LoginPage() {
   React.useEffect(() => {
     if (status === 'authenticated') {
       const redirectUrl = router.query.callback;
-      console.log('redirect url is', redirectUrl);
       if (redirectUrl === undefined) router.push('/profile');
       else if (typeof redirectUrl === 'string') router.push(redirectUrl);
       else router.push(redirectUrl[0]);
