@@ -90,7 +90,7 @@ export default function LoginPage() {
                 await signIn(values);
                 router.push('/');
               } catch (error: any) {
-                setFieldValue('password', '');
+                setFieldValue('password', '', false);
                 setLoginError(firebaseErrorHandler(error, {
                   'user-not-found': 'Incorrect username or password',
                   'wrong-password': 'Incorrect username or password',
