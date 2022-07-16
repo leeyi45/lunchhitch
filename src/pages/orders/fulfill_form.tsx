@@ -26,11 +26,11 @@ type Props = {
 async function getOrders(shop: Shop, user: SessionUser): Promise<LunchHitchOrder[]> {
   const res = await fetchApi<LunchHitchOrder[]>('orders', {
     where: {
-      NOT: {
-        fromId: user.username,
-      },
-      fulfillerId: null,
-      shopId: shop.id,
+      AND: [{ NOT: { fromId: user.username } },
+        // TODO fix this filter
+        // { fulfillerId: null } ,
+        { shopId: shop.id },
+      ],
     },
   });
 
@@ -55,10 +55,12 @@ const OrderListItem = ({ order, onSelect }: OrderItemProps) => {
         onClick={onSelect}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
-        elevation={hover ? 5 : 3}
+        elevation={hover ? 7 : 3}
       >
         <div>
           <h3>From {order.from.displayName}</h3>
+          {// TODO Figure out date display format
+          }
           <p>Delivery by {order.deliverBy.toString()}</p>
           <ol>
             {order.orders.map((x, j) => (<li key={j}>{x}</li>))}

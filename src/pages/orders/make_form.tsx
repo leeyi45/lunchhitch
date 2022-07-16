@@ -54,8 +54,6 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
             deliverBy: deliverBy.toDate(),
           });
 
-          console.log('Result and value are', result, value);
-
           if (result === 'error') throw value;
 
           setOrderField({

@@ -3,7 +3,8 @@ import requests
 def main():
     resp = requests.post('http://localhost:3000/api/orders', json={
         "where": {
-            "OR": [{ "fromId": "leeyi"}, { "fulfillerId": "leeyi", }]
+            "NOT": { "fromId": "leeyi"},
+            "fulfillerId": None,
         }
     })
     print(resp.text)
