@@ -9,15 +9,19 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
 import { fetchApi } from '../../api_helpers';
-import { useNullableState } from '../../common';
+import { SessionUser, useNullableState } from '../../common';
 import useAsync from '../../common/async';
 import Box from '../../common/components/Box';
 import { ConfirmPopover } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 import { LunchHitchOrder } from '../../prisma';
 
-const getOrdersMade = async () => {
-  const result = await fetchApi<LunchHitchOrder[]>('orders?fulfilled=true');
+const getOrdersMade = async (user: SessionUser) => {
+  const result = await fetchApi<LunchHitchOrder[]>('orders', {
+    where: {
+      fromId: user.username,
+    },
+  });
   if (result.result === 'error') throw result.value;
   return result.value;
 };
@@ -82,13 +86,13 @@ const OrderDisplay = ({ orders, onRemove }: OrderDisplayProps) => {
 /**
  * Display orders that the current user has made
  */
-export default function MadeDisplay() {
+export default function MadeDisplay({ user }: { user: SessionUser }) {
   const orders = useAsync(getOrdersMade);
 
   React.useEffect(() => {
-    orders.call();
+    orders.call(user);
     return orders.cancel;
-  }, []);
+  }, [user]);
 
   const getDisp = React.useCallback(() => {
     switch (orders.state) {
@@ -127,7 +131,7 @@ export default function MadeDisplay() {
         <h2 style={{ color: '#47b16a' }}>My Pending Orders</h2>
         <TooltipButton
           tooltip="Refresh"
-          onClick={() => orders.call()}
+          onClick={() => orders.call(user)}
         >
           <RefreshIcon />
         </TooltipButton>

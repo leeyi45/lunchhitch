@@ -11,6 +11,7 @@ import { Order, Shop } from '@prisma/client';
 import { useFormik } from 'formik';
 
 import { fetchApi } from '../../api_helpers';
+import { SessionUser } from '../../common';
 import useAsync from '../../common/async';
 import Box from '../../common/components/Box';
 import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
@@ -19,10 +20,19 @@ import { LunchHitchOrder } from '../../prisma';
 
 type Props = {
   shop: Shop | null;
+  user: SessionUser;
 };
 
-async function getOrders(shop: Shop): Promise<LunchHitchOrder[]> {
-  const res = await fetchApi<LunchHitchOrder[]>(`orders?shopId=${shop.id}&force=&fulfilled=false`);
+async function getOrders(shop: Shop, user: SessionUser): Promise<LunchHitchOrder[]> {
+  const res = await fetchApi<LunchHitchOrder[]>('orders', {
+    where: {
+      username: {
+        not: user.username,
+      },
+      fulfilled: null,
+      shopId: shop.id,
+    },
+  });
 
   if (res.result === 'success') return res.value;
   else throw new Error(res.value);
@@ -59,7 +69,7 @@ const OrderListItem = ({ order, onSelect }: OrderItemProps) => {
   );
 };
 
-const FulFillForm = ({ shop }: Props) => {
+const FulFillForm = ({ shop, user }: Props) => {
   const { setPopover } = usePopoverContext();
   const ordersAsync = useAsync(getOrders);
   const {
@@ -82,7 +92,7 @@ const FulFillForm = ({ shop }: Props) => {
   const [searchField, setSearchField] = React.useState('');
 
   React.useEffect(() => {
-    if (shop) ordersAsync.call(shop);
+    if (shop) ordersAsync.call(shop, user);
     setFieldValue('order', null);
     return ordersAsync.cancel;
   }, [shop]);
@@ -165,7 +175,7 @@ const FulFillForm = ({ shop }: Props) => {
           }}
           tooltip="Refresh orders"
           onClick={() => {
-            ordersAsync.call(shop!);
+            ordersAsync.call(shop!, user);
             setFieldValue('order', null);
           }}
           disabled={shop === null}

@@ -82,7 +82,7 @@ const OrdersPage = ({ communities }: Props) => {
                       paddingRight: '10px',
                     }}
                     >
-                      <FulFillForm shop={shop} />
+                      <FulFillForm shop={shop} user={user} />
                     </div>
                   </Box>
                   <Box style={{ backgroundColor: 'rgba(255, 204, 204, 0.5)' }}>
@@ -98,7 +98,7 @@ const OrdersPage = ({ communities }: Props) => {
                     </div>
                   </Box>
                 </Stack>
-                <MadeDisplay />
+                <MadeDisplay user={user} />
               </Stack>
             </PopoverContainer>
           </>
