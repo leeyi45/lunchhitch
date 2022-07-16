@@ -10,7 +10,6 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
-import { LunchHitchUser } from '../auth';
 import AuthSelector from '../common/auth_selector';
 import Box from '../common/components/Box';
 import NavBar from '../common/components/navbar';
@@ -30,7 +29,7 @@ export default function Suggestions() {
   return (
     <div className={styles.Suggestions}>
       <AuthSelector force>
-        {(user: LunchHitchUser | null | undefined) => (
+        {(user) => (
           <>
             <NavBar user={user} />
             <Box style={{
