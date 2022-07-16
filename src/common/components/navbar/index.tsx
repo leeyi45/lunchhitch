@@ -11,12 +11,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { LunchHitchUser, signOut } from '../../../auth';
+import { signOut } from '../../../auth';
+import { SessionUser } from '../..';
 import Logo from '../../media/logo.png';
 import LunchHitch from '../../media/lunchhitch2.png';
 
 export type NavbarProps = {
-  user?: LunchHitchUser | null;
+  user?: SessionUser | null;
 };
 
 /**
@@ -24,12 +25,7 @@ export type NavbarProps = {
  */
 export default function NavBar({ user }: NavbarProps) {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [usernameText, setUsernameText] = React.useState('Login');
   const router = useRouter();
-
-  React.useEffect(() => {
-    setUsernameText(user ? user.displayName : 'Login');
-  }, [user]);
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -106,7 +102,7 @@ export default function NavBar({ user }: NavbarProps) {
               fontFamily: 'raleway',
             }}
             >
-              {usernameText}
+              {user?.displayName ?? 'Login'}
             </text>
           </IconButton>
           <Menu

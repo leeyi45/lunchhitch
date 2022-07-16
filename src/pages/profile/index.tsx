@@ -2,13 +2,16 @@ import React from 'react';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
+import { GetServerSideProps } from 'next';
 
-import { LunchHitchUser } from '../../auth';
-import AuthSelector from '../../common/auth_selector';
+import { SessionUserWithProfile } from '../../common';
+import ErrorScreen from '../../common/auth_selector/error_screen';
 import NavBar from '../../common/components/navbar';
+import { getSession } from '../../firebase/admin';
+import prisma from '../../prisma';
 
 type Props = {
-  user: LunchHitchUser;
+  user: SessionUserWithProfile | null;
 };
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -21,7 +24,7 @@ const Item = styled(Paper)(({ theme }) => ({
   height: '30px',
 }));
 
-const ProfileDisplay = ({ user }: Props) => (
+const ProfileDisplay = ({ user }: { user: SessionUserWithProfile }) => (
   <>
     <NavBar user={user} />
     <Stack spacing={2} style={{ alignItems: 'center', color: '#47b16a' }}>
@@ -38,10 +41,30 @@ const ProfileDisplay = ({ user }: Props) => (
   </>
 );
 
-export default function ProfilePage() {
-  return (
-    <AuthSelector>
-      {(user) => (<ProfileDisplay user={user} />)}
-    </AuthSelector>
-  );
+export default function ProfilePage({ user }: Props) {
+  return !user ? (<ErrorScreen error="Error loading user" />) : <ProfileDisplay user={user} />;
 }
+
+export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
+  const username = await getSession(ctx.req.cookies.token);
+
+  if (!username) {
+    return {
+      redirect: {
+        destination: `/auth/login?callback=${encodeURIComponent(ctx.resolvedUrl)}`,
+      },
+      props: null as never,
+    };
+  } else {
+    const user = await prisma.userInfo.findFirst({
+      where: {
+        username,
+      },
+    });
+    return {
+      props: {
+        user,
+      },
+    };
+  }
+};

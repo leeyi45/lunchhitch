@@ -9,7 +9,6 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
 import { fetchApi } from '../../api_helpers';
-import { LunchHitchUser } from '../../auth';
 import { useNullableState } from '../../common';
 import useAsync from '../../common/async';
 import Box from '../../common/components/Box';
@@ -83,13 +82,13 @@ const OrderDisplay = ({ orders, onRemove }: OrderDisplayProps) => {
 /**
  * Display orders that the current user has made
  */
-export default function MadeDisplay({ user }: { user: LunchHitchUser }) {
+export default function MadeDisplay() {
   const orders = useAsync(getOrdersMade);
 
   React.useEffect(() => {
     orders.call();
     return orders.cancel;
-  }, [user]);
+  }, []);
 
   const getDisp = React.useCallback(() => {
     switch (orders.state) {
@@ -120,7 +119,7 @@ export default function MadeDisplay({ user }: { user: LunchHitchUser }) {
       }
       default: return null as never;
     }
-  }, [user, orders.state]);
+  }, [orders.state]);
 
   return (
     <Box style={{ backgroundColor: 'rgba(230, 230, 250, 1)' }}>

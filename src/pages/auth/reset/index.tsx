@@ -8,16 +8,18 @@ import TextField from '@mui/material/TextField';
 import {
   Field, FieldProps, Form, Formik,
 } from 'formik';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
 import * as yup from 'yup';
 
 import { fetchApi } from '../../../api_helpers';
-import { LunchHitchUser } from '../../../auth';
-import AuthSelector from '../../../common/auth_selector';
+import { SessionUserWithProfile } from '../../../common';
 import Box from '../../../common/components/Box';
 import NavBar from '../../../common/components/navbar';
 import PasswordField from '../../../common/formik_wrapper/password_field';
 import { FIREBASE_AUTH, firebaseErrorHandler } from '../../../firebase';
+import { getSession } from '../../../firebase/admin';
+import prisma from '../../../prisma';
 
 import style from './ResetPage.module.css';
 
@@ -100,14 +102,14 @@ type UserResetFormValues = {
 /**
  * Password reset page displayed to logged in users
  */
-function UserResetPage({ user }: { user: LunchHitchUser }) {
+function UserResetPage({ user }: { user: SessionUserWithProfile }) {
   const [resetDone, setResetDone] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
 
   const submitCallback = async ({ oldPass, newPass }: UserResetFormValues) => {
     try {
       const currentUser = FIREBASE_AUTH.currentUser!;
-      await reauthenticateWithCredential(currentUser, EmailAuthProvider.credential(user.email!, oldPass));
+      await reauthenticateWithCredential(currentUser, EmailAuthProvider.credential(user.email, oldPass));
       await updatePassword(currentUser, newPass);
       setResetDone(true);
     } catch (error: any) {
@@ -200,25 +202,53 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
     );
 }
 
+type PageProps = {
+  user: SessionUserWithProfile | null;
+}
+
 /**
  * Password reset page
  */
-export default function ResetPage() {
+export default function ResetPage({ user }: PageProps) {
   return (
-    <AuthSelector
-      unauthenticated={(
-        <div>
-          <NavBar />
-          <NoUserResetPage />
-        </div>
-      )}
-    >
-      {(user) => (
-        <>
-          <NavBar user={user} />
-          <UserResetPage user={user} />
-        </>
-      )}
-    </AuthSelector>
+    <Stack>
+      <NavBar user={user} />
+      {user ? <UserResetPage user={user} /> : <NoUserResetPage />}
+    </Stack>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<PageProps> = async (ctx) => {
+  const username = await getSession(ctx.req.cookies.token);
+
+  if (!username) {
+    return {
+      props: {
+        user: null,
+      },
+    };
+  } else {
+    const userInfo = await prisma.userInfo.findFirst({
+      where: {
+        username,
+      },
+    });
+
+    if (!userInfo) {
+      return {
+        props: {
+          user: null,
+        },
+      };
+    }
+
+    return {
+      props: {
+        user: {
+          ...userInfo,
+          username,
+        },
+      },
+    };
+  }
+};

@@ -1,15 +1,12 @@
 /* eslint-disable no-shadow */
 import React from 'react';
-import { UserInfo } from '@prisma/client';
 import nookies from 'nookies';
 
-import { fetchApi } from '../api_helpers';
+import { SessionUser } from '../common';
 import { FIREBASE_AUTH } from '../firebase';
 
-import { LunchHitchUser } from '.';
-
 export type Session = {
-  user: LunchHitchUser;
+  user: SessionUser;
   status: 'authenticated';
   error: null;
 } | {
@@ -43,46 +40,28 @@ export function AuthProvider({ children }: any) {
     setContext(value);
   };
 
-  React.useEffect(() => FIREBASE_AUTH.onAuthStateChanged(async (user) => {
+  React.useEffect(() => FIREBASE_AUTH.onAuthStateChanged((user) => {
     if (!user) {
       setContextObj({
-        user: null,
         status: 'unauthenticated',
+        user: null,
         error: null,
       });
     } else {
+      const usernameMatch = user.email!.match(
+        /(.+)@lunchhitch.firebaseapp.com/,
+      );
+
+      if (!usernameMatch) throw new Error(`Failed to match username: ${user.email}`);
+
       setContextObj({
-        user: null,
-        status: 'loading',
+        status: 'authenticated',
+        user: {
+          username: usernameMatch[1],
+          displayName: user.displayName!,
+        },
         error: null,
       });
-
-      try {
-        const usernameMatch = user.email!.match(
-          /(.+)@lunchhitch.firebaseapp.com/,
-        );
-
-        if (!usernameMatch) throw new Error(`Failed to match username: ${user.email}`);
-
-        const userInfoResult = await fetchApi<UserInfo>('userinfo');
-        console.log('userInfoResult was', userInfoResult);
-
-        if (userInfoResult.result === 'error') {
-          throw new Error(`Prisma did not return userinfo for ${user.email}`);
-        }
-
-        setContextObj({
-          user: userInfoResult.value,
-          status: 'authenticated',
-          error: null,
-        });
-      } catch (error) {
-        setContextObj({
-          user: null,
-          status: 'errored',
-          error,
-        });
-      }
     }
   }), []);
 

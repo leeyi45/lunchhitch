@@ -27,7 +27,6 @@ export default function LoginPage() {
   React.useEffect(() => {
     if (status === 'authenticated') {
       const redirectUrl = router.query.callback;
-      console.log('redirect url is', redirectUrl);
       if (redirectUrl === undefined) router.push('/profile');
       else if (typeof redirectUrl === 'string') router.push(redirectUrl);
       else router.push(redirectUrl[0]);
@@ -91,7 +90,7 @@ export default function LoginPage() {
                 await signIn(values);
                 router.push('/');
               } catch (error: any) {
-                setFieldValue('password', '');
+                setFieldValue('password', '', false);
                 setLoginError(firebaseErrorHandler(error, {
                   'user-not-found': 'Incorrect username or password',
                   'wrong-password': 'Incorrect username or password',
