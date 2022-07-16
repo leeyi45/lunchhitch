@@ -40,12 +40,13 @@ const OrderListItem = ({ order, onSelect }: OrderItemProps) => {
   const [hover, setHover] = React.useState(false);
 
   return (
-    <ListItem
-      onClick={onSelect}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-    >
-      <Box elevation={hover ? 5 : 3}>
+    <ListItem>
+      <Box
+        onClick={onSelect}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        elevation={hover ? 5 : 3}
+      >
         <div>
           <h3>From {order.from.displayName}</h3>
           <p>Delivery by {order.deliverBy.toString()}</p>

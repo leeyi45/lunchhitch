@@ -58,6 +58,7 @@ export const PopoverContainer = React.forwardRef<HTMLDivElement, PopoverContaine
 
   const setPopover = React.useCallback((name: keyof Values, value: boolean) => {
     if (popoverStates[name] === undefined) throw new Error(`Could not find a popover with name ${name}`);
+    console.log(`Setting ${name} to ${value}`);
     return setPopoversState({ ...popoverStates, [name]: value });
   }, [popoverStates]);
 
@@ -128,7 +129,7 @@ export function connectPopover<P extends RequiredPopoverProps>(Component: React.
     const { state, setState } = usePopover(name);
     const newProps = {
       ...props,
-      state,
+      open: state,
     } as unknown as P;
 
     return (
