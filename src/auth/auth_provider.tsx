@@ -40,6 +40,8 @@ export function AuthProvider({ children }: any) {
     setContext(value);
   };
 
+  React.useEffect(() => console.log('Current Auth User:', FIREBASE_AUTH.currentUser));
+
   React.useEffect(() => FIREBASE_AUTH.onAuthStateChanged((user) => {
     if (!user) {
       setContextObj({
