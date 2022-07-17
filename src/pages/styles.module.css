@@ -5,3 +5,10 @@
     height: 100vh;
     overflow-y: auto;
 }
+
+.Payment {
+    height: 100vh;
+    overflow-y: auto;
+    padding-top: 5%;
+    padding-inline: 33%;
+}

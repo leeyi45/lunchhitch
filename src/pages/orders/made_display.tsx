@@ -126,7 +126,7 @@ export default function MadeDisplay({ user }: { user: SessionUser }) {
   }, [orders.state]);
 
   return (
-    <Box style={{ backgroundColor: 'rgba(230, 230, 250, 1)' }}>
+    <Box style={{ backgroundColor: 'rgba(230, 230, 250, 0.9)' }}>
       <Stack direction="row" spacing={1}>
         <h2 style={{ color: '#47b16a' }}>My Pending Orders</h2>
         <TooltipButton

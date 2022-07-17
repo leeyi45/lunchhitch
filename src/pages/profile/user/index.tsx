@@ -26,7 +26,7 @@ export default function UserHomePage() {
         >
           <Typography
             variant="h1"
-            style={{ fontSize: '100px', textShadow: '2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3)' }}
+            style={{ fontSize: '100px', textShadow: '2px 8px 6px rgba(0,0,0,0.4), 0px -5px 35px rgba(255,255,255,0.4)' }}
           >
             Welcome back!
           </Typography>
