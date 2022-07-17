@@ -200,7 +200,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       </Field>
                     </LocalizationProvider>
                   </Stack>
-                  <Box style={{ backgroundColor: 'rgba(255, 204, 204, 0.1)' }}>
+                  <Box style={{ backgroundColor: 'rgba(255, 217, 217, 0.9)' }}>
                     {orders.length === 0 ? (
                       <div
                         style={{
@@ -210,7 +210,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                         }}
                       >
                         <p style={{
-                          color: '#c5c9c6',
+                          color: '#7c807d',
                         }}
                         >Add some orders to begin!
                         </p>
