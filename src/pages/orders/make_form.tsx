@@ -322,11 +322,11 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               </ol>
             </Stack>
           </ConfirmPopover>
-          <LinkedClickAwayPopover
-            name="makeSuccess"
-          >
-            Successfully placed your order!
-            <CheckCircleIcon />
+          <LinkedClickAwayPopover name="makeSuccess">
+            <Stack direction="column">
+              <CheckCircleIcon />
+              Successfully placed your order!
+            </Stack>
           </LinkedClickAwayPopover>
         </Form>
       )}

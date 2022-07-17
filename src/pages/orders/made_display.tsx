@@ -1,5 +1,5 @@
 import React from 'react';
-import CancelIcon from '@mui/icons-material/Cancel';
+import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Autocomplete from '@mui/material/Autocomplete';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -37,7 +37,7 @@ const OrderDisplay = ({ orders, onRemove }: OrderDisplayProps) => {
   const filteredOrders = selectedShop ? orders.filter((order) => order.shop.name.match(selectedShop)) : orders;
 
   return (
-    <div>
+    <>
       <ConfirmPopover
         name="madeRemove"
         confirmAction={() => {
@@ -52,12 +52,12 @@ const OrderDisplay = ({ orders, onRemove }: OrderDisplayProps) => {
         getOptionLabel={(option) => (typeof option === 'string' ? option : option.name)}
         onChange={(_event, value) => setSelectedShop(typeof value === 'string' ? value : (value?.name) ?? null)}
         freeSolo
-        renderInput={(params) => (<TextField variant="standard" {...params} placeholder="Shop" />)}
+        renderInput={(params) => (<TextField variant="standard" {...params} placeholder="Search" />)}
       />
       <List>
         {filteredOrders.map((option, i) => (
           <ListItem key={i}>
-            <div>
+            <Box>
               <div
                 style={{
                   display: 'flex',
@@ -69,17 +69,17 @@ const OrderDisplay = ({ orders, onRemove }: OrderDisplayProps) => {
                   tooltip="Remove this order"
                   onClick={() => onRemove(i, option)}
                 >
-                  <CancelIcon />
+                  <DeleteIcon />
                 </TooltipButton>
               </div>
               <ol>
                 {option.orders.map((each, j) => (<li key={j}>{each}</li>))}
               </ol>
-            </div>
+            </Box>
           </ListItem>
         ))}
       </List>
-    </div>
+    </>
   );
 };
 

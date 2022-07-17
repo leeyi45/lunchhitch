@@ -70,7 +70,7 @@ export const wrapWithAuth = <T, U>({ handler: apiHandler, ...apiParams }: APIPar
   async handler({
     data, req, res, params,
   }) {
-    if (req.query.force === '') {
+    if (process.env.NODE_ENV !== 'production' && req.query.force === '') {
       return wrapIntoPromise(apiHandler({
         data, req, res, params: { username: testUser.username, ...params },
       }));

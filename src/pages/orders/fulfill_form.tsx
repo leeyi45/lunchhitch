@@ -2,11 +2,13 @@
 import React from 'react';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
-import { InputAdornment, TextField } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
+import InputAdornment from '@mui/material/InputAdornment';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
 import { Order, Shop } from '@prisma/client';
 import { useFormik } from 'formik';
 
@@ -107,31 +109,18 @@ const FulFillForm = ({ shop, user }: Props) => {
     switch (ordersAsync.state) {
       case 'loading': return (<CircularProgress />);
       case 'errored': return (
-        <div>
+        <>
           An error occurred, please refresh the page and try again.<br />
           {ordersAsync.result.toString()}
-        </div>
+        </>
       );
       case 'done': {
         if (ordersAsync.result.length === 0) {
-          return (
-            <div>
-              <p
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  width: '100%',
-                  height: '100%',
-                }}
-              >No Orders
-              </p>
-            </div>
-          );
+          return (<p>No Orders</p>);
         }
         return (
-          <Stack direction="column" spacing={1}>
-            Displaying orders from {shop.name}
+          <Stack direction="column" spacing={1} style={{ width: '100%' }}>
+            <p>Displaying orders from {shop.name}</p>
             <TextField
               value={searchField}
               placeholder="Search"
@@ -145,21 +134,28 @@ const FulFillForm = ({ shop, user }: Props) => {
                 ),
               }}
             />
-            <List style={{ maxHeight: '100%', overflow: 'auto' }}>
-              {(searchField === '' ? ordersAsync.result : ordersAsync.result.filter((order) => (
-                order.from.displayName.includes(searchField) // Search display name
+            <Paper
+              elevation={0}
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0)', height: '40%', maxHeight: '10%', overflow: 'auto',
+              }}
+            >
+              <List>
+                {(searchField === '' ? ordersAsync.result : ordersAsync.result.filter((order) => (
+                  order.from.displayName.includes(searchField) // Search display name
                 || order.orders.find((each) => each.includes(searchField)) // Search each entry
-              ))).map((order, i) => (
-                <OrderListItem
-                  order={order}
-                  key={i}
-                  onSelect={() => {
-                    setFieldValue('order', order);
-                    setPopover('fulfillPopover', true);
-                  }}
-                />
-              ))}
-            </List>
+                ))).map((order, i) => (
+                  <OrderListItem
+                    order={order}
+                    key={i}
+                    onSelect={() => {
+                      setFieldValue('order', order);
+                      setPopover('fulfillPopover', true);
+                    }}
+                  />
+                ))}
+              </List>
+            </Paper>
           </Stack>
         );
       }
@@ -204,7 +200,18 @@ const FulFillForm = ({ shop, user }: Props) => {
       >
         Accepted the order!
       </ConfirmPopover>
-      {getForm()}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '100%',
+          height: '100%',
+
+        }}
+      >
+        {getForm()}
+      </div>
     </form>
   );
 };

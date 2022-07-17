@@ -10,9 +10,18 @@ export default wrapWithQuery({
   handler: prismaHandler(({ data }) => prisma.order.findMany({
     ...data,
     include: {
-      fulfiller: true,
-      from: true,
-      shop: true,
+      fulfiller: {
+        select: {
+          displayName: true,
+          username: true,
+        },
+      },
+      from: {
+        select: {
+          displayName: true,
+          username: true,
+        },
+      },
     },
   })),
 });

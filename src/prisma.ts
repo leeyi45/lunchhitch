@@ -2,7 +2,7 @@
 /* eslint-disable no-var */
 /* eslint-disable vars-on-top */
 import {
-  Community, Order, PrismaClient, Shop, UserInfo,
+  Community, Order, PrismaClient, Shop,
 } from '@prisma/client';
 
 // import { KeysOfType } from './common';
@@ -20,11 +20,14 @@ if (process.env.NODE_ENV !== 'production') global.prisma = prisma;
 // type PrismaFuncs = KeysOfType<PrismaClient, Function>;
 // type Collection = KeysOfType<Omit<PrismaClient, PrismaFuncs>>;
 // type Method = KeysOfType<PrismaClient[Collection]>
+export type SessionUser = {
+  username: string;
+  displayName: string;
+}
 
 export type LunchHitchOrder = {
-  from: UserInfo;
-  shop: Shop;
-  fulfiller: UserInfo | null;
+  from: SessionUser;
+  fulfiller: SessionUser | null;
 } & Order;
 
 export type LunchHitchCommunity = {
