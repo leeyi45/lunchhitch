@@ -1,9 +1,10 @@
 import React from 'react';
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import FavoriteIcon from '@mui/icons-material/Favorite';
+import PaidIcon from '@mui/icons-material/Paid';
+import PendingIcon from '@mui/icons-material/Pending';
+import RefreshIcon from '@mui/icons-material/Refresh';
 import SendIcon from '@mui/icons-material/Send';
-import ShareIcon from '@mui/icons-material/Share';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -16,14 +17,17 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import Divider from '@mui/material/Divider';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Image from 'next/image';
 
+import TooltipButton from '../common/components/tooltip_button';
 import Prata from '../common/media/prata.png';
 
 import styles from './styles.module.css';
@@ -137,30 +141,62 @@ export default function PaymentPage() {
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleClose} autoFocus style={{ color: '#50C878' }}>Cancel</Button>
+                <Button onClick={handleClose} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
                 <Button onClick={handleDisable} autoFocus style={{ color: '#50C878' }}>Confirm</Button>
               </DialogActions>
             </Dialog>
           </Stack>
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Typography sx={{ fontFamily: 'raleway' }}>Ordering</Typography>
-            <EventNoteIcon />
-            <OrderSwitch
-              inputProps={{ 'aria-label': 'ant design' }}
-              color="success"
-            />
-            <TwoWheelerIcon />
-            <Typography sx={{ fontFamily: 'raleway' }}>On the way</Typography>
+          <Divider sx={{ paddingTop: '10px' }} />
+          <Stack direction="row" sx={{ paddingTop: '10px' }}>
+            <Stack direction="column">
+              <Typography sx={{ fontFamily: 'raleway', fontWeight: 'bold' }}>Orderer payment status:</Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography sx={{ fontFamily: 'raleway' }}>Pending</Typography>
+                <PendingIcon />
+                <OrderSwitch
+                  disabled
+                  inputProps={{ 'aria-label': 'ant design' }}
+                  color="success"
+                />
+                <PaidIcon />
+                <Typography sx={{ fontFamily: 'raleway' }}>Paid</Typography>
+                <TooltipButton
+                  style={{
+                    float: 'right',
+                    color: '#50C878',
+                  }}
+                  tooltip="Refresh status"
+                >
+                  <RefreshIcon />
+                </TooltipButton>
+              </Stack>
+              <Typography sx={{ fontFamily: 'raleway', fontWeight: 'bold' }}>Update delivery status:</Typography>
+              <Stack direction="row" spacing={1} alignItems="center">
+                <Typography sx={{ fontFamily: 'raleway' }}>Ordering</Typography>
+                <EventNoteIcon />
+                <Tooltip title="Press to update">
+                  <OrderSwitch
+                    inputProps={{ 'aria-label': 'ant design' }}
+                    color="success"
+                  />
+                </Tooltip>
+                <TwoWheelerIcon />
+                <Typography sx={{ fontFamily: 'raleway' }}>On the way</Typography>
+              </Stack>
+            </Stack>
+            <Button
+              variant="outlined"
+              sx={{
+                fontFamily: 'raleway', height: '30%', marginInline: '20px', marginBlock: '31px', color: '#50C878',
+              }}
+            >Complete Order
+            </Button>
           </Stack>
         </CardContent>
+        <Divider />
         <CardActions>
-          <IconButton aria-label="add to favorites">
-            <FavoriteIcon />
-          </IconButton>
-          <IconButton aria-label="share">
-            <ShareIcon />
-          </IconButton>
-          <p style={{ marginLeft: '190px' }}> View Order Details</p>
+          <Button variant="outlined" sx={{ fontFamily: 'raleway', color: '#faa7a7', marginInline: '55px' }}>Cancel Order</Button>
+          <p style={{ marginLeft: '20px' }}> View Order Details</p>
           <ExpandMore
             expand={expanded}
             onClick={handleExpandClick}
