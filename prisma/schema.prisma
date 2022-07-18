@@ -22,11 +22,17 @@ model Community {
   shops   Shop[]
 }
 
+enum OrderState {
+  ORDERING
+  DELIVERING
+}
+
 model Order {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
   from        UserInfo  @relation(name: "orderer", fields: [fromId], references: [username])
   fromId      String
   orders      String[]
+  state       OrderState
   shop        Shop      @relation(fields: [shopId], references: [id])
   shopId      String    @db.ObjectId
   deliverBy   DateTime

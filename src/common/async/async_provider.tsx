@@ -4,104 +4,118 @@ import React from 'react';
 import ErrorScreen from '../auth_selector/error_screen';
 import LoadingScreen from '../auth_selector/loading_screen';
 
-export type AsyncProps<TFunc extends (...params: any) => Promise<any>> = {
-  func: TFunc;
-  children: React.ReactNode;
-};
-
-type AsyncContextType<TFunc extends (...params: any) => Promise<any>> = ({
-  status: 'initial' | 'loading';
-  result: undefined;
-} | {
-  status: 'done';
-  result: Awaited<TFunc>;
-} | {
-  status: 'errored';
-  result: any;
-}) & {
-  call: (...params: Parameters<TFunc>) => void;
-  cancel: () => void;
-};
-
-type ChildProps = {
-  children?: React.ReactNode;
+export type AsyncStateCompleted<TResult> = {
+  status: 'done',
+  result: TResult;
 }
 
-export default class Async<TFunc extends (...params: any) => Promise<any>> extends React.Component<AsyncProps<TFunc>, AsyncContextType<TFunc>> {
-  private AsyncContext: React.Context<AsyncContextType<TFunc>>;
+export type AsyncState<TResult> = ({
+  status: 'initial' | 'loading';
+  result: undefined;
+} | AsyncStateCompleted<TResult>
+  | {
+  status: 'errored';
+  result: any;
+})
 
-  private readonly abortController: AbortController;
+export type AsyncContextType<TResult, TParams = void> = {
+  call: (...params: TParams[]) => void;
+  cancel: () => void;
+} & AsyncState<TResult>;
 
-  constructor(props: AsyncProps<TFunc>) {
-    super(props);
-    const abortController = new AbortController();
-    this.abortController = abortController;
+export const createAsync = <TResult, TParams = void>(func: (...params: TParams[]) => Promise<TResult>) => {
+  const AsyncContext = React.createContext<AsyncContextType<TResult, TParams>>({
+    status: 'initial',
+    result: undefined,
+    call: () => {},
+    cancel: () => {},
+  });
 
-    const promiseFunc = async (...args: Parameters<TFunc>) => {
-      this.setState({ status: 'loading' });
+  type AsyncProps = {
+    children? : React.ReactElement | React.ReactElement[] | ((ctx: AsyncContextType<TResult, TParams>) => (React.ReactElement[] | React.ReactElement))
+  }
+
+  const Async = ({ children }: AsyncProps) => {
+    const [state, setState] = React.useState<AsyncState<TResult>>({
+      status: 'loading',
+      result: undefined,
+    });
+
+    const abortControllerRef = React.useRef(new AbortController());
+    const fnWrapperRef = React.useRef((...args: TParams[]) => new Promise<TResult>((resolve, reject) => {
+      func(...args)
+        .then(resolve)
+        .catch(reject)
+        .finally(() => abortControllerRef.current.signal.removeEventListener('abort', reject));
+
+      abortControllerRef.current.signal.addEventListener('abort', reject);
+    }));
+
+    const promiseFunc = React.useCallback(async (...args: TParams[]) => {
+      setState({
+        status: 'loading',
+        result: undefined,
+      });
       try {
-        const result = await props.func(...args);
-        this.setState({
+        const result = await fnWrapperRef.current(...args);
+        setState({
           status: 'done',
           result,
         });
       } catch (error) {
-        this.setState({
+        setState({
           status: 'errored',
           result: error,
         });
       }
-    };
+    }, [fnWrapperRef.current]);
 
-    this.state = {
-      status: 'initial',
-      result: undefined,
-      call: (...args: Parameters<TFunc>) => new Promise<void>((resolve, reject) => {
-        promiseFunc(...args)
-          .then(resolve)
-          .catch(reject)
-          .finally(() => abortController.signal.removeEventListener('abort', reject));
+    const contextObj = React.useMemo(() => ({
+      ...state,
+      call: promiseFunc,
+      cancel: () => abortControllerRef.current.abort(),
+    }), [state, promiseFunc, abortControllerRef.current]);
 
-        abortController.signal.addEventListener('abort', reject);
-      }),
-      cancel: () => abortController.abort(),
-    };
-    this.AsyncContext = React.createContext<AsyncContextType<TFunc>>(this.state);
-  }
-
-  public componentWillUnmount() {
-    this.abortController.abort();
-  }
-
-  public Initial = ({ children }: ChildProps) => {
-    const { status } = React.useContext(this.AsyncContext);
-
-    if (status === 'initial') return children ?? <LoadingScreen />;
-    else return null;
+    return (
+      <AsyncContext.Provider value={contextObj}>{typeof children === 'function' ? children(contextObj) : children}</AsyncContext.Provider>
+    );
   };
 
-  public Loading = ({ children }: ChildProps) => {
-    const { status } = React.useContext(this.AsyncContext);
-
-    if (status === 'loading') return children ?? <LoadingScreen />;
-    else return null;
+  Async.defaultProps = {
+    children: undefined,
   };
 
-  public Errored = ({ children }: ChildProps) => {
-    const { status, result } = React.useContext(this.AsyncContext);
+  type ChildProps = { children?: React.ReactElement | ((ctx: AsyncContextType<TResult, TParams>) => React.ReactElement) }
 
-    if (status === 'errored') return children ?? <ErrorScreen error={result.toString()} />;
-    else return null;
-  };
+  return Object.assign(Async, {
+    Initial: ({ children }: Required<ChildProps>) => {
+      const ctx = React.useContext(AsyncContext);
 
-  public Done = ({ children }: { children: React.ReactNode | ((result: Awaited<TFunc>) => React.ReactNode)}) => {
-    const { status, result } = React.useContext(this.AsyncContext);
-    if (status === 'done') return typeof children === 'function' ? children(result) : children;
-    return null;
-  };
+      if (ctx.status === 'initial') return typeof children === 'function' ? children(ctx) : children;
+      else return null;
+    },
+    Loading: ({ children }: ChildProps) => {
+      const ctx = React.useContext(AsyncContext);
 
-  public render() {
-    const Context = this.AsyncContext;
-    return <Context.Provider value={this.state}>{this.props.children}</Context.Provider>;
-  }
-}
+      if (ctx.status === 'loading') {
+        if (children) return typeof children === 'function' ? children(ctx) : children;
+        return <LoadingScreen />;
+      } else return null;
+    },
+    Errored: ({ children }: ChildProps) => {
+      const ctx = React.useContext(AsyncContext);
+
+      if (ctx.status === 'errored') {
+        if (children) return typeof children === 'function' ? children(ctx) : children;
+        return <ErrorScreen error={ctx.result.toString()} />;
+      } else return null;
+    },
+    Done: ({ children }: { children: React.ReactElement | ((ctx: AsyncStateCompleted<TResult>) => React.ReactElement)}) => {
+      const ctx = React.useContext(AsyncContext);
+
+      if (ctx.status === 'done') {
+        return typeof children === 'function' ? children(ctx) : children;
+      } else return null;
+    },
+  });
+};

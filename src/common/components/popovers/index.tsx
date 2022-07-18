@@ -7,10 +7,10 @@ import { KeysOfType } from '../..';
 
 import Popover from './popover';
 
-type Values = { [name: string ]: boolean };
+type Values = { [name: string ]: any };
 export type PopoverContextType = {
   popovers: Values,
-  setPopover: (name: string, value: boolean) => void;
+  setPopover: (name: string, value: any) => void;
 };
 
 const PopoverContext = React.createContext<PopoverContextType | null>(null);
@@ -38,13 +38,13 @@ export const usePopover = (name: string) => {
 
   return {
     state: ctx.popovers[name],
-    setState: (state: boolean) => ctx.setPopover(name, state),
+    setState: (state: any) => ctx.setPopover(name, state),
   };
 };
 
 export type PopoverContainerProps = {
   popovers: Values;
-  children: React.ReactNode | ((values: Values, setOpen: (name: keyof Values, value: boolean) => void) => React.ReactNode);
+  children: React.ReactNode | ((values: Values, setOpen: (name: keyof Values, value: any) => void) => React.ReactNode);
   blurDist?: number;
 };
 
@@ -58,7 +58,7 @@ export const PopoverContainer = React.forwardRef<HTMLDivElement, PopoverContaine
 
   const setPopover = React.useCallback((name: keyof Values, value: boolean) => {
     if (popoverStates[name] === undefined) throw new Error(`Could not find a popover with name ${name}`);
-    console.log(`Setting ${name} to ${value}`);
+    // console.log(`Setting ${name} to ${value}`);
     return setPopoversState({ ...popoverStates, [name]: value });
   }, [popoverStates]);
 
@@ -87,9 +87,13 @@ PopoverContainer.defaultProps = {
   blurDist: 3,
 };
 
-export function withPopover<OuterProps>(popoverKeys: { [key: string ]: boolean | React.ReactNode }, Component: React.ComponentType<OuterProps & { popovers: PopoverContextType }>, displayName: string) {
+export function withPopover<OuterProps>(
+  popoverKeys: { [key: string ]: boolean | React.ReactNode },
+  Component: React.ComponentType<OuterProps & { popovers: PopoverContextType }>,
+  displayName: string,
+) {
   const popovers = Object.entries(popoverKeys).reduce((res, [key, value]) => ({ ...res, [key]: typeof value === 'boolean' ? value : false }), {} as PopoverContextType['popovers']);
-  const callback = (name: string, value: boolean) => {
+  const callback = (name: string, value: any) => {
     if (popovers[name] === undefined) throw new Error(`Could not find popover with key ${name}`);
     popovers[name] = value;
   };
@@ -113,7 +117,7 @@ export function withPopover<OuterProps>(popoverKeys: { [key: string ]: boolean |
 
 type PopoverWrapperProps = {
   name: string;
-  children: React.ReactNode | ((args: { state: boolean, setState: (newValue: boolean) => void }) => React.ReactNode);
+  children: React.ReactNode | ((args: { state: any, setState: (newValue: any) => void }) => React.ReactNode);
 };
 
 type RequiredPopoverProps = {
@@ -129,7 +133,7 @@ export function connectPopover<P extends RequiredPopoverProps>(Component: React.
     const { state, setState } = usePopover(name);
     const newProps = {
       ...props,
-      open: state,
+      open: Boolean(state),
     } as unknown as P;
 
     return (

@@ -28,6 +28,9 @@ export type SessionUser = {
 export type LunchHitchOrder = {
   from: SessionUser;
   fulfiller: SessionUser | null;
+  shop: {
+    name: string;
+  }
 } & Order;
 
 export type LunchHitchCommunity = {

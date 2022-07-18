@@ -15,6 +15,7 @@ import { LinkedPopover, PopoverContainer } from '../../common/components/popover
 import prisma, { LunchHitchCommunity } from '../../prisma';
 
 import FulFillForm from './fulfill_form';
+import FulfilledDisplay from './fulfilled_display';
 import MadeDisplay from './made_display';
 import MakeForm from './make_form';
 import ShopSelector from './shop_selector';
@@ -99,7 +100,10 @@ const OrdersPage = ({ communities }: Props) => {
                     </div>
                   </Box>
                 </Stack>
-                <MadeDisplay user={user} />
+                <Stack direction="row">
+                  <MadeDisplay user={user} />
+                  <FulfilledDisplay user={user} />
+                </Stack>
               </Stack>
             </PopoverContainer>
           </>
