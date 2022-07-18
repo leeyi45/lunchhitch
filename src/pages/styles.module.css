@@ -9,6 +9,7 @@
 .Payment {
     height: 100vh;
     overflow-y: auto;
-    padding-top: 5%;
+    padding-block: 1%;
     padding-inline: 33%;
+    line-height: 30px;
 }

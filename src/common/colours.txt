@@ -14,3 +14,4 @@ light orange: rgba(255, 204, 153, 0.5)
 lavender: rgba(230, 230, 250, 0.5)
 pretty blue: rgba(105, 135, 245, 0.5)
 mint: rgba(152, 255, 152, 0.3)
+cancel: #faa7a7
