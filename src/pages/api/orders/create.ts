@@ -7,10 +7,14 @@ import { prismaHandler, wrapWithAuth } from '../../../api_helpers/api_wrappers';
 import prisma from '../../../prisma';
 
 export default wrapWithAuth({
-  handler: prismaHandler(({ data, params: { username } }) => prisma.order.create({
-    data: {
-      ...data,
-      fromId: username,
-    },
-  })),
+  handlers: {
+    POST: prismaHandler(({ data: { shopId, orders, deliverBy }, params: { username } }) => prisma.order.create({
+      data: {
+        shopId,
+        orders,
+        deliverBy,
+        fromId: username,
+      },
+    })),
+  },
 });

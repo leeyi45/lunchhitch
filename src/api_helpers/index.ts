@@ -28,7 +28,15 @@ export const fetchApi = async <T>(url: string, data?: any): Promise<APIResult<T>
     method: data !== undefined ? 'POST' : 'GET',
     body: data === undefined ? data : JSON.stringify(data),
   });
-  return resp.json();
+  const result = await resp.json() as APIResult<T>;
+
+  return result;
+};
+
+export const fetchApiThrowOnError = async <T>(url: string, data?: any) => {
+  const { result, value } = await fetchApi<T>(url, data);
+  if (result === 'error') throw value;
+  return value;
 };
 
 export type { APIResult, APIParams };

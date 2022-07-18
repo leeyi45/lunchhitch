@@ -7,21 +7,28 @@ import { prismaHandler, wrapWithQuery } from '../../../api_helpers/api_wrappers'
 import prisma from '../../../prisma';
 
 export default wrapWithQuery({
-  handler: prismaHandler(({ data }) => prisma.order.findMany({
-    ...data,
-    include: {
-      fulfiller: {
-        select: {
-          displayName: true,
-          username: true,
+  handlers: {
+    POST: prismaHandler(({ data }) => prisma.order.findMany({
+      ...data,
+      include: {
+        fulfiller: {
+          select: {
+            displayName: true,
+            username: true,
+          },
+        },
+        from: {
+          select: {
+            displayName: true,
+            username: true,
+          },
+        },
+        shop: {
+          select: {
+            name: true,
+          },
         },
       },
-      from: {
-        select: {
-          displayName: true,
-          username: true,
-        },
-      },
-    },
-  })),
+    })),
+  },
 });

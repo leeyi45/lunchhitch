@@ -8,7 +8,7 @@ import testUser from '../auth/test_user';
 import { wrapIntoPromise } from '../common';
 import { getSession } from '../firebase/admin';
 
-import { APIParams, APIResult } from './types';
+import { APIParams, APIResult, Handler } from './types';
 
 type Params = {
   [name: string]: string;
@@ -20,7 +20,7 @@ type Params = {
  */
 export const wrapWithQuery = <T, U>({
   params,
-  handler,
+  handlers,
   errorHandler,
 }: APIParams<T>) => async (req: NextApiRequest, res: NextApiResponse) => {
     const query = req.query as Params;
@@ -47,17 +47,22 @@ export const wrapWithQuery = <T, U>({
       res.status(400).json({ result: 'error', value: `Missing required query params: ${errors.join(', ')}` } as APIResult<T>);
     } else {
       try {
+        const handler = handlers[req.method as string];
+
+        if (!handler) {
+          res.status(405).json({ result: 'error', value: 'Unsupported HTTP method' });
+          return;
+        }
+
         const result = await wrapIntoPromise(handler({
           data: req.body as U, req, res, params: queryParams,
         }));
         if (result !== undefined) res.status(200).json(result);
       } catch (error) {
         if (errorHandler) errorHandler(error, res);
-        else if (process.env.NODE_ENV === 'production') {
+        else {
           res.status(500).json({ result: 'error', value: error } as APIResult<T>);
-          return;
         }
-        throw error;
       }
     }
   };
@@ -65,29 +70,33 @@ export const wrapWithQuery = <T, U>({
 /**
  * Wrap an API route handler to require authentication. The API route will return a 401 if the user is unauthorized
  */
-export const wrapWithAuth = <T, U>({ handler: apiHandler, ...apiParams }: APIParams<T>) => wrapWithQuery<T, U>({
+export const wrapWithAuth = <T, U>({ handlers: apiHandlers, ...apiParams }: APIParams<T>) => wrapWithQuery<T, U>({
   ...apiParams,
-  async handler({
-    data, req, res, params,
-  }) {
-    if (process.env.NODE_ENV !== 'production' && req.query.force === '') {
-      return wrapIntoPromise(apiHandler({
-        data, req, res, params: { username: testUser.username, ...params },
-      }));
-    }
+  handlers: Object.entries(apiHandlers).reduce((result, [method, handler]) => ({
+    ...result,
+    [method]: !handler ? undefined : async ({
+      data, req, res, params,
+    }) => {
+      if (process.env.NODE_ENV !== 'production' && req.query.force === '') {
+        return wrapIntoPromise(handler({
+          data, req, res, params: { username: testUser.username, ...params },
+        }));
+      }
 
-    const username = await getSession(req.cookies.token);
-    if (!username) {
-      res.status(401).json({ result: 'error', value: 'Must be logged in' });
-      return undefined as never;
-    }
-    return wrapIntoPromise(apiHandler({
-      data, req, res, params: { username, ...params },
-    }));
-  },
+      const username = await getSession(req.cookies.token);
+      if (!username) {
+        res.status(401).json({ result: 'error', value: 'Must be logged in' });
+        return undefined as never;
+      }
+      return wrapIntoPromise(handler({
+        data, req, res, params: { username, ...params },
+      }));
+    },
+  }), {} as APIParams<T>['handlers']),
+
 });
 
-export const prismaHandler = <T>(func: (...args: Parameters<APIParams<T>['handler']>) => Promise<T | null>): APIParams<T>['handler'] => async (params) => {
+export const prismaHandler = <TResult, TData>(func: (...args: Parameters<Handler<TResult, TData>>) => Promise<TResult | null>): Handler<TResult, TData> => async (params) => {
   const value = await func(params);
   return value ? { result: 'success', value } : { result: 'error', value: 'No document matched the given criteria!' };
 };
