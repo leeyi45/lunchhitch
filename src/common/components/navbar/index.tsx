@@ -137,7 +137,7 @@ export default function NavBar({ user }: NavbarProps) {
               )]
               : [(
                 <MenuItem key={0}>
-                  <Link href={`./auth/login?callback=${encodeURIComponent(router.pathname)}`}><Button>Log In</Button></Link>
+                  <Link href={`/auth/login?callback=${encodeURIComponent(router.pathname)}`}><Button>Log In</Button></Link>
                 </MenuItem>
               ), (
                 <MenuItem key={1}>

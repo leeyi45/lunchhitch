@@ -18,6 +18,12 @@ import styles from './styles.module.css';
 
 export default function Suggestions() {
   const [open, setOpen] = React.useState(false);
+  const [shopName, setShopName] = React.useState({
+    value: '',
+  });
+  const [desc, setDesc] = React.useState({
+    value: '',
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -26,6 +32,17 @@ export default function Suggestions() {
   const handleClose = () => {
     setOpen(false);
   };
+
+  const handleClear = () => {
+    setOpen(false);
+    setShopName({
+      value: '',
+    });
+    setDesc({
+      value: '',
+    });
+  };
+
   return (
     <div className={styles.Suggestions}>
       <AuthSelector>
@@ -50,19 +67,29 @@ export default function Suggestions() {
                 <Stack direction="row" style={{ lineHeight: '5px', justifyContent: 'center' }}>
                   <p style={{ fontSize: '20px', paddingRight: '10px' }}>Shop Name:</p>
                   <TextField
+                    {...shopName}
                     id="standard-textarea"
                     multiline
                     variant="standard"
                     style={{ width: '40%' }}
+                    onChange={(event) => setShopName({
+                      ...shopName,
+                      value: event.target.value,
+                    })}
                   />
                 </Stack>
                 <Stack direction="row" style={{ lineHeight: '5px' }}>
                   <p style={{ fontSize: '20px', paddingRight: '10px', paddingLeft: '5px' }}>Description:</p>
                   <TextField
+                    {...desc}
                     id="standard-textarea"
                     multiline
                     variant="standard"
                     fullWidth
+                    onChange={(event) => setDesc({
+                      ...desc,
+                      value: event.target.value,
+                    })}
                   />
                 </Stack>
                 <div>
@@ -86,7 +113,7 @@ export default function Suggestions() {
                       </DialogContentText>
                     </DialogContent>
                     <DialogActions>
-                      <Button href="/" autoFocus style={{ color: '#50C878' }}>Back to home</Button>
+                      <Button onClick={handleClear} autoFocus style={{ color: '#50C878' }}>Close</Button>
                     </DialogActions>
                   </Dialog>
                 </div>

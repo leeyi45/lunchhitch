@@ -25,12 +25,10 @@ import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import Image from 'next/image';
 
-import TooltipButton from '../common/components/tooltip_button';
-import Prata from '../common/media/prata.png';
+import TooltipButton from '../../common/components/tooltip_button';
 
-import styles from './styles.module.css';
+import styles from './payments.module.css';
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -85,6 +83,8 @@ export default function PaymentPage() {
   const [expanded, setExpanded] = React.useState(false);
   const [disable, setDisabled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [complete, setComplete] = React.useState(false);
+  const [cancel, setCancel] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -103,18 +103,30 @@ export default function PaymentPage() {
     setOpen(false);
   };
 
+  const handleComplete = () => {
+    setComplete(true);
+  };
+
+  const handleUncomplete = () => {
+    setComplete(false);
+  };
+
+  const handleCancel = () => {
+    setCancel(true);
+  };
+
+  const handleUncancel = () => {
+    setCancel(false);
+  };
+
   return (
-    <div className={styles.Payment}>
+    <div className={styles.Fulfiller}>
       <Card sx={{ maxWidth: '500px' }}>
         <CardHeader
           title="Order for Niqqi's"
           subheader="Deliver by: " // todo: add delivery time
         />
-        <Image
-          src={Prata}
-          alt="prata"
-          height="400px"
-        />
+        <Divider />
         <CardContent>
           <Stack direction="row" style={{ justifyContent: 'center' }}>
             <p style={{ paddingRight: '5px' }}>$</p>
@@ -138,6 +150,7 @@ export default function PaymentPage() {
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                   Once you have checked that the total cost is correct, press confirm to send the fee to the orderer.
+                  No changes will be allowed after confirming.
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
@@ -145,6 +158,27 @@ export default function PaymentPage() {
                 <Button onClick={handleDisable} autoFocus style={{ color: '#50C878' }}>Confirm</Button>
               </DialogActions>
             </Dialog>
+          </Stack>
+          <Stack direction="row" style={{ marginLeft: '93px', paddingTop: '10px' }}>
+            <TextField
+              disabled
+              id="outlined-read-only-input"
+              label="Await delivery location"
+              style={{ width: '234px' }}
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+            <TooltipButton
+              style={{
+                float: 'right',
+                color: '#50C878',
+                marginLeft: '5px',
+              }}
+              tooltip="Refresh"
+            >
+              <RefreshIcon />
+            </TooltipButton>
           </Stack>
           <Divider sx={{ paddingTop: '10px' }} />
           <Stack direction="row" sx={{ paddingTop: '10px' }}>
@@ -189,13 +223,54 @@ export default function PaymentPage() {
               sx={{
                 fontFamily: 'raleway', height: '30%', marginInline: '20px', marginBlock: '31px', color: '#50C878',
               }}
+              onClick={handleComplete}
             >Complete Order
             </Button>
+            <Dialog
+              open={complete}
+              onClose={handleUncomplete}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">
+                Order completed?
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  Once you have correctly delivered the food, select Confirm.
+                  Thank you for using Lunch Hitch!
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleUncomplete} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+                <Button href="/" autoFocus style={{ color: '#50C878' }}>Confirm</Button>
+              </DialogActions>
+            </Dialog>
           </Stack>
         </CardContent>
         <Divider />
         <CardActions>
-          <Button variant="outlined" sx={{ fontFamily: 'raleway', color: '#faa7a7', marginInline: '55px' }}>Cancel Order</Button>
+          <Button variant="outlined" onClick={handleCancel} sx={{ fontFamily: 'raleway', color: '#faa7a7', marginInline: '55px' }}>Cancel Order</Button>
+          <Dialog
+            open={cancel}
+            onClose={handleUncancel}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              Cancel order?
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                If you are sure about cancelling the order, select Confirm.
+                Thank you for using Lunch Hitch!
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleUncancel} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+              <Button href="/" autoFocus style={{ color: '#50C878' }}>Confirm</Button>
+            </DialogActions>
+          </Dialog>
           <p style={{ marginLeft: '20px' }}> View Order Details</p>
           <ExpandMore
             expand={expanded}

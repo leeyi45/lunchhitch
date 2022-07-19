@@ -1,0 +1,21 @@
+.Fulfiller {
+    background: url('../../common/media/food2.jpg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    overflow-y: auto;
+    padding-block: 7%;
+    padding-inline: 33%;
+    line-height: 30px;
+}
+
+.Orderer {
+    background: url('../../common/media/food9.jpg') no-repeat;
+    background-size: cover;
+    background-position:initial;
+    height: 100vh;
+    overflow-y: auto;
+    padding-block: 7%;
+    padding-inline: 33%;
+    line-height: 30px;
+}
