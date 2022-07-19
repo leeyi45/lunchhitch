@@ -1,20 +1,29 @@
-import { wrapWithAuth } from '../../../api_helpers/api_wrappers';
+import { prismaHandler, wrapWithAuth } from '../../../api_helpers/api_wrappers';
 import prisma from '../../../prisma';
 
 export default wrapWithAuth({
   params: ['id'],
   handlers: {
-    async POST({ params: { id, username } }) {
-      const order = await prisma.order.update({
+    POST: prismaHandler(async ({ params: { id, username } }) => {
+      const order = await prisma.order.findFirst({
         where: {
           id,
-        },
-        data: {
-          fulfillerId: username,
+          fulfillerId: null,
         },
       });
 
-      return { result: 'success', value: order };
-    },
+      if (order) {
+        // Protect against changing an already fulfilled order
+        return prisma.order.update({
+          where: {
+            id,
+          },
+          data: {
+            fulfillerId: username,
+          },
+        });
+      }
+      return null;
+    }),
   },
 });

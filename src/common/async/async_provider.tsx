@@ -1,34 +1,42 @@
-/* eslint-disable react/no-unused-class-component-methods */
 import React from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import ErrorScreen from '../auth_selector/error_screen';
-import LoadingScreen from '../auth_selector/loading_screen';
 
 export type AsyncStateCompleted<TResult> = {
   status: 'done',
   result: TResult;
 }
 
-export type AsyncState<TResult> = ({
+export type AsyncState<TResult> = {
   status: 'initial' | 'loading';
   result: undefined;
-} | AsyncStateCompleted<TResult>
-  | {
+} | AsyncStateCompleted<TResult> | {
   status: 'errored';
   result: any;
-})
+};
 
 export type AsyncContextType<TResult, TParams = void> = {
   call: (...params: TParams[]) => void;
   cancel: () => void;
 } & AsyncState<TResult>;
 
-export const createAsync = <TResult, TParams = void>(func: (...params: TParams[]) => Promise<TResult>) => {
+export const createAsync = <TResult, TParams = void>(func: (...params: TParams[]) => Promise<TResult>, ...initialValues: TParams[]) => {
   const AsyncContext = React.createContext<AsyncContextType<TResult, TParams>>({
     status: 'initial',
     result: undefined,
     call: () => {},
     cancel: () => {},
+  });
+
+  const abortController = new AbortController();
+  const fnWrapper = (...args: TParams[]) => new Promise<TResult>((resolve, reject) => {
+    func(...args)
+      .then(resolve)
+      .catch(reject)
+      .finally(() => abortController.signal.removeEventListener('abort', reject));
+
+    abortController.signal.addEventListener('abort', reject);
   });
 
   type AsyncProps = {
@@ -37,27 +45,17 @@ export const createAsync = <TResult, TParams = void>(func: (...params: TParams[]
 
   const Async = ({ children }: AsyncProps) => {
     const [state, setState] = React.useState<AsyncState<TResult>>({
-      status: 'loading',
+      status: 'initial',
       result: undefined,
     });
 
-    const abortControllerRef = React.useRef(new AbortController());
-    const fnWrapperRef = React.useRef((...args: TParams[]) => new Promise<TResult>((resolve, reject) => {
-      func(...args)
-        .then(resolve)
-        .catch(reject)
-        .finally(() => abortControllerRef.current.signal.removeEventListener('abort', reject));
-
-      abortControllerRef.current.signal.addEventListener('abort', reject);
-    }));
-
-    const promiseFunc = React.useCallback(async (...args: TParams[]) => {
+    const promiseFunc = async (...args: TParams[]) => {
       setState({
         status: 'loading',
         result: undefined,
       });
       try {
-        const result = await fnWrapperRef.current(...args);
+        const result = await fnWrapper(...args);
         setState({
           status: 'done',
           result,
@@ -68,13 +66,17 @@ export const createAsync = <TResult, TParams = void>(func: (...params: TParams[]
           result: error,
         });
       }
-    }, [fnWrapperRef.current]);
+    };
+
+    React.useEffect(() => {
+      if (initialValues) promiseFunc(...initialValues);
+    }, []);
 
     const contextObj = React.useMemo(() => ({
       ...state,
       call: promiseFunc,
-      cancel: () => abortControllerRef.current.abort(),
-    }), [state, promiseFunc, abortControllerRef.current]);
+      cancel: () => abortController.abort(),
+    }), [state]);
 
     return (
       <AsyncContext.Provider value={contextObj}>{typeof children === 'function' ? children(contextObj) : children}</AsyncContext.Provider>
@@ -99,7 +101,7 @@ export const createAsync = <TResult, TParams = void>(func: (...params: TParams[]
 
       if (ctx.status === 'loading') {
         if (children) return typeof children === 'function' ? children(ctx) : children;
-        return <LoadingScreen />;
+        return <CircularProgress />;
       } else return null;
     },
     Errored: ({ children }: ChildProps) => {

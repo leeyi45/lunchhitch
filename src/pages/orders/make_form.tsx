@@ -19,7 +19,7 @@ import {
 import moment, { Moment } from 'moment';
 import * as yup from 'yup';
 
-import { fetchApi } from '../../api_helpers';
+import { fetchApiThrowOnError } from '../../api_helpers';
 import Box from '../../common/components/Box';
 import { ConfirmPopover, LinkedClickAwayPopover, usePopoverContext } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
@@ -48,20 +48,23 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
       }}
       onSubmit={async ({ orders, deliverBy }, { resetForm }) => {
         try {
-          const { result, value } = await fetchApi('orders/create', {
+          await fetchApiThrowOnError('orders/create', {
             orders,
             shopId: shop!.id,
             deliverBy: deliverBy.toDate(),
           });
-
-          if (result === 'error') throw value;
 
           setOrderField({
             value: '',
             error: false,
             helperText: 'Placed order!',
           });
-          resetForm();
+          resetForm({
+            values: {
+              deliverBy: moment(),
+              orders: [],
+            },
+          });
           setPopover('makeSuccess', true);
         } catch (error: any) {
           // TODO submit error handling
