@@ -1,0 +1,15 @@
+.Border{
+    background: linear-gradient(to right, #abebb3, #88a0f7, #c2c2fc);
+    border-radius: 5px;
+    height: 120px;
+    width: 120px;
+    padding-top: 5px;
+}
+
+.Background{
+    background: url('../../common/media/food2.jpg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    overflow-y: auto;
+}
