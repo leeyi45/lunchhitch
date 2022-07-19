@@ -1,6 +1,6 @@
 import React from 'react';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import AppBar from '@mui/material/AppBar';
+import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
@@ -96,7 +96,7 @@ export default function NavBar({ user }: NavbarProps) {
             onClick={handleMenu}
             color="inherit"
           >
-            <AccountCircle />
+            <Avatar sx={{ bgcolor: '#c2c2fc' }}>{user?.displayName[0]}</Avatar>
             <text style={{
               paddingLeft: '5px',
               fontFamily: 'raleway',
