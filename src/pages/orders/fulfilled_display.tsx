@@ -35,7 +35,7 @@ export default function FulfilledDisplay({ user }: { user: SessionUser }) {
   return (
     <OrdersAsync>
       {(ctx) => (
-        <Box>
+        <Box style={{ backgroundColor: 'rgba(197, 211, 252, 0.9)' }}>
           <Dialog
             onClose={() => setRemovePopover(null)}
             open={Boolean(removePopover)}
@@ -65,7 +65,7 @@ export default function FulfilledDisplay({ user }: { user: SessionUser }) {
             <Stack direction="column">
               <Stack direction="row">
                 <Tooltip title="The orders you've decided to fulfill">
-                  <h3>My Fulfilled Orders</h3>
+                  <h2 style={{ color: '#47b16a' }}>My Fulfilled Orders</h2>
                 </Tooltip>
                 <TooltipButton
                   tooltip="Refresh Orders"

@@ -8,11 +8,12 @@ import Tooltip from '@mui/material/Tooltip';
 import { UserInfo } from '@prisma/client';
 import { GetServerSideProps } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 
 import ErrorScreen from '../../common/auth_selector/error_screen';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
-import Onigiri from '../../common/media/onigiri.jpg';
+import Logo from '../../common/media/logoo.png';
 import { getSession } from '../../firebase/admin';
 import prisma from '../../prisma';
 
@@ -50,7 +51,7 @@ const ProfileDisplay = ({ user }: { user: UserInfo }) => (
       <Stack spacing={2} alignItems="center">
         <div className={styles.Border}>
           <Image
-            src={Onigiri}
+            src={Logo}
             alt="Profile Picture"
             height="110px"
             width="110px"
@@ -76,6 +77,7 @@ const ProfileDisplay = ({ user }: { user: UserInfo }) => (
             </Stack>
           </Stack>
         </Item>
+        <Link href="/auth/reset">Reset Password</Link>
       </Stack>
     </Box>
   </div>

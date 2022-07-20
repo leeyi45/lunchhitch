@@ -129,6 +129,10 @@ export default function NavBar({ user }: NavbarProps) {
                 </MenuItem>),
               (
                 <MenuItem key={1}>
+                  <Link href="https://teamby.notion.site/User-s-Guide-a9070e41ead948418c3a983ba37d0049"><Button>User Guide</Button></Link>
+                </MenuItem>),
+              (
+                <MenuItem key={2}>
                   <Button onClick={() => {
                     signOut();
                     router.push('/');
