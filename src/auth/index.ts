@@ -7,24 +7,16 @@ import {
 } from '@firebase/auth';
 import { UserInfo } from '@prisma/client';
 
-import { fetchApi } from '../api_helpers';
+import { fetchApiThrowOnError } from '../api_helpers';
 import { FIREBASE_AUTH } from '../firebase';
 
 import { useSession } from './auth_provider';
+import type { Credential } from './types';
 
-const DEFAULT_DOMAIN = 'lunchhitch.firebaseapp.com';
-
-export type Credential = {
-  username: string;
-  password: string;
-};
-
-export type LunchHitchUser = {
-  username: string;
-  email: string;
-  displayName: string;
-  phoneNumber: string;
-};
+/**
+ * The login domain in use
+ */
+export const DEFAULT_DOMAIN = 'lunchhitch.firebaseapp.com';
 
 /**
  * Sign in with the given username and password
@@ -44,7 +36,7 @@ export async function signUp({ password, ...params }: UserInfo & { password: str
   await updateProfile(FIREBASE_AUTH.currentUser!, {
     displayName: params.displayName,
   });
-  await fetchApi('userinfo/create', params);
+  await fetchApiThrowOnError('userinfo/create', params);
   // await firebaseSignOut(FIREBASE_AUTH);
 }
 

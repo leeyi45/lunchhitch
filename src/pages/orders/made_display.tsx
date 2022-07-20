@@ -11,7 +11,7 @@ import useAsync from '../../common/async';
 import Box from '../../common/components/Box';
 import { LinkedClickAwayPopover, usePopover } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
-import { LunchHitchOrder } from '../../prisma';
+import type { LunchHitchOrder } from '../../prisma/types';
 
 import OrdersDisplay from './orders_display';
 
@@ -83,7 +83,7 @@ export default function MadeDisplay({ user }: { user: SessionUser }) {
   return (
     <Box style={{ backgroundColor: 'rgba(230, 230, 250, 0.9)' }}>
       <LinkedClickAwayPopover
-        name="madeRemovePopover"
+        name="madeRemove"
       >
         {({ state: order, setState }) => (
           <Stack direction="column">

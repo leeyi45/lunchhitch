@@ -18,7 +18,7 @@ import useAsync from '../../common/async';
 import Box from '../../common/components/Box';
 import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
-import { LunchHitchOrder } from '../../prisma';
+import type { LunchHitchOrder } from '../../prisma/types';
 
 type Props = {
   shop: Shop | null;

@@ -11,6 +11,7 @@ export default wrapWithAuth({
     POST: prismaHandler(({ data: { shopId, orders, deliverBy }, params: { username } }) => prisma.order.create({
       data: {
         shopId,
+        state: 'DELIVERING',
         orders,
         deliverBy,
         fromId: username,

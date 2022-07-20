@@ -16,7 +16,7 @@ import { createAsync } from '../../common/async/async_provider';
 import Box from '../../common/components/Box';
 import { usePopoverContext } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
-import { LunchHitchOrder, SessionUser } from '../../prisma';
+import type { LunchHitchOrder, SessionUser } from '../../prisma/types';
 
 const OrdersAsync = createAsync((user: SessionUser) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
   where: {
@@ -41,7 +41,7 @@ export default function FulfilledDisplay({ user }: { user: SessionUser }) {
             open={Boolean(removePopover)}
           >
             <DialogTitle>Abandon Order?</DialogTitle>
-            <h3>Abandon this order from {removePopover!.from.displayName}</h3>
+            <h3>Abandon this order from {removePopover?.from.displayName}</h3>
             <DialogActions>
               <Button
                 onClick={() => fetchApi(`orders/unfulfill?id=${removePopover!.id}`)}

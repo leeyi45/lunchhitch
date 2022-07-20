@@ -96,7 +96,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (ctx) => {
       props: null as never,
     };
   } else {
-    const user = await prisma.userInfo.findFirst({
+    const user = await prisma.userInfo.findUnique({
       where: {
         username,
       },

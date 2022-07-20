@@ -1,9 +1,11 @@
 import React from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { Form, Formik } from 'formik';
+import {
+  Field, FieldProps, Form, Formik,
+} from 'formik';
+import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import * as yup from 'yup';
@@ -12,8 +14,14 @@ import { signIn } from '../../auth';
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
+import TextField from '../../common/components/textfield';
 import PasswordField from '../../common/formik_wrapper/password_field';
 import { firebaseErrorHandler } from '../../firebase';
+
+type LoginFormValues = {
+  username: string;
+  password: string;
+}
 
 /**
  * Login page for users. If a callback URL is specified in the params, then
@@ -41,6 +49,9 @@ export default function LoginPage() {
       alignContent: 'center',
     }}
     >
+      <Head>
+        <title>Login to LunchHitch</title>
+      </Head>
       <NavBar />
       <Stack
         style={{
@@ -73,7 +84,7 @@ export default function LoginPage() {
               Log In to Lunch Hitch
             </Typography>
           </div>
-          <Formik
+          <Formik<LoginFormValues>
             initialValues={{
               username: '',
               password: '',
@@ -88,33 +99,36 @@ export default function LoginPage() {
             onSubmit={async (values, { setFieldValue }) => {
               try {
                 await signIn(values);
-                router.push('/');
               } catch (error: any) {
-                setFieldValue('password', '', false);
                 setLoginError(firebaseErrorHandler(error, {
                   'user-not-found': 'Incorrect username or password',
                   'wrong-password': 'Incorrect username or password',
                   'too-many-requests': 'Too many failed login attempts, please try again later',
                 }));
               }
+              setFieldValue('password', '', false);
             }}
           >
-            {({ values, errors, ...formik }) => (
+            {({ errors, isSubmitting, submitForm }) => (
               <Form>
                 <Stack
                   direction="column"
                   spacing={1.5}
                 >
-                  {loginError || Object.values(errors).at(0)}<br />
-                  <TextField
-                    type="text"
-                    label="Username"
-                    value={values.username}
-                    variant="standard"
-                    onChange={(event) => formik.setFieldValue('username', event.target.value)}
-                    onBlur={formik.handleBlur}
-                    error={!!errors.username && formik.touched.username}
-                  />
+                  <p>{loginError || Object.values(errors).at(0)}</p>
+                  <Field name="username">
+                    {({ field, meta }: FieldProps<LoginFormValues>) => (
+                      <TextField
+                        {...field}
+                        type="text"
+                        label="Username"
+                        variant="standard"
+                        onEscape={(event) => (event.target as any).blur()}
+                        onEnter={submitForm}
+                        error={meta.touched && !!meta.error}
+                      />
+                    )}
+                  </Field>
                   <PasswordField
                     variant="standard"
                     label="Password"
@@ -122,7 +136,7 @@ export default function LoginPage() {
                   />
                   <Button
                     type="submit"
-                    disabled={formik.isSubmitting}
+                    disabled={isSubmitting}
                   >Sign In
                   </Button>
                 </Stack>

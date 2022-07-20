@@ -6,7 +6,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
 import Box from '../../common/components/Box';
-import { LunchHitchOrder } from '../../prisma';
+import type { LunchHitchOrder } from '../../prisma/types';
 
 export const OrderEnumerator = ({ order }: { order: LunchHitchOrder}) => (
   <ol>

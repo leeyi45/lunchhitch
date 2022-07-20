@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import { Shop } from '@prisma/client';
 
 import { useNullableState } from '../../common';
-import { LunchHitchCommunity } from '../../prisma';
+import type { LunchHitchCommunity } from '../../prisma/types';
 
 import styles from './orders.module.css';
 

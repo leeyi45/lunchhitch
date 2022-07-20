@@ -6,6 +6,7 @@ import Stack from '@mui/material/Stack';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { FirebaseError } from 'firebase/app';
 import { Form, Formik, useField } from 'formik';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import * as yup from 'yup';
 
@@ -212,6 +213,9 @@ export default function SignUpPage() {
         signupSuccess: false,
       }}
     >
+      <Head>
+        <title>Sign up for a LunchHitch account!</title>
+      </Head>
       <ConfirmPopover
         name="signupSuccess"
         confirmButton={false}

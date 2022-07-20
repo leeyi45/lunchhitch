@@ -12,7 +12,8 @@ import AuthSelector from '../../common/auth_selector';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
 import { LinkedPopover, PopoverContainer } from '../../common/components/popovers';
-import prisma, { LunchHitchCommunity } from '../../prisma';
+import prisma from '../../prisma';
+import type { LunchHitchCommunity } from '../../prisma/types';
 
 import FulFillForm from './fulfill_form';
 import FulfilledDisplay from './fulfilled_display';

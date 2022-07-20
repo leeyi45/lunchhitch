@@ -9,7 +9,8 @@ import { UserInfo } from '@prisma/client';
 import {
   Field, FieldProps, Form, Formik,
 } from 'formik';
-import { GetServerSideProps } from 'next';
+import type { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import Link from 'next/link';
 import * as yup from 'yup';
 
@@ -141,7 +142,7 @@ function UserResetPage({ user }: { user: UserInfo }) {
           validateOnChange={false}
           validateOnBlur={false}
         >
-          {({ values, errors, ...formik }) => (
+          {({ values: { oldPass, newPass, repeatPass }, errors, resetForm }) => (
             <>
               <p
                 style={{
@@ -163,30 +164,24 @@ function UserResetPage({ user }: { user: UserInfo }) {
                       marginTop: '15px',
                     }}
                     label="Current Password"
-                    value={values.oldPass}
-                    onChange={(event) => formik.setFieldValue('oldPass', event.target.value)}
-                    error={Boolean(errors.oldPass)}
+                    value={oldPass}
                     name="oldPass"
                   />
                   <PasswordField
                     className={style.PasswordField}
                     label="New Password"
-                    value={values.newPass}
-                    onChange={(event) => formik.setFieldValue('newPass', event.target.value)}
-                    error={Boolean(errors.newPass)}
+                    value={newPass}
                     name="newPass"
                   />
                   <PasswordField
                     className={style.PasswordField}
                     label="Repeat New Password"
-                    value={values.repeatPass}
-                    onChange={(event) => formik.setFieldValue('repeatPass', event.target.value)}
-                    error={Boolean(errors.repeatPass)}
+                    value={repeatPass}
                     name="repeatPass"
                   />
                   <div>
                     <Button
-                      onClick={() => formik.resetForm()}
+                      onClick={() => resetForm()}
                     >Clear
                     </Button>
                     <Button type="submit">
@@ -212,6 +207,9 @@ type PageProps = {
 export default function ResetPage({ user }: PageProps) {
   return (
     <Stack>
+      <Head>
+        <title>Reset Password</title>
+      </Head>
       <NavBar user={user} />
       {user ? <UserResetPage user={user} /> : <NoUserResetPage />}
     </Stack>

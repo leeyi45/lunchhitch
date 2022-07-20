@@ -27,6 +27,12 @@ export { FIREBASE_AUTH };
 export function firebaseErrorHandler(error: firebase.FirebaseError, codes: { [code: string]: string }) {
   const errorCode = error.code.match(/auth\/(.+)/);
 
+  // eslint-disable-next-line no-param-reassign
+  codes = {
+    ...codes,
+    'network-request-failed': 'Unable to reach Firebase servers!',
+  };
+
   if (errorCode && codes[errorCode[1]]) return codes[errorCode[1]];
   return `Unexpected error: '${errorCode}'`;
 }

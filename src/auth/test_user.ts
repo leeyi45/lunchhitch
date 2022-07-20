@@ -1,4 +1,4 @@
-import { LunchHitchUser } from '.';
+import type { LunchHitchUser } from './types';
 
 /**
  * A set of credentials that can be used for testing without signing in
