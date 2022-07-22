@@ -84,6 +84,7 @@ export default function PaymentPage() {
   const [cancel, setCancel] = React.useState(false);
   const [disable, setDisabled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [otw] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -195,6 +196,7 @@ export default function PaymentPage() {
                     disabled
                     inputProps={{ 'aria-label': 'ant design' }}
                     color="success"
+                    checked={otw}
                   />
                 </Tooltip>
                 <TwoWheelerIcon />
@@ -214,7 +216,9 @@ export default function PaymentPage() {
         </CardContent>
         <Divider />
         <CardActions>
-          <Button variant="outlined" onClick={handleCancel} sx={{ fontFamily: 'raleway', color: '#faa7a7', marginInline: '55px' }}>Cancel Order</Button>
+          <Tooltip title="Once the Fulfiller is on the way, you cannot cancel the order">
+            <Button variant="outlined" onClick={handleCancel} sx={{ fontFamily: 'raleway', color: '#faa7a7', marginInline: '55px' }} disabled={otw}>Cancel Order</Button>
+          </Tooltip>
           <Dialog
             open={cancel}
             onClose={handleUncancel}

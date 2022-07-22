@@ -85,6 +85,8 @@ export default function PaymentPage() {
   const [open, setOpen] = React.useState(false);
   const [complete, setComplete] = React.useState(false);
   const [cancel, setCancel] = React.useState(false);
+  const [report, setReport] = React.useState(false);
+  const [paid, setPaid] = React.useState(false);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -117,6 +119,19 @@ export default function PaymentPage() {
 
   const handleUncancel = () => {
     setCancel(false);
+  };
+
+  const handleReport = () => {
+    setReport(true);
+  };
+
+  const handleUnreport = () => {
+    setReport(false);
+  };
+
+  const handleReported = () => {
+    setPaid(false);
+    setReport(false);
   };
 
   return (
@@ -191,6 +206,7 @@ export default function PaymentPage() {
                   disabled
                   inputProps={{ 'aria-label': 'ant design' }}
                   color="success"
+                  checked={paid}
                 />
                 <PaidIcon />
                 <Typography sx={{ fontFamily: 'raleway' }}>Paid</Typography>
@@ -221,36 +237,45 @@ export default function PaymentPage() {
             <Button
               variant="outlined"
               sx={{
-                fontFamily: 'raleway', height: '30%', marginInline: '20px', marginBlock: '31px', color: '#50C878',
+                fontFamily: 'raleway', height: '30%', marginInline: '20px', marginBlock: '18px', color: '#fcc590',
               }}
-              onClick={handleComplete}
-            >Complete Order
+              onClick={handleReport}
+            >Report incorrect payment
             </Button>
             <Dialog
-              open={complete}
-              onClose={handleUncomplete}
+              open={report}
+              onClose={handleUnreport}
               aria-labelledby="alert-dialog-title"
               aria-describedby="alert-dialog-description"
             >
               <DialogTitle id="alert-dialog-title">
-                Order completed?
+                Report payment?
               </DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                  Once you have correctly delivered the food, select Confirm.
-                  Thank you for using Lunch Hitch!
+                  If the orderer has paid the wrong amount, select Confirm to prompt them to pay again.
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button onClick={handleUncomplete} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
-                <Button href="/" autoFocus style={{ color: '#50C878' }}>Confirm</Button>
+                <Button onClick={handleUnreport} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+                <Button onClick={handleReported} autoFocus style={{ color: '#50C878' }}>Confirm</Button>
               </DialogActions>
             </Dialog>
           </Stack>
         </CardContent>
         <Divider />
         <CardActions>
-          <Button variant="outlined" onClick={handleCancel} sx={{ fontFamily: 'raleway', color: '#faa7a7', marginInline: '55px' }}>Cancel Order</Button>
+          <Tooltip title="If Orderer has paid, you can not cancel the order">
+            <Button
+              variant="outlined"
+              onClick={handleCancel}
+              sx={{
+                fontFamily: 'raleway', color: '#faa7a7', width: '150px', marginInline: '10px',
+              }}
+              disabled={paid}
+            >Cancel Order
+            </Button>
+          </Tooltip>
           <Dialog
             open={cancel}
             onClose={handleUncancel}
@@ -271,7 +296,35 @@ export default function PaymentPage() {
               <Button href="/" autoFocus style={{ color: '#50C878' }}>Confirm</Button>
             </DialogActions>
           </Dialog>
-          <p style={{ marginLeft: '20px' }}> View Order Details</p>
+          <Button
+            variant="outlined"
+            sx={{
+              fontFamily: 'raleway', color: '#50C878', width: '150px',
+            }}
+            onClick={handleComplete}
+          >Complete Order
+          </Button>
+          <Dialog
+            open={complete}
+            onClose={handleUncomplete}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              Order completed?
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Once you have correctly delivered the food, select Confirm.
+                Thank you for using Lunch Hitch!
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleUncomplete} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+              <Button href="/" autoFocus style={{ color: '#50C878' }}>Confirm</Button>
+            </DialogActions>
+          </Dialog>
+          <p style={{ marginLeft: '20px', width: '200px' }}> View Order Details</p>
           <ExpandMore
             expand={expanded}
             onClick={handleExpandClick}
