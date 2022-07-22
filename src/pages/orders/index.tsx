@@ -1,7 +1,10 @@
 /* eslint-disable no-empty-pattern */
 import React from 'react';
+import CheckIcon from '@mui/icons-material/Check';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
 import Stack from '@mui/material/Stack';
 import { Shop } from '@prisma/client';
 import { GetServerSideProps } from 'next';
@@ -30,6 +33,11 @@ type Props = {
 const OrdersPage = ({ communities }: Props) => {
   const [shop, setShop] = React.useState<Shop | null>(null);
   const router = useRouter();
+  const [selected, setSelected] = React.useState(false);
+
+  const handleSelected = () => {
+    setSelected(true);
+  };
 
   return (
     <div className={styles.orders}>
@@ -66,9 +74,12 @@ const OrdersPage = ({ communities }: Props) => {
                 </Stack>
               </LinkedPopover>
               <Stack direction="column">
+                <h1 style={{ color: '#50C878', textAlign: 'center', paddingTop: '10%' }}>Choose your community and shop to start!</h1>
                 <div style={{
                   paddingLeft: '20px',
                   paddingRight: '20px',
+                  marginBlock: '50px',
+                  height: '50vh',
                 }}
                 >
                   <ShopSelector
@@ -76,6 +87,11 @@ const OrdersPage = ({ communities }: Props) => {
                     value={shop}
                     onChange={setShop}
                   />
+                  <Collapse in={!!shop} sx={{ width: '11%', paddingTop: '20px', marginInline: '44.5%' }}>
+                    <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
+                      Scroll down!
+                    </Alert>
+                  </Collapse>
                 </div>
                 <Stack direction="row">
                   <Box style={{ backgroundColor: 'rgba(255, 219, 184, 0.9)' }}>
