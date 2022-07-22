@@ -33,11 +33,6 @@ type Props = {
 const OrdersPage = ({ communities }: Props) => {
   const [shop, setShop] = React.useState<Shop | null>(null);
   const router = useRouter();
-  const [selected, setSelected] = React.useState(false);
-
-  const handleSelected = () => {
-    setSelected(true);
-  };
 
   return (
     <div className={styles.orders}>
