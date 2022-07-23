@@ -63,9 +63,9 @@ export default function NavBar({ user }: NavbarProps) {
                 width="225px"
                 style={{ paddingRight: '20px' }}
               />
-              <Button className={styles.Button}><Link href="/">Home</Link></Button>
-              <Button className={styles.Button}><Link href="/orders">New Orders</Link></Button>
-              <Button className={styles.Button}><Link href="/suggestions">Suggestions</Link></Button>
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/">Home</Link></Button>
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/orders">New Orders</Link></Button>
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/suggestions">Suggestions</Link></Button>
             </Typography>
           ) : (
             <Typography
@@ -129,6 +129,10 @@ export default function NavBar({ user }: NavbarProps) {
                 </MenuItem>),
               (
                 <MenuItem key={1}>
+                  <Link href="https://teamby.notion.site/User-s-Guide-a9070e41ead948418c3a983ba37d0049"><Button>User Guide</Button></Link>
+                </MenuItem>),
+              (
+                <MenuItem key={2}>
                   <Button onClick={() => {
                     signOut();
                     router.push('/');

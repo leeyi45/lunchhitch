@@ -27,6 +27,7 @@ type Props = {
 
 export default function FulfilledDisplay({ Async }: Props) {
   return (
+<<<<<<< HEAD
     <Box>
       <AsyncWrapper<LunchHitchOrder[]> Async={Async}>
         {(data, { run }) => (
@@ -36,7 +37,7 @@ export default function FulfilledDisplay({ Async }: Props) {
             header={(
               <Stack direction="row" spacing={1}>
                 <h2 style={{ color: '#47b16a' }}>Orders you have to fulfill!</h2>
-                <TooltipButton
+               <TooltipButton
                   style={{
                     float: 'right',
                   }}

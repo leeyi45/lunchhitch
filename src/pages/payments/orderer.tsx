@@ -11,6 +11,7 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
+import Checkbox from '@mui/material/Checkbox';
 import Collapse from '@mui/material/Collapse';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -18,7 +19,9 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Divider from '@mui/material/Divider';
+import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
+import Rating from '@mui/material/Rating';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import Switch from '@mui/material/Switch';
@@ -84,6 +87,9 @@ export default function PaymentPage() {
   const [cancel, setCancel] = React.useState(false);
   const [disable, setDisabled] = React.useState(false);
   const [open, setOpen] = React.useState(false);
+  const [otw] = React.useState(false);
+  const [complete, setComplete] = React.useState(false);
+  const [value, setValue] = React.useState<number | null>(0);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -108,6 +114,14 @@ export default function PaymentPage() {
 
   const handleUncancel = () => {
     setCancel(false);
+  };
+
+  const handleComplete = () => {
+    setComplete(true);
+  };
+
+  const handleUncomplete = () => {
+    setComplete(false);
   };
 
   return (
@@ -185,6 +199,9 @@ export default function PaymentPage() {
                 </Tooltip>
                 <PaidIcon />
                 <Typography sx={{ fontFamily: 'raleway' }}>Paid</Typography>
+                <Tooltip title="Fulfiller will check this once they have accepted your payment">
+                  <FormControlLabel disabled control={<Checkbox />} label="Payment accepted" labelPlacement="start" style={{ marginLeft: '25px', fontFamily: 'raleway' }} />
+                </Tooltip>
               </Stack>
               <Typography sx={{ fontFamily: 'raleway', fontWeight: 'bold' }}>Fulfiller delivery status:</Typography>
               <Stack direction="row" spacing={1} alignItems="center">
@@ -195,6 +212,7 @@ export default function PaymentPage() {
                     disabled
                     inputProps={{ 'aria-label': 'ant design' }}
                     color="success"
+                    checked={otw}
                   />
                 </Tooltip>
                 <TwoWheelerIcon />
@@ -214,7 +232,17 @@ export default function PaymentPage() {
         </CardContent>
         <Divider />
         <CardActions>
-          <Button variant="outlined" onClick={handleCancel} sx={{ fontFamily: 'raleway', color: '#faa7a7', marginInline: '55px' }}>Cancel Order</Button>
+          <Tooltip title="Once the Fulfiller is on the way, you cannot cancel the order">
+            <Button
+              variant="outlined"
+              onClick={handleCancel}
+              sx={{
+                fontFamily: 'raleway', color: '#faa7a7', width: '150px', marginInline: '10px',
+              }}
+              disabled={otw}
+            >Cancel Order
+            </Button>
+          </Tooltip>
           <Dialog
             open={cancel}
             onClose={handleUncancel}
@@ -235,7 +263,45 @@ export default function PaymentPage() {
               <Button href="/" autoFocus style={{ color: '#50C878' }}>Confirm</Button>
             </DialogActions>
           </Dialog>
-          <p style={{ marginLeft: '20px' }}> View Order Details</p>
+          <Button
+            variant="outlined"
+            sx={{
+              fontFamily: 'raleway', color: '#50C878', width: '150px',
+            }}
+            onClick={handleComplete}
+          >Complete Order
+          </Button>
+          <Dialog
+            open={complete}
+            onClose={handleUncomplete}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              Order completed?
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Once your food has arrived, select Confirm.
+                Thank you for using Lunch Hitch!
+              </DialogContentText>
+              <div style={{ textAlign: 'center' }}>
+                <Typography component="legend">Rate your Fulfiller!</Typography>
+                <Rating
+                  name="simple-controlled"
+                  value={value}
+                  onChange={(_event, newValue) => {
+                    setValue(newValue);
+                  }}
+                />
+              </div>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleUncomplete} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+              <Button href="/" autoFocus style={{ color: '#50C878' }}>Confirm</Button>
+            </DialogActions>
+          </Dialog>
+          <p style={{ marginLeft: '20px', width: '200px' }}> View Order Details</p>
           <ExpandMore
             expand={expanded}
             onClick={handleExpandClick}

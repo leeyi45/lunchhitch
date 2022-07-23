@@ -117,19 +117,15 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
 
   return (
     <Stack
-      direction="column"
-      style={{
-        margin: '10px, 10px, 10px, 10px',
-        paddingTop: '20px',
-      }}
-      spacing={1}
+      direction="row"
+      spacing={11}
     >
       <Autocomplete
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         options={communities}
         onChange={(_event, value) => setCommunity(value)}
-        style={{ backgroundColor: 'rgba(152, 255, 152, 0.3)' }}
+        style={{ width: '45%', marginLeft: '2%' }}
         renderInput={(params) => (<TextField {...params} label="Community" />)}
         renderOption={(liProps, option) => (
           <Stack direction="row">
@@ -171,7 +167,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
                 style={{
                   fontFamily: 'raleway',
                   height: '100%',
-                  width: '50%',
+                  width: '100%',
                 }}
               >
                 <ImageSrc className={styles.comingSoon} />
@@ -206,18 +202,18 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
           setShop(value);
           onChange(value);
         }}
-        style={{ backgroundColor: 'rgba(152, 255, 152, 0.3)' }}
+        style={{ width: '45%', marginRight: '2%' }}
         options={community?.shops ?? []}
         renderInput={(params) => (<TextField {...params} label="Shop" />)}
         renderOption={(liProps, option) => (
           <Stack direction="row">
-            <ListItem {...liProps} style={{ width: '30%' }}>
+            <ListItem {...liProps}>
               <ImageButton
                 focusRipple
                 key={niqqis.title}
                 style={{
                   fontFamily: 'raleway',
-                  height: '230px',
+                  height: '260px',
                   width: '100%',
                 }}
               >
@@ -235,20 +231,20 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
                       pb: (theme) => `calc(${theme.spacing(1)} + 6px)`,
                     }}
                   >
-                    {option.name}
+                    <h1>{option.name}</h1>
                     <ImageMarked className="MuiImageMarked-root" />
                   </Typography>
                 </Image>
               </ImageButton>
             </ListItem>
-            <ListItem style={{ width: '30%' }}>
+            <ListItem>
               <ImageButton
                 focusRipple
                 key="coming soon"
                 style={{
                   fontFamily: 'raleway',
                   height: '100%',
-                  width: '80%',
+                  width: '100%',
                 }}
               >
                 <ImageSrc className={styles.comingSoon} />
