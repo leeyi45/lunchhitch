@@ -100,7 +100,7 @@ const OrdersPage = ({ communities, user }: Props) => {
           tabs={{
             'Make New Orders': (
               <Stack direction="column">
-                <h1 style={{ color: '#50C878', textAlign: 'center', paddingTop: '10%' }}>Choose your community and shop to start!</h1>
+                <h1 style={{ color: '#50C878', textAlign: 'center', paddingTop: '8%' }}>Choose your community and shop to start!</h1>
                 <div style={{
                   paddingLeft: '20px',
                   paddingRight: '20px',
@@ -120,10 +120,14 @@ const OrdersPage = ({ communities, user }: Props) => {
                   </Collapse>
                 </div>
                 <Stack direction="row">
-                  <FulfillerAsync user={user}>
-                    {({ run }) => (<FulFillForm run={run} Async={FulfillerAsync} shop={shop} />)}
-                  </FulfillerAsync>
-                  <MakeForm shop={shop} />
+                  <div style={{ width: '50%', marginLeft: '20px' }}>
+                    <FulfillerAsync user={user}>
+                      {({ run }) => (<FulFillForm run={run} Async={FulfillerAsync} shop={shop} />)}
+                    </FulfillerAsync>
+                  </div>
+                  <div style={{ width: '50%', paddingRight: '40px' }}>
+                    <MakeForm shop={shop} />
+                  </div>
                 </Stack>
               </Stack>
             ),

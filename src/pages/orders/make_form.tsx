@@ -121,8 +121,12 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               };
 
               return (
-                <Box style={{ backgroundColor: 'rgba(255, 217, 217, 0.9)' }}>
+                <Box style={{
+                  backgroundColor: 'rgba(255, 217, 217, 0.9)', height: '450px', overflow: 'hidden', overflowY: 'scroll', width: '100%',
+                }}
+                >
                   <Stack direction="column">
+                    <h2 style={{ color: '#47b16a', textAlign: 'center', paddingBottom: '15px' }}>Make an Order!</h2>
                     <Stack direction="row" spacing={1}>
                       <TextField
                         {...orderField}

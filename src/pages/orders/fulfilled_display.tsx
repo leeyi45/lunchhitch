@@ -27,7 +27,7 @@ type Props = {
 
 export default function FulfilledDisplay({ Async }: Props) {
   return (
-    <Box>
+    <Box style={{ backgroundColor: 'rgba(154, 184, 252, 0.5)' }}>
       <AsyncWrapper<LunchHitchOrder[]> Async={Async}>
         {(data, { run }) => (
           <OrdersDisplay

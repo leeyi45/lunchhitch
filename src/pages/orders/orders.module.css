@@ -9,6 +9,7 @@
 .eusoff {
     background: url('../../common/media/eusoff.jpg');
     background-position: center;
+    background-size: cover;
 }
 
 .niqqis {

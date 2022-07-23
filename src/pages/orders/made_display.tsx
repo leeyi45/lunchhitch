@@ -45,7 +45,7 @@ type Props = {
  */
 export default function MadeDisplay({ Async }: Props) {
   return (
-    <Box style={{ backgroundColor: 'rgba(230,230, 250, 0.9)' }}>
+    <Box style={{ backgroundColor: 'rgba(194, 194, 252, 0.6)' }}>
       <LinkedClickAwayPopover
         name="madeRemove"
       >

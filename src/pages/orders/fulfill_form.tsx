@@ -71,7 +71,10 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
   }, [run, shop]);
 
   return (
-    <Box style={{ backgroundColor: 'rgba(255, 219, 184, 0.9)' }}>
+    <Box style={{
+      backgroundColor: 'rgba(255, 219, 184, 0.9)', height: '450px', overflow: 'hidden', overflowY: 'scroll',
+    }}
+    >
       <form>
         <ConfirmPopover
           name="fulfillPopover"
@@ -100,8 +103,9 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
               empty={(<p>No Orders</p>)}
               header={(
                 <Stack direction="column">
+                  <h2 style={{ color: '#47b16a', textAlign: 'center' }}>Fulfill an Order!</h2>
                   <Stack direction="row" spacing={1}>
-                    <h2 style={{ color: '#47b16a' }}>Fulfill an Order!</h2>
+                    <p>Displaying orders from {shop?.name}</p>
                     <TooltipButton
                       style={{
                         float: 'right',
@@ -116,7 +120,6 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
                       <RefreshIcon />
                     </TooltipButton>
                   </Stack>
-                  <p>Displaying orders from {shop?.name}</p>
                 </Stack>
                   )}
               OrderHeader={OrderListItem}
