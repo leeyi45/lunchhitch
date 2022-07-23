@@ -1,6 +1,12 @@
 import React from 'react';
 import { AsyncConstructor } from 'react-async';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 import { Shop } from '@prisma/client';
 import { useFormik } from 'formik';
@@ -8,7 +14,7 @@ import { DateTime } from 'luxon';
 
 import { fetchApi } from '../../api_helpers';
 import Box from '../../common/components/Box';
-import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
+// import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 import type { LunchHitchOrder } from '../../prisma/types';
 
@@ -45,7 +51,12 @@ type FulfillFormValues = {
 }
 
 const FulFillForm = ({ Async, run, shop }: Props) => {
-  const { setPopover } = usePopoverContext();
+  // const { setPopover } = usePopoverContext();
+  const [accept, setAccept] = React.useState(false);
+
+  const handleUnaccept = () => {
+    setAccept(false);
+  };
 
   const {
     values: { order }, isSubmitting, submitForm, setFieldValue,
@@ -56,7 +67,7 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
     onSubmit: async ({ order: selectedOrder }) => {
       try {
         await fetchApi('orders/fulfill', { id: selectedOrder!.id });
-        setPopover('fulfillSuccess', true);
+        // setPopover('fulfillSuccess', true);
       } catch (error) {
         // TODO fulfill error handling
       }
@@ -76,6 +87,7 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
     }}
     >
       <form>
+        {/*
         <ConfirmPopover
           name="fulfillPopover"
           confirmButton="Accept Order"
@@ -93,6 +105,34 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
         >
           Accepted the order!
         </ConfirmPopover>
+        */}
+        <Dialog
+          open={accept}
+          onClose={handleUnaccept}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            Accept the following order?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {order && <OrderEnumerator order={order} />}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleUnaccept} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+            <Button
+              onClick={() => {
+                if (!isSubmitting) submitForm();
+                setAccept(false);
+              }}
+              autoFocus
+              style={{ color: '#50C878' }}
+            >Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
         <AsyncWrapper<LunchHitchOrder[]>
           initial={<p>Select a community and shop to view orders</p>}
           Async={Async}
@@ -125,7 +165,8 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
               OrderHeader={OrderListItem}
               onSelect={(selected) => {
                 setFieldValue('order', selected);
-                setPopover('fulfillPopover', true);
+                // setPopover('fulfillPopover', true);
+                setAccept(true);
               }}
             />
           )}

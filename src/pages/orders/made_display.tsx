@@ -3,6 +3,11 @@ import { AsyncConstructor, createInstance } from 'react-async';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 
 import { fetchApiThrowOnError } from '../../api_helpers';
@@ -50,23 +55,38 @@ export default function MadeDisplay({ Async }: Props) {
         name="madeRemove"
       >
         {({ state: order, setState }) => (
-          <Stack direction="column">
-            <h3>Remove this order?</h3>
-            <Stack direction="row">
-              <Button
-                onClick={() => fetchApiThrowOnError(`orders/delete?id=${order.id}`)}
-                color="success"
-              >
-                Confirm
-              </Button>
+          <Dialog
+            open
+            onClose={() => setState(false)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              Remove
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Remove this order?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
               <Button
                 onClick={() => setState(false)}
-                color="error"
-              >
-                Cancel
+                autoFocus
+                style={{ color: '#faa7a7' }}
+              >Close
               </Button>
-            </Stack>
-          </Stack>
+              <Button
+                onClick={() => {
+                  fetchApiThrowOnError(`orders/delete?id=${order.id}`);
+                  setState(false);
+                }}
+                autoFocus
+                style={{ color: '#50C878' }}
+              >Confirm
+              </Button>
+            </DialogActions>
+          </Dialog>
         )}
       </LinkedClickAwayPopover>
       <AsyncWrapper<LunchHitchOrder[]> Async={Async}>

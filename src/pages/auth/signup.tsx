@@ -107,17 +107,17 @@ const SignUpForm = () => {
           <Stack
             style={{
               left: '50%',
-              height: '90%',
+              height: '91%',
               position: 'absolute',
               transform: 'translateX(-50%)',
-              width: '30%',
+              width: '40%',
               alignItems: 'center',
               justifyContent: 'center',
             }}
             direction="column"
             spacing={1}
           >
-            <Box style={{ padding: '30px' }}>
+            <Box>
               <p style={{
                 color: '#50C878', fontSize: '30px', textAlign: 'center',
               }}
@@ -220,7 +220,7 @@ export default function SignUpPage() {
         name="signupSuccess"
         confirmButton={false}
         cancelButton="Close"
-        onClickAway={() => router.push('/profile')}
+        onClickAway={() => router.push('/auth/login')}
       >
         <DoneIcon />
         <p>Successfully signed up!</p>

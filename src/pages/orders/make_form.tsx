@@ -6,6 +6,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import Badge from '@mui/material/Badge';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -21,9 +27,6 @@ import * as yup from 'yup';
 
 import { fetchApiThrowOnError } from '../../api_helpers';
 import Box from '../../common/components/Box';
-import {
-  ConfirmPopover, LinkedClickAwayPopover, usePopoverContext,
-} from '../../common/components/popovers';
 import TooltipButton from '../../common/components/tooltip_button';
 
 type MakeFormValues = {
@@ -43,7 +46,30 @@ const Persister = () => {
 };
 
 export default function MakeForm({ shop }: { shop: Shop | null }) {
-  const { setPopover } = usePopoverContext();
+  // const { setPopover } = usePopoverContext();
+  const [clear, setClear] = React.useState(false);
+  const [submit, setSubmit] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
+
+  const handleClear = () => {
+    setClear(true);
+  };
+
+  const handleUnclear = () => {
+    setClear(false);
+  };
+
+  const handleSubmit = () => {
+    setSubmit(true);
+  };
+
+  const handleUnsubmit = () => {
+    setSubmit(false);
+  };
+
+  const handleUnsuccess = () => {
+    setSuccess(false);
+  };
 
   const [orderField, setOrderField] = React.useState({
     value: '',
@@ -51,8 +77,8 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
     helperText: '',
   });
 
-  const sessionValues = window.localStorage.getItem('makeform');
-  const initialValues = sessionValues === null ? { orders: [], deliverBy: DateTime.now() } : JSON.parse(sessionValues);
+  // const sessionValues = window.localStorage.getItem('makeform');
+  const initialValues = { orders: [], deliverBy: DateTime.now() };
 
   return (
     <Formik<MakeFormValues>
@@ -76,7 +102,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               orders: [],
             },
           });
-          setPopover('makeSuccess', true);
+          setSuccess(true);
         } catch (error: any) {
           // TODO submit error handling
           setOrderField({
@@ -277,17 +303,86 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       display: 'inline',
                     }}
                     >
+                      {/* clear orders */}
+                      <Dialog
+                        open={clear}
+                        onClose={handleUnclear}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                      >
+                        <DialogTitle id="alert-dialog-title">
+                          Clear Orders
+                        </DialogTitle>
+                        <DialogContent>
+                          <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to clear all orders?
+                          </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleUnclear} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+                          <Button
+                            onClick={() => {
+                              submitForm();
+                              setOrderField({
+                                value: '',
+                                error: false,
+                                helperText: '',
+                              });
+                              setClear(false);
+                            }}
+                            autoFocus
+                            style={{ color: '#50C878' }}
+                          >Confirm
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                      {/* submit orders */}
                       <TooltipButton
                         style={{
                           paddingLeft: '10px',
                         }}
                         disabled={orders.length === 0}
                         tooltip="Remove all orders"
-                        onClick={() => setPopover('makeFormClear', true)}
+                        onClick={handleClear}
                         startIcon={<DeleteIcon />}
                       >
                         Clear Orders
                       </TooltipButton>
+                      <Dialog
+                        open={submit}
+                        onClose={handleUnsubmit}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                      >
+                        <DialogTitle id="alert-dialog-title">
+                          Confirm the following order from {shop?.name}
+                        </DialogTitle>
+                        <DialogContent>
+                          <DialogContentText id="alert-dialog-description">
+                            <ol>
+                              {orders.map((order, i) => (<li key={i}>{order}</li>))}
+                            </ol>
+                          </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleUnclear} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+                          <Button
+                            onClick={() => {
+                              submitForm();
+                              setOrderField({
+                                value: '',
+                                error: false,
+                                helperText: '',
+                              });
+                              setSubmit(false);
+                              setSuccess(true);
+                            }}
+                            autoFocus
+                            style={{ color: '#50C878' }}
+                          >Confirm
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
                       <TooltipButton
                         disabled={
                         orders.length === 0
@@ -296,7 +391,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                         || Object.values(errors).length > 0
                       }
                         tooltip="Submit this order!"
-                        onClick={() => setPopover('makeFormConfirm', true)}
+                        onClick={handleSubmit}
                         endIcon={(
                           <Badge color="primary" badgeContent={orders.length}>
                             <ShoppingCartCheckoutIcon />
@@ -307,12 +402,38 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       </TooltipButton>
                       <p style={{ float: 'right', paddingRight: '20px' }}>{orders.length}/{MAX_ORDERS} Orders</p>
                     </div>
+                    {/* order succeeded */}
+                    <Dialog
+                      open={success}
+                      onClose={handleUnsuccess}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      <DialogTitle id="alert-dialog-title">
+                        Success
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                          <CheckCircleIcon />
+                          Successfully placed your order! <br />
+                          The app will automatically lead you to the payment page once someone has offered to fulfill your order.
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button
+                          onClick={handleUnsuccess}
+                          autoFocus
+                          style={{ color: '#50C878' }}
+                        >Close
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
                   </Stack>
                 </Box>
               );
             }}
           </FieldArray>
-          <ConfirmPopover
+          {/* <ConfirmPopover
             name="makeFormClear"
             confirmAction={() => {
               setFieldValue('orders', []);
@@ -348,7 +469,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               <CheckCircleIcon />
               Successfully placed your order!
             </Stack>
-          </LinkedClickAwayPopover>
+          </LinkedClickAwayPopover> */}
         </Form>
       )}
     </Formik>

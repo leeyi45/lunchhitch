@@ -35,7 +35,7 @@ export default function FulfilledDisplay({ Async }: Props) {
             empty={<p>You have no orders to fulfill</p>}
             header={(
               <Stack direction="row" spacing={1}>
-                <h2 style={{ color: '#47b16a' }}>Orders you have to fulfill!</h2>
+                <h2 style={{ color: '#47b16a' }}>Orders you have to fulfill</h2>
                 <TooltipButton
                   style={{
                     float: 'right',

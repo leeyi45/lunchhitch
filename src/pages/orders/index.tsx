@@ -99,7 +99,7 @@ const OrdersPage = ({ communities, user }: Props) => {
         <Tabs
           tabs={{
             'Make New Orders': (
-              <Stack direction="column">
+              <Stack direction="column" sx={{ paddingBottom: '16vh' }}>
                 <h1 style={{ color: '#50C878', textAlign: 'center', paddingTop: '8%' }}>Choose your community and shop to start!</h1>
                 <div style={{
                   paddingLeft: '20px',
