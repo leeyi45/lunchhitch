@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { LunchHitchUser } from '../auth';
+import type { LunchHitchUser } from '../auth/types';
 import AuthSelector from '../common/auth_selector';
 import Navbar from '../common/components/navbar';
 

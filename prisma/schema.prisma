@@ -25,18 +25,19 @@ model Community {
 enum OrderState {
   ORDERING
   DELIVERING
+  UNKNOWN
 }
 
 model Order {
-  id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  from        UserInfo  @relation(name: "orderer", fields: [fromId], references: [username])
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  from        UserInfo   @relation(name: "orderer", fields: [fromId], references: [username])
   fromId      String
   orders      String[]
-  state       OrderState
-  shop        Shop      @relation(fields: [shopId], references: [id])
-  shopId      String    @db.ObjectId
+  state       OrderState @default(UNKNOWN)
+  shop        Shop       @relation(fields: [shopId], references: [id])
+  shopId      String     @db.ObjectId
   deliverBy   DateTime
-  fulfiller   UserInfo? @relation(name: "fulfiller", fields: [fulfillerId], references: [username])
+  fulfiller   UserInfo?  @relation(name: "fulfiller", fields: [fulfillerId], references: [username])
   fulfillerId String?
 }
 

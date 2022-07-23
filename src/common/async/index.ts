@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 /**
  * Represents the state of an async operation
  */
-export type AsyncState<TResult, TFunc extends (...args: any) => Promise<TResult>> = ({
+export type AsyncState<TResult, TParams> = ({
   state: 'loading' | 'waiting';
   result: undefined;
 } | {
@@ -16,7 +16,7 @@ export type AsyncState<TResult, TFunc extends (...args: any) => Promise<TResult>
   /**
    * Execute the promiseFn again with the given arguments
    */
-  call: (...args: Parameters<TFunc>) => void;
+  call: (...args: TParams[]) => void;
 
   /**
    * Cancel any ongoing promises
@@ -29,15 +29,14 @@ export type AsyncState<TResult, TFunc extends (...args: any) => Promise<TResult>
  * @param promiseFunc Function that returns a promise resolving to the desired data
  * @returns AsyncState object
  */
-export default function useAsync<TFunc extends(...args: any) => Promise<any>>(
-  promiseFunc: TFunc): AsyncState<Awaited<ReturnType<TFunc>>, TFunc> {
-  type Result = Awaited<ReturnType<TFunc>>;
-
+export default function useAsync<TResult, TParams>(
+  promiseFunc: (...params: TParams[]) => Promise<TResult>,
+): AsyncState<TResult, TParams> {
   const [state, setState] = useState<'loading' | 'errored' | 'done' | 'waiting'>('waiting');
-  const [result, setResult] = useState<Result | any>(undefined);
+  const [result, setResult] = useState<TResult | any>(undefined);
 
   const abortControllerRef = useRef(new AbortController());
-  const fnWrapperRef = useRef((...args: Parameters<TFunc>) => new Promise<Result>((resolve, reject) => {
+  const fnWrapperRef = useRef((...args: TParams[]) => new Promise<TResult>((resolve, reject) => {
     promiseFunc(...args)
       .then(resolve)
       .catch(reject)

@@ -50,18 +50,21 @@ export const wrapWithQuery = <T, U>({
         const handler = handlers[req.method as string];
 
         if (!handler) {
-          res.status(405).json({ result: 'error', value: 'Unsupported HTTP method' });
+          res.status(405).json({ result: 'error', value: `Unsupported HTTP method: '${req.method}'` });
           return;
         }
 
         const result = await wrapIntoPromise(handler({
           data: req.body as U, req, res, params: queryParams,
         }));
+
+        console.log(`API route ${req.url} received a request`);
         if (result !== undefined) res.status(200).json(result);
       } catch (error) {
         if (errorHandler) errorHandler(error, res);
         else {
           res.status(500).json({ result: 'error', value: error } as APIResult<T>);
+          console.log(error);
         }
       }
     }
@@ -70,31 +73,22 @@ export const wrapWithQuery = <T, U>({
 /**
  * Wrap an API route handler to require authentication. The API route will return a 401 if the user is unauthorized
  */
-export const wrapWithAuth = <T, U>({ handlers: apiHandlers, ...apiParams }: APIParams<T>) => wrapWithQuery<T, U>({
-  ...apiParams,
-  handlers: Object.entries(apiHandlers).reduce((result, [method, handler]) => ({
-    ...result,
-    [method]: !handler ? undefined : async ({
-      data, req, res, params,
-    }) => {
-      if (process.env.NODE_ENV !== 'production' && req.query.force === '') {
-        return wrapIntoPromise(handler({
-          data, req, res, params: { username: testUser.username, ...params },
-        }));
-      }
+export const wrapWithAuth = <T, U>({ handlers: apiHandlers, ...apiParams }: APIParams<T>) => async (req: NextApiRequest, res: NextApiResponse) => {
+  const username = (req.query.force === '' && process.env.NODE_ENV !== 'production') ? testUser.username : await getSession(req.cookies.token);
 
-      const username = await getSession(req.cookies.token);
-      if (!username) {
-        res.status(401).json({ result: 'error', value: 'Must be logged in' });
-        return undefined as never;
-      }
-      return wrapIntoPromise(handler({
-        data, req, res, params: { username, ...params },
-      }));
-    },
-  }), {} as APIParams<T>['handlers']),
+  if (!username) {
+    res.status(401).json({ result: 'error', value: 'Must be logged in' });
+    return undefined as never;
+  }
 
-});
+  return wrapWithQuery<T, U>({
+    ...apiParams,
+    handlers: Object.entries(apiHandlers).reduce((result, [method, handler]) => ({
+      ...result,
+      [method]: handler ? async ({ params, ...others }: Parameters<Handler<T, U>>[0]) => handler({ ...others, params: { username, ...params } }) : undefined,
+    }), {}),
+  })(req, res);
+};
 
 export const prismaHandler = <TResult, TData>(func: (...args: Parameters<Handler<TResult, TData>>) => Promise<TResult | null>): Handler<TResult, TData> => async (params) => {
   const value = await func(params);
