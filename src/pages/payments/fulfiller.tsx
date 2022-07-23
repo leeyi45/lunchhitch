@@ -337,7 +337,9 @@ export default function PaymentPage() {
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
             <Typography paragraph>
-              insert dishes in the order
+              1. 2 Cheese pratas <br />
+              2. maggie pattaya white <br />
+              3. ice milo <br />
             </Typography>
           </CardContent>
         </Collapse>

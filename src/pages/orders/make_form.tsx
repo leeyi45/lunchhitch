@@ -1,6 +1,5 @@
 import React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveIcon from '@mui/icons-material/Remove';
@@ -414,7 +413,6 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       </DialogTitle>
                       <DialogContent>
                         <DialogContentText id="alert-dialog-description">
-                          <CheckCircleIcon />
                           Successfully placed your order! <br />
                           The app will automatically lead you to the payment page once someone has offered to fulfill your order.
                         </DialogContentText>

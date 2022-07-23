@@ -129,7 +129,7 @@ export default function PaymentPage() {
       <Card sx={{ maxWidth: '500px' }}>
         <CardHeader
           title="Order for Niqqi's"
-          subheader="Pay to:  " // todo: add fulfiller's phone number
+          subheader="Pay to:  94382947" // todo: add fulfiller's phone number
         />
         <Divider />
         <CardContent>
@@ -314,7 +314,9 @@ export default function PaymentPage() {
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
             <Typography paragraph>
-              insert dishes in the order
+              1. 2 Cheese pratas <br />
+              2. maggie pattaya white <br />
+              3. ice milo <br />
             </Typography>
           </CardContent>
         </Collapse>
