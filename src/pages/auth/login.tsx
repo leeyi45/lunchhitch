@@ -62,6 +62,7 @@ export default function LoginPage() {
           justifyContent: 'center',
           position: 'absolute',
           paddingBottom: '100px',
+          paddingTop: '5%',
         }}
         spacing={2}
       >
