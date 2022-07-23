@@ -127,6 +127,7 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
                 if (!isSubmitting) submitForm();
                 setAccept(false);
               }}
+              href="/payments/fulfiller"
               autoFocus
               style={{ color: '#50C878' }}
             >Confirm

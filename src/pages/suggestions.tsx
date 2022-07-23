@@ -62,7 +62,7 @@ export default function Suggestions() {
             }}
             >
               <h1 style={{ color: '#50C878' }}>Know a hidden gem in your community? Share it with us!</h1>
-              <Typography variant="subtitle2" style={{ color: '#808080', paddingBottom: '10px', fontFamily: 'raleway' }}>Please add a short description of the shop as well! You can include its main cuisine, location, signature dishes, as well as why you would like to suggest this shop to your community.</Typography>
+              <Typography variant="subtitle2" style={{ color: '#808080', paddingBottom: '10px', fontFamily: 'raleway' }}>Please add a short description of the shop as well! <br />You can include its main cuisine, location, signature dishes, as well as why you would like to suggest this shop to your community.</Typography>
               <Stack direction="column" style={{ width: '90%' }}>
                 <Stack direction="row" style={{ lineHeight: '5px', justifyContent: 'center' }}>
                   <p style={{ fontSize: '20px', paddingRight: '10px' }}>Shop Name:</p>
@@ -107,8 +107,8 @@ export default function Suggestions() {
                     </DialogTitle>
                     <DialogContent>
                       <DialogContentText id="alert-dialog-description">
-                        Thank you for contributing to our site database.
-                        Site admins will look into your suggestion and might choose to bring it to the site.
+                        Thank you for contributing to our site database.<br />
+                        Site admins will look into your suggestion and might choose to bring it to the site.<br />
                         Be sure to look out for any updates!
                       </DialogContentText>
                     </DialogContent>

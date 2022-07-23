@@ -119,7 +119,7 @@ export default function SwipeableEdgeDrawer(props: Props) {
         }}
       />
       <Box sx={{ textAlign: 'center', pt: 1 }}>
-        <Button variant="outlined" onClick={toggleDrawer(true)} style={{ color: '#50C878', backgroundColor: 'white' }}>Food Gallery</Button>
+        <Button variant="outlined" onClick={toggleDrawer(true)} style={{ color: '#50C878', backgroundColor: 'white' }}>Open Food Gallery</Button>
       </Box>
       <SwipeableDrawer
         container={container}
