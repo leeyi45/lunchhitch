@@ -5,7 +5,7 @@ import { useSession } from '../../auth/auth_provider';
 import testUser from '../../auth/test_user';
 
 import ErrorScreen from './error_screen';
-import LoadingScreen from './loading_screen';
+import LoadingScreen from '../loading_screen';
 
 type Props = ({
   /**

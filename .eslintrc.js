@@ -83,4 +83,17 @@ module.exports = {
       },
     },
   },
+  overrides: [
+    {
+      extends: [
+        'airbnb',
+        'plugin:jest/recommended',
+      ],
+      files: ['src/testing/**.ts', '**/*.test.ts', '**/*.test.tsx'],
+      env: {
+        jest: true,
+      },
+      plugins: ['jest'],
+    },
+  ],
 };
