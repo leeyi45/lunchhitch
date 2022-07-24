@@ -93,7 +93,30 @@ module.exports = {
       env: {
         jest: true,
       },
-      plugins: ['jest'],
+      plugins: [
+        'eslint-plugin-import',
+        'jest',
+      ],
+      settings: {
+        'import/resolver': {
+          node: {
+            extensions: ['.js', '.jsx', '.ts', '.tsx'],
+          },
+        },
+      },
+      rules: {
+        'import/extensions': [
+          'error',
+          'ignorePackages',
+          {
+            js: 'never',
+            jsx: 'never',
+            ts: 'never',
+            tsx: 'never',
+          },
+        ],
+        'no-underscore-dangle': 0,
+      },
     },
   ],
 };

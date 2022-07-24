@@ -20,7 +20,7 @@
   "include": [
     "next-env.d.ts", 
     ".eslintrc.js",
-    "next.config.mjs",
+    "next.config.js",
     "testing/**/*.ts",
     "testing/**/*.js",
     "scripts/**.js",

@@ -1,10 +1,9 @@
 import { createMocks, RequestMethod } from 'node-mocks-http';
 
-import handler from '../create';
 import testUser from '../../../../auth/test_user';
 import type { APIRequest, APIResponse } from '../../../../testing/api_mocker';
-
-import { prismaMock } from '../../../../testing/singleton';
+// import { prismaMock } from '../../../../testing/singleton';
+import handler from '../create';
 
 jest.mock('../../../../firebase/admin', () => ({
   FIREBASE_ADMIN: {
@@ -25,8 +24,8 @@ const mockReq = (token: 'authorized' | 'unauthorized', method: RequestMethod = '
   body: testUser,
   cookies: {
     token,
-  }
-})
+  },
+});
 
 describe('Testing userinfo/create API route handler', () => {
   it('Creates a userinfo entry no issue', async () => {
@@ -43,14 +42,14 @@ describe('Testing userinfo/create API route handler', () => {
     await handler(req, res);
     expect(res.statusCode).toBe(401);
     expect(res._getJSONData()).toEqual({ result: 'error', value: 'Must be logged in' });
-  })
+  });
 
   it('should return a 405 if the HTTP method was unsupported', async () => {
     const { req, res } = mockReq('authorized');
 
     await handler(req, res);
     expect(res.statusCode).toBe(405);
-    expect(res._getJSONData()).toEqual({ result: 'error', value: `Unsupported HTTP method: 'PUT'` });
+    expect(res._getJSONData()).toEqual({ result: 'error', value: 'Unsupported HTTP method: \'PUT\'' });
   });
 
   it('should return 500 if the handler errors', async () => {
@@ -61,14 +60,12 @@ describe('Testing userinfo/create API route handler', () => {
       },
       cookies: {
         token: 'authorized',
-      }
-    })
-
+      },
+    });
 
     await handler(req, res);
     expect(res.statusCode).toBe(500);
     // TODO changed this to the prisma error message
-    expect(res._getJSONData()).toEqual({ result: 'error', value: `Unsupported HTTP method: 'PUT'` });
-  })
-})
-
+    expect(res._getJSONData()).toEqual({ result: 'error', value: 'Unsupported HTTP method: \'PUT\'' });
+  });
+});

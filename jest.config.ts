@@ -2,8 +2,13 @@
  * For a detailed explanation regarding each configuration property and type check, visit:
  * https://jestjs.io/docs/configuration
  */
+import nextJest from 'next/jest';
 
-export default {
+const createJestConfig = nextJest({
+  dir: './',
+});
+
+export default createJestConfig({
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -71,9 +76,10 @@ export default {
   // maxWorkers: "50%",
 
   // An array of directory names to be searched recursively up from the requiring module's location
-  // moduleDirectories: [
-  //   "node_modules"
-  // ],
+  moduleDirectories: [
+    "node_modules",
+    "<rootDir>/",
+  ],
 
   // An array of file extensions your modules use
   // moduleFileExtensions: [
@@ -144,7 +150,7 @@ export default {
   // snapshotSerializers: [],
 
   // The test environment that will be used for testing
-  testEnvironment: "node",
+  testEnvironment: "jest-environment-jsdom",
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
@@ -192,4 +198,4 @@ export default {
 
   // Whether to use watchman for file crawling
   // watchman: true,
-};
+});
