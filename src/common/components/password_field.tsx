@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import { useField } from 'formik';
 
-import TextField, { TextFieldProps } from '../components/textfield';
+import TextField, { TextFieldProps } from './textfield';
 
 type Props = Omit<TextFieldProps, 'type' | 'InputProps'> & { name: string, showError?: boolean };
 

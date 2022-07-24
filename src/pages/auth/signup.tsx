@@ -17,7 +17,7 @@ import NavBar from '../../common/components/navbar';
 import {
   ConfirmPopover, PopoverContainer, usePopover,
 } from '../../common/components/popovers';
-import PasswordField from '../../common/formik_wrapper/password_field';
+import PasswordField from '../../common/components/password_field';
 import LoadingScreen from '../../common/loading_screen';
 
 type SignupFieldProps = {

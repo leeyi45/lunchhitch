@@ -15,7 +15,7 @@ import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
 import TextField from '../../common/components/textfield';
-import PasswordField from '../../common/formik_wrapper/password_field';
+import PasswordField from '../../common/components/password_field';
 import { firebaseErrorHandler } from '../../firebase';
 
 type LoginFormValues = {
