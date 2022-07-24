@@ -1,7 +1,7 @@
 import React from 'react';
 import DinnerDiningTwoToneIcon from '@mui/icons-material/DinnerDiningTwoTone';
 import PeopleTwoToneIcon from '@mui/icons-material/PeopleTwoTone';
-import { Typography } from '@mui/material';
+import Typography from '@mui/material/Typography';
 
 import styles from './NoUserHomePage.module.css';
 

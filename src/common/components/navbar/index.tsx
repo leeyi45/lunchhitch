@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 
 import { signOut } from '../../../auth';
-import { SessionUser } from '../..';
+import type { SessionUser } from '../..';
 import Logo from '../../media/logo.png';
 import LunchHitch from '../../media/lunchhitch2.png';
 

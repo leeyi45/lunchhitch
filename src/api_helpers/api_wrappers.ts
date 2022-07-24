@@ -2,13 +2,13 @@
  * Because this file imports functions from firebase admin, this file cannot be imported
  * by anything that is required client-side
  */
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 import testUser from '../auth/test_user';
 import { wrapIntoPromise } from '../common';
 import { getSession } from '../firebase/admin';
 
-import { APIParams, APIResult, Handler } from './types';
+import type { APIParams, APIResult, Handler } from './types';
 
 type Params = {
   [name: string]: string;

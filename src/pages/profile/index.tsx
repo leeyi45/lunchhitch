@@ -5,8 +5,8 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
-import { UserInfo } from '@prisma/client';
-import { GetServerSideProps } from 'next';
+import type { UserInfo } from '@prisma/client';
+import type { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 

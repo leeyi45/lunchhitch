@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncConstructor, createInstance } from 'react-async';
+import type { AsyncConstructor } from 'react-async';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Button from '@mui/material/Button';
@@ -11,20 +11,12 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 
 import { fetchApiThrowOnError } from '../../../api_helpers';
-import { LunchHitchOrder } from '../../../prisma/types';
+import type { LunchHitchOrder } from '../../../prisma/types';
 import Box from '../Box';
 import { LinkedClickAwayPopover, usePopover } from '../popovers';
 import TooltipButton from '../tooltip_button';
 
 import OrdersDisplay, { AsyncWrapper } from './orders_display';
-
-export const MadeAsync = createInstance<LunchHitchOrder[]>({
-  promiseFn: ({ user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
-    where: {
-      fromId: user.username,
-    },
-  }),
-});
 
 const MadeDisplayOrderHeader = ({ order }: { order: LunchHitchOrder}) => {
   const { setState } = usePopover('madeRemove');

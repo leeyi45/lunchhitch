@@ -5,7 +5,7 @@
 import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, updateProfile,
 } from '@firebase/auth';
-import { UserInfo } from '@prisma/client';
+import type { UserInfo } from '@prisma/client';
 
 import { fetchApiThrowOnError } from '../api_helpers';
 import { FIREBASE_AUTH } from '../firebase';

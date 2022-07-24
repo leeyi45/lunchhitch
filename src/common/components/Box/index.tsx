@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, PaperProps } from '@mui/material';
+import Paper, { PaperProps } from '@mui/material/Paper';
 
 import styles from './Box.module.css';
 
