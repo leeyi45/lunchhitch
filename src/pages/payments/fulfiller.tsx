@@ -139,7 +139,7 @@ export default function PaymentPage() {
       <Card sx={{ maxWidth: '500px' }}>
         <CardHeader
           title="Order for Niqqi's"
-          subheader="Deliver by: " // todo: add delivery time
+          subheader="Deliver by: 7/25/2022 01:10PM" // todo: add delivery time
         />
         <Divider />
         <CardContent>
@@ -164,7 +164,7 @@ export default function PaymentPage() {
               </DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                  Once you have checked that the total cost is correct, press confirm to send the fee to the orderer.
+                  Once you have checked that the total cost is correct, press confirm to send the fee to the orderer.<br />
                   No changes will be allowed after confirming.
                 </DialogContentText>
               </DialogContent>
@@ -178,7 +178,7 @@ export default function PaymentPage() {
             <TextField
               disabled
               id="outlined-read-only-input"
-              label="Await delivery location"
+              label="Await Delivery Location"
               style={{ width: '234px' }}
               InputProps={{
                 readOnly: true,
@@ -287,7 +287,7 @@ export default function PaymentPage() {
             </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                If you are sure about cancelling the order, select Confirm.
+                If you are sure about cancelling the order, select Confirm.<br />
                 Thank you for using Lunch Hitch!
               </DialogContentText>
             </DialogContent>
@@ -315,7 +315,7 @@ export default function PaymentPage() {
             </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                Once you have correctly delivered the food, select Confirm.
+                Once you have correctly delivered the food, select Confirm.<br />
                 Thank you for using Lunch Hitch!
               </DialogContentText>
             </DialogContent>
@@ -337,7 +337,9 @@ export default function PaymentPage() {
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
             <Typography paragraph>
-              insert dishes in the order
+              1. 2 Cheese pratas <br />
+              2. maggie pattaya white <br />
+              3. ice milo <br />
             </Typography>
           </CardContent>
         </Collapse>

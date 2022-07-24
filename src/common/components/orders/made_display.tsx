@@ -3,13 +3,18 @@ import { AsyncConstructor, createInstance } from 'react-async';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 
-import { fetchApiThrowOnError } from '../../api_helpers';
-import Box from '../../common/components/Box';
-import { LinkedClickAwayPopover, usePopover } from '../../common/components/popovers';
-import TooltipButton from '../../common/components/tooltip_button';
-import type { LunchHitchOrder } from '../../prisma/types';
+import { fetchApiThrowOnError } from '../../../api_helpers';
+import { LunchHitchOrder } from '../../../prisma/types';
+import Box from '../Box';
+import { LinkedClickAwayPopover, usePopover } from '../popovers';
+import TooltipButton from '../tooltip_button';
 
 import OrdersDisplay, { AsyncWrapper } from './orders_display';
 
@@ -45,28 +50,43 @@ type Props = {
  */
 export default function MadeDisplay({ Async }: Props) {
   return (
-    <Box style={{ backgroundColor: 'rgba(230,230, 250, 0.9)' }}>
+    <Box style={{ backgroundColor: 'rgba(194, 194, 252, 0.6)' }}>
       <LinkedClickAwayPopover
         name="madeRemove"
       >
         {({ state: order, setState }) => (
-          <Stack direction="column">
-            <h3>Remove this order?</h3>
-            <Stack direction="row">
-              <Button
-                onClick={() => fetchApiThrowOnError(`orders/delete?id=${order.id}`)}
-                color="success"
-              >
-                Confirm
-              </Button>
+          <Dialog
+            open
+            onClose={() => setState(false)}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              Remove
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Remove this order?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
               <Button
                 onClick={() => setState(false)}
-                color="error"
-              >
-                Cancel
+                autoFocus
+                style={{ color: '#faa7a7' }}
+              >Close
               </Button>
-            </Stack>
-          </Stack>
+              <Button
+                onClick={() => {
+                  fetchApiThrowOnError(`orders/delete?id=${order.id}`);
+                  setState(false);
+                }}
+                autoFocus
+                style={{ color: '#50C878' }}
+              >Confirm
+              </Button>
+            </DialogActions>
+          </Dialog>
         )}
       </LinkedClickAwayPopover>
       <AsyncWrapper<LunchHitchOrder[]> Async={Async}>

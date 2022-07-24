@@ -9,8 +9,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Shop } from '@prisma/client';
 
-import { useNullableState } from '../../common';
-import type { LunchHitchCommunity } from '../../prisma/types';
+import type { LunchHitchCommunity } from '../../../prisma/types';
+import { useNullableState } from '../..';
 
 import styles from './orders.module.css';
 
@@ -111,9 +111,6 @@ const ImageMarked = styled('span')(({ theme }) => ({
  */
 export default function ShopSelector({ communities, onChange, value }: Props) {
   const [community, setCommunity] = useNullableState<LunchHitchCommunity>();
-  const [shop, setShop] = useNullableState<Shop>(value);
-
-  React.useEffect(() => setShop(value), [value]);
 
   return (
     <Stack
@@ -199,7 +196,6 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         onChange={(_event, value) => {
-          setShop(value);
           onChange(value);
         }}
         style={{ width: '45%', marginRight: '2%' }}
@@ -269,7 +265,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
             </ListItem>
           </Stack>
         )}
-        value={shop}
+        value={value}
       />
     </Stack>
   );

@@ -1,11 +1,16 @@
 import React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
 import Badge from '@mui/material/Badge';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
@@ -14,17 +19,15 @@ import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { Shop } from '@prisma/client';
 import {
-  Field, FieldArray, FieldProps, Form, Formik, useFormikContext,
+  Field, FieldArray, FieldProps, Form, Formik, FormikContext, FormikContextType,
 } from 'formik';
 import { DateTime } from 'luxon';
 import * as yup from 'yup';
 
-import { fetchApiThrowOnError } from '../../api_helpers';
-import Box from '../../common/components/Box';
-import {
-  ConfirmPopover, LinkedClickAwayPopover, usePopoverContext,
-} from '../../common/components/popovers';
-import TooltipButton from '../../common/components/tooltip_button';
+import { fetchApiThrowOnError } from '../../../api_helpers';
+import Box from '../Box';
+import { connectPopover, usePopoverContext } from '../popovers';
+import TooltipButton from '../tooltip_button';
 
 type MakeFormValues = {
   orders: string[];
@@ -33,14 +36,19 @@ type MakeFormValues = {
 
 const MAX_ORDERS = 10;
 
-const Persister = () => {
-  const { values } = useFormikContext();
-  React.useEffect(() => () => {
-    window.localStorage.setItem('makeform', JSON.stringify(values));
-  }, [values]);
+class Persister extends React.Component {
+  componentWillUnmount() {
+    if (window) window.localStorage.setItem('makeform', JSON.stringify((this.context as FormikContextType<MakeFormValues>).values));
+  }
 
-  return null;
-};
+  render() {
+    return null;
+  }
+}
+
+Persister.contextType = FormikContext;
+
+const LinkedDialog = connectPopover(Dialog);
 
 export default function MakeForm({ shop }: { shop: Shop | null }) {
   const { setPopover } = usePopoverContext();
@@ -51,8 +59,22 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
     helperText: '',
   });
 
-  const sessionValues = window.localStorage.getItem('makeform');
-  const initialValues = sessionValues === null ? { orders: [], deliverBy: DateTime.now() } : JSON.parse(sessionValues);
+  let initialValues: MakeFormValues;
+
+  if (typeof window !== 'undefined') {
+    const sessionValues = window.localStorage.getItem('makeform');
+    if (sessionValues) {
+      const parsed = JSON.parse(sessionValues);
+      initialValues = {
+        ...parsed,
+        deliverBy: DateTime.fromISO(parsed.deliverBy),
+      };
+    } else {
+      initialValues = { orders: [], deliverBy: DateTime.now() };
+    }
+  } else {
+    initialValues = { orders: [], deliverBy: DateTime.now() };
+  }
 
   return (
     <Formik<MakeFormValues>
@@ -76,7 +98,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               orders: [],
             },
           });
-          setPopover('makeSuccess', true);
+          setPopover('makeFormSuccess', true);
         } catch (error: any) {
           // TODO submit error handling
           setOrderField({
@@ -121,8 +143,12 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               };
 
               return (
-                <Box style={{ backgroundColor: 'rgba(255, 217, 217, 0.9)' }}>
+                <Box style={{
+                  backgroundColor: 'rgba(255, 217, 217, 0.9)', height: '450px', overflow: 'hidden', overflowY: 'scroll', width: '100%',
+                }}
+                >
                   <Stack direction="column">
+                    <h2 style={{ color: '#47b16a', textAlign: 'center', paddingBottom: '15px' }}>Make an Order!</h2>
                     <Stack direction="row" spacing={1}>
                       <TextField
                         {...orderField}
@@ -273,6 +299,43 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       display: 'inline',
                     }}
                     >
+                      {/* clear orders */}
+                      <LinkedDialog
+                        name="makeFormClear"
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                      >
+                        {({ setState }) => (
+                          <>
+                            <DialogTitle id="alert-dialog-title">
+                              Clear Orders
+                            </DialogTitle>
+                            <DialogContent>
+                              <DialogContentText id="alert-dialog-description">
+                                Are you sure you want to clear all orders?
+                              </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                              <Button onClick={() => setState(false)} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+                              <Button
+                                onClick={() => {
+                                  setFieldValue('orders', []);
+                                  setOrderField({
+                                    value: '',
+                                    error: false,
+                                    helperText: 'Cleared all orders',
+                                  });
+                                  setState(false);
+                                }}
+                                autoFocus
+                                style={{ color: '#50C878' }}
+                              >Confirm
+                              </Button>
+                            </DialogActions>
+                          </>
+                        )}
+                      </LinkedDialog>
+                      {/* submit orders */}
                       <TooltipButton
                         style={{
                           paddingLeft: '10px',
@@ -284,6 +347,45 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       >
                         Clear Orders
                       </TooltipButton>
+                      <LinkedDialog
+                        name="makeFormConfirm"
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                      >
+                        {({ close }) => (
+                          <>
+                            <DialogTitle id="alert-dialog-title">
+                              Confirm the following order from {shop?.name}
+                            </DialogTitle>
+                            <DialogContent>
+                              <DialogContentText id="alert-dialog-description">
+                                <ol>
+                                  {orders.map((order, i) => (<li key={i}>{order}</li>))}
+                                </ol>
+                              </DialogContentText>
+                            </DialogContent>
+                            <DialogActions>
+                              <Button onClick={() => close()} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+                              <Button
+                                onClick={async () => {
+                                  await submitForm();
+                                  setOrderField({
+                                    value: '',
+                                    error: false,
+                                    helperText: '',
+                                  });
+                                  close();
+                                  // Open it after submit form finishes
+                                  // setPopover('makeFormSuccess', true);
+                                }}
+                                autoFocus
+                                style={{ color: '#50C878' }}
+                              >Confirm
+                              </Button>
+                            </DialogActions>
+                          </>
+                        )}
+                      </LinkedDialog>
                       <TooltipButton
                         disabled={
                         orders.length === 0
@@ -303,12 +405,40 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
                       </TooltipButton>
                       <p style={{ float: 'right', paddingRight: '20px' }}>{orders.length}/{MAX_ORDERS} Orders</p>
                     </div>
+                    {/* order succeeded */}
+                    <LinkedDialog
+                      name="makeFormSuccess"
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      {({ close }) => (
+                        <>
+                          <DialogTitle id="alert-dialog-title">
+                            Success
+                          </DialogTitle>
+                          <DialogContent>
+                            <DialogContentText id="alert-dialog-description">
+                              Successfully placed your order! <br />
+                              The app will automatically lead you to the payment page once someone has offered to fulfill your order.
+                            </DialogContentText>
+                          </DialogContent>
+                          <DialogActions>
+                            <Button
+                              onClick={() => close()}
+                              autoFocus
+                              style={{ color: '#50C878' }}
+                            >Close
+                            </Button>
+                          </DialogActions>
+                        </>
+                      )}
+                    </LinkedDialog>
                   </Stack>
                 </Box>
               );
             }}
           </FieldArray>
-          <ConfirmPopover
+          {/* <ConfirmPopover
             name="makeFormClear"
             confirmAction={() => {
               setFieldValue('orders', []);
@@ -344,7 +474,7 @@ export default function MakeForm({ shop }: { shop: Shop | null }) {
               <CheckCircleIcon />
               Successfully placed your order!
             </Stack>
-          </LinkedClickAwayPopover>
+          </LinkedClickAwayPopover> */}
         </Form>
       )}
     </Formik>

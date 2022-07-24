@@ -11,22 +11,19 @@ import { Shop } from '@prisma/client';
 import { memoize } from 'lodash';
 import { useRouter } from 'next/router';
 
-import { APIResult, fetchApiThrowOnError, wrapApiResult } from '../../api_helpers';
-import SSRAuthHandler from '../../api_helpers/server_props';
-import { useNullableState } from '../../common';
-import NavBar from '../../common/components/navbar';
-import { LinkedPopover, PopoverContainer } from '../../common/components/popovers';
-import Tabs from '../../common/components/tabs';
-import prisma from '../../prisma';
-import type { LunchHitchCommunity, LunchHitchOrder, SessionUser } from '../../prisma/types';
+import { APIResult, fetchApiThrowOnError, wrapApiResult } from '../api_helpers';
+import SSRAuthHandler from '../api_helpers/server_props';
+import { useNullableState } from '../common';
+import NavBar from '../common/components/navbar';
+import { FulfilledDisplay, MadeDisplay, MakeForm } from '../common/components/orders';
+import FulFillForm from '../common/components/orders/fulfill_form';
+import ShopSelector from '../common/components/orders/shop_selector';
+import { LinkedPopover, PopoverContainer } from '../common/components/popovers';
+import Tabs from '../common/components/tabs';
+import prisma from '../prisma';
+import type { LunchHitchCommunity, LunchHitchOrder, SessionUser } from '../prisma/types';
 
-import FulFillForm from './fulfill_form';
-import FulfilledDisplay from './fulfilled_display';
-import MadeDisplay from './made_display';
-import MakeForm from './make_form';
-import ShopSelector from './shop_selector';
-
-import styles from './orders.module.css';
+import styles from '../common/components/orders/orders.module.css';
 
 type Props = {
   communities: APIResult<LunchHitchCommunity[]>;
@@ -75,7 +72,7 @@ const OrdersPage = ({ communities, user }: Props) => {
           fulfillSuccess: false,
           makeFormClear: false,
           makeFormConfirm: false,
-          makeSuccess: false,
+          makeFormSuccess: false,
           madeRemove: false,
         }}
       >
@@ -99,8 +96,8 @@ const OrdersPage = ({ communities, user }: Props) => {
         <Tabs
           tabs={{
             'Make New Orders': (
-              <Stack direction="column">
-                <h1 style={{ color: '#50C878', textAlign: 'center', paddingTop: '10%' }}>Choose your community and shop to start!</h1>
+              <Stack direction="column" sx={{ paddingBottom: '16vh' }}>
+                <h1 style={{ color: '#50C878', textAlign: 'center', paddingTop: '8%' }}>Choose your community and shop to start!</h1>
                 <div style={{
                   paddingLeft: '20px',
                   paddingRight: '20px',
@@ -120,10 +117,14 @@ const OrdersPage = ({ communities, user }: Props) => {
                   </Collapse>
                 </div>
                 <Stack direction="row">
-                  <FulfillerAsync user={user}>
-                    {({ run }) => (<FulFillForm run={run} Async={FulfillerAsync} shop={shop} />)}
-                  </FulfillerAsync>
-                  <MakeForm shop={shop} />
+                  <div style={{ width: '50%', marginLeft: '20px' }}>
+                    <FulfillerAsync user={user}>
+                      {({ run }) => (<FulFillForm run={run} Async={FulfillerAsync} shop={shop} />)}
+                    </FulfillerAsync>
+                  </div>
+                  <div style={{ width: '50%', paddingRight: '40px' }}>
+                    <MakeForm shop={shop} />
+                  </div>
                 </Stack>
               </Stack>
             ),

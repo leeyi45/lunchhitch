@@ -15,7 +15,7 @@ export default function Tabs({ tabs }: Props) {
 
   return (
     <Stack direction="column">
-      <MUITabs value={index} onChange={(_e, newVal) => setIndex(newVal)}>
+      <MUITabs value={index} onChange={(_e, newVal) => setIndex(newVal)} centered textColor="inherit" indicatorColor="primary">
         {Object.keys(tabs).map((each, i) => (<Tab key={i} value={i} label={each} />))}
       </MUITabs>
       {children[index]}

@@ -16,8 +16,6 @@ import { SessionUser } from '../..';
 import Logo from '../../media/logo.png';
 import LunchHitch from '../../media/lunchhitch2.png';
 
-import styles from './Navbar.module.css';
-
 export type NavbarProps = {
   user?: SessionUser | null;
 };
@@ -64,7 +62,7 @@ export default function NavBar({ user }: NavbarProps) {
                 style={{ paddingRight: '20px' }}
               />
               <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/">Home</Link></Button>
-              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/orders">New Orders</Link></Button>
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/orders">Order</Link></Button>
               <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/suggestions">Suggestions</Link></Button>
             </Typography>
           ) : (

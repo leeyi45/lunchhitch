@@ -4,9 +4,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Stack from '@mui/material/Stack';
 
-import Box from '../../common/components/Box';
-import TooltipButton from '../../common/components/tooltip_button';
-import { LunchHitchOrder } from '../../prisma/types';
+import { LunchHitchOrder } from '../../../prisma/types';
+import Box from '../Box';
+import TooltipButton from '../tooltip_button';
 
 import OrdersDisplay, { AsyncWrapper } from './orders_display';
 
@@ -27,8 +27,7 @@ type Props = {
 
 export default function FulfilledDisplay({ Async }: Props) {
   return (
-<<<<<<< HEAD
-    <Box>
+    <Box style={{ backgroundColor: 'rgba(154, 184, 252, 0.5)' }}>
       <AsyncWrapper<LunchHitchOrder[]> Async={Async}>
         {(data, { run }) => (
           <OrdersDisplay
@@ -36,8 +35,8 @@ export default function FulfilledDisplay({ Async }: Props) {
             empty={<p>You have no orders to fulfill</p>}
             header={(
               <Stack direction="row" spacing={1}>
-                <h2 style={{ color: '#47b16a' }}>Orders you have to fulfill!</h2>
-               <TooltipButton
+                <h2 style={{ color: '#47b16a' }}>Orders you have to fulfill</h2>
+                <TooltipButton
                   style={{
                     float: 'right',
                   }}

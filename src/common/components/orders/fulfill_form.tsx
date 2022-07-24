@@ -1,16 +1,22 @@
 import React from 'react';
 import { AsyncConstructor } from 'react-async';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 import { Shop } from '@prisma/client';
 import { useFormik } from 'formik';
 import { DateTime } from 'luxon';
 
-import { fetchApi } from '../../api_helpers';
-import Box from '../../common/components/Box';
-import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
-import TooltipButton from '../../common/components/tooltip_button';
-import type { LunchHitchOrder } from '../../prisma/types';
+import { fetchApi } from '../../../api_helpers';
+import type { LunchHitchOrder } from '../../../prisma/types';
+import Box from '../Box';
+// import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
+import TooltipButton from '../tooltip_button';
 
 import OrdersDisplay, { AsyncWrapper, OrderEnumerator } from './orders_display';
 
@@ -44,8 +50,13 @@ type FulfillFormValues = {
   order: null | LunchHitchOrder;
 }
 
-const FulFillForm = ({ Async, run, shop }: Props) => {
-  const { setPopover } = usePopoverContext();
+const FulfillForm = ({ Async, run, shop }: Props) => {
+  // const { setPopover } = usePopoverContext();
+  const [accept, setAccept] = React.useState(false);
+
+  const handleUnaccept = () => {
+    setAccept(false);
+  };
 
   const {
     values: { order }, isSubmitting, submitForm, setFieldValue,
@@ -56,7 +67,7 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
     onSubmit: async ({ order: selectedOrder }) => {
       try {
         await fetchApi('orders/fulfill', { id: selectedOrder!.id });
-        setPopover('fulfillSuccess', true);
+        // setPopover('fulfillSuccess', true);
       } catch (error) {
         // TODO fulfill error handling
       }
@@ -71,8 +82,12 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
   }, [run, shop]);
 
   return (
-    <Box style={{ backgroundColor: 'rgba(255, 219, 184, 0.9)' }}>
+    <Box style={{
+      backgroundColor: 'rgba(255, 219, 184, 0.9)', height: '450px', overflow: 'hidden', overflowY: 'scroll',
+    }}
+    >
       <form>
+        {/*
         <ConfirmPopover
           name="fulfillPopover"
           confirmButton="Accept Order"
@@ -90,6 +105,35 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
         >
           Accepted the order!
         </ConfirmPopover>
+        */}
+        <Dialog
+          open={accept}
+          onClose={handleUnaccept}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            Accept the following order?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {order && <OrderEnumerator order={order} />}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleUnaccept} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+            <Button
+              onClick={() => {
+                if (!isSubmitting) submitForm();
+                setAccept(false);
+              }}
+              href="/payments/fulfiller"
+              autoFocus
+              style={{ color: '#50C878' }}
+            >Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
         <AsyncWrapper<LunchHitchOrder[]>
           initial={<p>Select a community and shop to view orders</p>}
           Async={Async}
@@ -100,8 +144,9 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
               empty={(<p>No Orders</p>)}
               header={(
                 <Stack direction="column">
+                  <h2 style={{ color: '#47b16a', textAlign: 'center' }}>Fulfill an Order!</h2>
                   <Stack direction="row" spacing={1}>
-                    <h2 style={{ color: '#47b16a' }}>Fulfill an Order!</h2>
+                    <p>Displaying orders from {shop?.name}</p>
                     <TooltipButton
                       style={{
                         float: 'right',
@@ -116,13 +161,13 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
                       <RefreshIcon />
                     </TooltipButton>
                   </Stack>
-                  <p>Displaying orders from {shop?.name}</p>
                 </Stack>
                   )}
               OrderHeader={OrderListItem}
               onSelect={(selected) => {
                 setFieldValue('order', selected);
-                setPopover('fulfillPopover', true);
+                // setPopover('fulfillPopover', true);
+                setAccept(true);
               }}
             />
           )}
@@ -132,4 +177,4 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
   );
 };
 
-export default FulFillForm;
+export default FulfillForm;

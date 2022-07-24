@@ -129,7 +129,7 @@ export default function PaymentPage() {
       <Card sx={{ maxWidth: '500px' }}>
         <CardHeader
           title="Order for Niqqi's"
-          subheader="Pay to:  " // todo: add fulfiller's phone number
+          subheader="Pay to:  94382947" // todo: add fulfiller's phone number
         />
         <Divider />
         <CardContent>
@@ -174,7 +174,7 @@ export default function PaymentPage() {
               </DialogTitle>
               <DialogContent>
                 <DialogContentText id="alert-dialog-description">
-                  Once you have checked that the location is correct, press confirm to send it to the fulfiller.
+                  Once you have checked that the location is correct, press confirm to send it to the fulfiller.<br />
                   No changes will be allowed after confirming.
                 </DialogContentText>
               </DialogContent>
@@ -199,8 +199,8 @@ export default function PaymentPage() {
                 </Tooltip>
                 <PaidIcon />
                 <Typography sx={{ fontFamily: 'raleway' }}>Paid</Typography>
-                <Tooltip title="Fulfiller will check this once they have accepted your payment">
-                  <FormControlLabel disabled control={<Checkbox />} label="Payment accepted" labelPlacement="start" style={{ marginLeft: '25px', fontFamily: 'raleway' }} />
+                <Tooltip title="Fulfiller will check this if there is a problem with your payment">
+                  <FormControlLabel disabled control={<Checkbox />} label="Payment unaccepted" labelPlacement="start" style={{ marginLeft: '20px', fontFamily: 'raleway' }} />
                 </Tooltip>
               </Stack>
               <Typography sx={{ fontFamily: 'raleway', fontWeight: 'bold' }}>Fulfiller delivery status:</Typography>
@@ -254,7 +254,7 @@ export default function PaymentPage() {
             </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                If you are sure about cancelling the order, select Confirm.
+                If you are sure about cancelling the order, select Confirm.<br />
                 Thank you for using Lunch Hitch!
               </DialogContentText>
             </DialogContent>
@@ -282,7 +282,7 @@ export default function PaymentPage() {
             </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-description">
-                Once your food has arrived, select Confirm.
+                Once your food has arrived, select Confirm.<br />
                 Thank you for using Lunch Hitch!
               </DialogContentText>
               <div style={{ textAlign: 'center' }}>
@@ -314,7 +314,9 @@ export default function PaymentPage() {
         <Collapse in={expanded} timeout="auto" unmountOnExit>
           <CardContent>
             <Typography paragraph>
-              insert dishes in the order
+              1. 2 Cheese pratas <br />
+              2. maggie pattaya white <br />
+              3. ice milo <br />
             </Typography>
           </CardContent>
         </Collapse>
