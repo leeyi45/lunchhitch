@@ -1,25 +1,36 @@
-import { createMocks } from 'node-mocks-http';
+import { createMocks, RequestMethod } from 'node-mocks-http';
 
 import handler from '../create';
 import testUser from '../../../../auth/test_user';
 import type { APIRequest, APIResponse } from '../../../../testing/api_mocker';
 
-jest.mock('firebase-admin', () => ({
-  auth: () => ({
-    verifyIdToken: (token: string) => Promise.resolve(token === 'test'),
-  }),
-  apps: [null],
+import { prismaMock } from '../../../../testing/singleton';
+
+jest.mock('../../../../firebase/admin', () => ({
+  FIREBASE_ADMIN: {
+    auth: () => ({
+      verifyIdToken: (token: string) => Promise.resolve(token === 'test'),
+    }),
+    apps: [null],
+  },
+  getSession: (token: string) => Promise.resolve(token !== 'authorized' ? null : 'TestUser'),
 }));
 
+// jest.mock('../../../../prisma', () => ({
+//   prisma: prismaMock,
+// }))
+
+const mockReq = (token: 'authorized' | 'unauthorized', method: RequestMethod = 'POST') => createMocks<APIRequest, APIResponse>({
+  method,
+  body: testUser,
+  cookies: {
+    token,
+  }
+})
+
 describe('Testing userinfo/create API route handler', () => {
-  it('Creates a userinfo entry no issue', async() => {
-    const { req, res } = createMocks<APIRequest, APIResponse>({
-      method: 'POST',
-      body: testUser,
-      cookies: {
-        token: 'test',
-      }
-    });
+  it('Creates a userinfo entry no issue', async () => {
+    const { req, res } = mockReq('authorized');
 
     await handler(req, res);
     expect(res.statusCode).toBe(200);
@@ -27,13 +38,7 @@ describe('Testing userinfo/create API route handler', () => {
   });
 
   it('should return a 401 if the user is unauthorized', async () => {
-    const { req, res } = createMocks<APIRequest, APIResponse>({
-      method: 'POST',
-      body: testUser,
-      cookies: {
-        token: 'random',
-      }
-    })
+    const { req, res } = mockReq('unauthorized');
 
     await handler(req, res);
     expect(res.statusCode).toBe(401);
@@ -41,13 +46,7 @@ describe('Testing userinfo/create API route handler', () => {
   })
 
   it('should return a 405 if the HTTP method was unsupported', async () => {
-    const { req, res } = createMocks<APIRequest, APIResponse>({
-      method: 'PUT',
-      body: testUser,
-      cookies: {
-        token: 'test',
-      }
-    })
+    const { req, res } = mockReq('authorized');
 
     await handler(req, res);
     expect(res.statusCode).toBe(405);
@@ -56,14 +55,15 @@ describe('Testing userinfo/create API route handler', () => {
 
   it('should return 500 if the handler errors', async () => {
     const { req, res } = createMocks<APIRequest, APIResponse>({
-      method: 'PUT',
+      method: 'POST',
       body: {
         meme: true,
       },
       cookies: {
-        token: 'test',
+        token: 'authorized',
       }
     })
+
 
     await handler(req, res);
     expect(res.statusCode).toBe(500);
