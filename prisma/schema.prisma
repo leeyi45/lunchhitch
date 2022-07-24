@@ -7,26 +7,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-type Shop {
-  id   String @db.ObjectId
-  name String
+model Shop {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  Community   Community? @relation(fields: [communityId], references: [id])
+  communityId String?    @db.ObjectId
+  Order       Order[]
 }
 
 model Community {
-  id      String           @id @default(auto()) @map("_id") @db.ObjectId
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
   address String
   name    String
   shops   Shop[]
 }
 
+enum OrderState {
+  ORDERING
+  DELIVERING
+  UNKNOWN
+}
+
 model Order {
-  id     String   @id @default(auto()) @map("_id") @db.ObjectId
-  from   String
-  orders String[]
-  shop   String @db.ObjectId
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  from        UserInfo   @relation(name: "orderer", fields: [fromId], references: [username])
+  fromId      String
+  orders      String[]
+  state       OrderState @default(UNKNOWN)
+  shop        Shop       @relation(fields: [shopId], references: [id])
+  shopId      String     @db.ObjectId
+  deliverBy   DateTime
+  fulfiller   UserInfo?  @relation(name: "fulfiller", fields: [fulfillerId], references: [username])
+  fulfillerId String?
 }
 
 model UserInfo {
-  id    String @id @map("_id")
-  email String
+  username    String  @id @map("_id")
+  email       String
+  displayName String
+  phoneNumber String
+  Orderer     Order[] @relation("orderer")
+  Fulfiller   Order[] @relation("fulfiller")
 }

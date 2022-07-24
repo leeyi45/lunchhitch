@@ -1,80 +1,234 @@
-import React from 'react';
-import { FormikHelpers } from 'formik';
-import Link from 'next/link';
-import { RedirectOnAuth } from '../../common/auth_wrappers';
-import Redirecter from '../../common/redirecter';
-import { signUp } from '../../auth';
-import FormikWrapper from '../../common/formik_wrapper/formik_wrapper';
-import { firebaseErrorHandler } from '../../firebase';
+import React, { HTMLInputTypeAttribute } from 'react';
+import DoneIcon from '@mui/icons-material/Done';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { FirebaseError } from 'firebase/app';
+import { Form, Formik, useField } from 'formik';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
+import * as yup from 'yup';
 
-export default function SignUpPage() {
-  const [signUpSuccess, setSignUpSuccess] = React.useState(false);
+import { signUp } from '../../auth';
+import { useSession } from '../../auth/auth_provider';
+import LoadingScreen from '../../common/auth_selector/loading_screen';
+import Box from '../../common/components/Box';
+import NavBar from '../../common/components/navbar';
+import {
+  ConfirmPopover, PopoverContainer, usePopover,
+} from '../../common/components/popovers';
+import PasswordField from '../../common/formik_wrapper/password_field';
+
+type SignupFieldProps = {
+  name: string;
+  type: HTMLInputTypeAttribute;
+  labelText: string;
+} & TextFieldProps;
+
+/**
+ * Wrapper combining a Formik field and a MUI textfield
+ */
+const SignUpField = ({
+  name, type, labelText, ...props
+}: SignupFieldProps) => {
+  const [field, meta, helpers] = useField(name);
 
   return (
-    <RedirectOnAuth redirect="./profile">
-      {
-        signUpSuccess
-          ? (
-            <Redirecter redirect="/auth/login" duration={5}>
-              <p>Sign up successful! Redirecting you to the login page</p>
-            </Redirecter>
-          )
-          : (
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              width: '100%',
-              height: '100%',
+    <TextField
+      type={type}
+      variant="standard"
+      label={labelText}
+      onChange={(event) => helpers.setValue(event.target.value)}
+      onBlur={field.onBlur}
+      value={field.value}
+      error={meta.touched && !!meta.error}
+      {...props}
+    />
+  );
+};
+
+/**
+ * The actual signup form
+ */
+const SignUpForm = () => {
+  const [signUpError, setSignUpError] = React.useState<string | null>(null);
+  const { setState: setPopover } = usePopover('signupSuccess');
+
+  return (
+    <Formik
+      initialValues={{
+        displayName: '',
+        email: '',
+        username: '',
+        phoneNumber: '',
+        password: '',
+        repeatPass: '',
+      }}
+      onSubmit={async ({
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        repeatPass, ...values
+      }, { setFieldError }) => {
+        try {
+          await signUp(values);
+          setPopover(true);
+        } catch (error: any) {
+          if (error instanceof FirebaseError) {
+            switch ((error as FirebaseError).code) {
+              case 'auth/email-already-exists': {
+                setFieldError('username', 'An account with this username already exists');
+                break;
+              }
+              default: {
+                setSignUpError(`Unknown error: ${error.code}`);
+                break;
+              }
+            }
+          } else {
+            setSignUpError(`Non FirebaseError error: ${error.toString()}`);
+          }
+        }
+      }}
+      validationSchema={yup.object({
+        displayName: yup.string().required('Please enter a display name'),
+        email: yup.string().email().required('Please enter a valid email'),
+        // TODO username validation (stuff like cannot have @s or whatever)
+        username: yup.string().required('Please enter a valid username'),
+        // TODO add phone number validation
+        phoneNumber: yup.string().required('Please enter a valid phone number'),
+        password: yup.string().required(),
+        repeatPass: yup.string().required(),
+      })}
+      validateOnBlur={false}
+      validateOnChange={false}
+    >
+      {({ resetForm, isSubmitting, errors }) => (
+        <Form>
+          <Stack
+            style={{
+              left: '50%',
+              height: '91%',
+              position: 'absolute',
+              transform: 'translateX(-50%)',
+              width: '40%',
               alignItems: 'center',
               justifyContent: 'center',
-              position: 'absolute',
-              paddingBottom: '100px',
-              border: '5px solid #50C878',
             }}
-            >
-              <p style={{color: "#50C878", fontSize: "30px"}}>Sign up for a Lunch Hitch account</p>
-              <FormikWrapper
-                fields={{
-                  displayName: {
-                    initialValue: '', type: 'text', labelText: 'Name', required: true, hint: 'Name displayed to other users',
-                  },
-                  email: {
-                    initialValue: '', type: 'text', labelText: 'Email', required: true, hint: 'Email associated with this account',
-                  },
-                  username: {
-                    initialValue: '', type: 'text', labelText: 'Username', required: true,
-                  },
-                  password: {
-                    initialValue: '', type: 'text', labelText: 'Password', required: true,
-                  },
-                  repeatPass: {
-                    initialValue: '', type: 'text', labelText: 'Repeat Password', required: true,
-                  },
-                }}
-                onSubmit={async (values) => {
-                  await signUp(values);
-                  setSignUpSuccess(true);
-                }}
-                onSubmitError={(error, actions) => {
-                  actions.setFieldValue('password', '', false);
-                  actions.setFieldValue('repeatPass', '', false);
+            direction="column"
+            spacing={1}
+          >
+            <Box>
+              <p style={{
+                color: '#50C878', fontSize: '30px', textAlign: 'center',
+              }}
+              >
+                <b>Sign up for a Lunch Hitch account</b>
+              </p>
+              <Stack
+                direction="column"
+                spacing={1}
+              >
+                <Button
+                  href="./login"
+                  style={{
+                    justifyContent: 'left',
+                    width: '40%',
+                  }}
+                >
+                  <KeyboardBackspaceIcon />
+                  Back To Login
+                </Button>
+                {signUpError || Object.values(errors).at(0)}
+                <SignUpField
+                  labelText="Display Name"
+                  type="text"
+                  name="displayName"
+                />
+                <SignUpField
+                  labelText="Username"
+                  type="text"
+                  name="username"
+                />
+                <SignUpField
+                  labelText="Email"
+                  type="text"
+                  name="email"
+                />
+                <SignUpField
+                  labelText="Phone Number"
+                  type="text"
+                  name="phoneNumber"
+                />
+                <PasswordField
+                  style={{
+                    marginTop: '20px',
+                  }}
+                  label="Password"
+                  name="password"
+                  variant="standard"
+                />
+                <PasswordField
+                  style={{
+                    marginTop: '20px',
+                    marginBottom: '20px',
+                  }}
+                  label="Repeat Password"
+                  name="repeatPass"
+                  variant="standard"
+                />
+              </Stack>
+              <Stack direction="row">
+                <Button
+                  onClick={() => resetForm()}
+                >
+                  Clear Form
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                >Sign Up
+                </Button>
+              </Stack>
+            </Box>
+          </Stack>
+        </Form>
+      )}
+    </Formik>
+  );
+};
 
-                  return firebaseErrorHandler(error, {
-                    'email-already-exists': 'An account with this username already exists',
-                  });
-                }}
-                preValidate={({ password, repeatPass }) => {
-                  if (password !== repeatPass) {
-                    return { password: 'Passwords did not match!' };
-                  }
-                  return {};
-                }}
-                submitButtonText="Sign Up"
-              />
-              <Link href="/auth/login">Back to Login</Link>
-            </div>
-          )
-      }
-    </RedirectOnAuth>
+/**
+ * Signup page to be displayed to the user
+ */
+export default function SignUpPage() {
+  const { status } = useSession();
+  const router = useRouter();
+
+  if (status === 'authenticated') router.push('/profile');
+  else if (status === 'loading') return <LoadingScreen />;
+
+  return (
+    <PopoverContainer
+      popovers={{
+        signupSuccess: false,
+      }}
+    >
+      <Head>
+        <title>Sign up for a LunchHitch account!</title>
+      </Head>
+      <ConfirmPopover
+        name="signupSuccess"
+        confirmButton={false}
+        cancelButton="Close"
+        onClickAway={() => router.push('/auth/login')}
+      >
+        <DoneIcon />
+        <p>Successfully signed up!</p>
+      </ConfirmPopover>
+      <Stack>
+        <NavBar />
+        <SignUpForm />
+      </Stack>
+    </PopoverContainer>
   );
 }

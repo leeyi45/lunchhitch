@@ -1,287 +1,475 @@
 import React from 'react';
 import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import ErrorIcon from '@mui/icons-material/Error';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DeleteIcon from '@mui/icons-material/Delete';
+import RemoveIcon from '@mui/icons-material/Remove';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import Badge from '@mui/material/Badge';
 import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
 import InputAdornment from '@mui/material/InputAdornment';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import Popover from '@mui/material/Popover';
+import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { Shop } from '@prisma/client';
 import {
-  Formik, Form, FieldArray,
+  Field, FieldArray, FieldProps, Form, Formik, useFormikContext,
 } from 'formik';
-import { Community, Order, Shop } from '@prisma/client';
-import ShopSelector from './shop_selector';
-import TooltipButton from '../../common/tooltip_button';
-import { LunchHitchUser } from '../../auth';
+import { DateTime } from 'luxon';
+import * as yup from 'yup';
+
+import { fetchApiThrowOnError } from '../../api_helpers';
+import Box from '../../common/components/Box';
+import TooltipButton from '../../common/components/tooltip_button';
+
+type MakeFormValues = {
+  orders: string[];
+  deliverBy: DateTime;
+}
 
 const MAX_ORDERS = 10;
 
-type OrderListItemProps = {
-  order: string;
-  onRemove: () => void;
-  onChange: (newValue: string) => void;
-  onDuplicate: () => void;
-}
+const Persister = () => {
+  const { values } = useFormikContext();
+  React.useEffect(() => () => {
+    window.localStorage.setItem('makeform', JSON.stringify(values));
+  }, [values]);
 
-export const OrderListItem = ({
-  order, onRemove, onChange, onDuplicate,
-}: OrderListItemProps) => {
-  const [inputField, setInputField] = React.useState(order);
-
-  return (
-    <ListItem>
-      <div>
-        <TooltipButton
-          tooltip={`Remove ${order} from list`}
-          onClick={onRemove}
-        >
-          <RemoveIcon />
-        </TooltipButton>
-        <TooltipButton
-          tooltip="Duplicate Order"
-          onClick={onDuplicate}
-        >
-          <ContentCopyIcon />
-        </TooltipButton>
-        <TextField
-          value={inputField}
-          onChange={(event) => {
-            setInputField(event.target.value);
-            onChange(event.target.value);
-          }}
-          type="text"
-        />
-        {inputField !== '' ? undefined : (
-          <span>
-            <ErrorIcon />
-            Order cannot be empty!
-          </span>
-        )}
-      </div>
-    </ListItem>
-  );
+  return null;
 };
 
-type MakeFormProps = {
-  communities: Community[]
-  user: LunchHitchUser;
-};
+export default function MakeForm({ shop }: { shop: Shop | null }) {
+  // const { setPopover } = usePopoverContext();
+  const [clear, setClear] = React.useState(false);
+  const [submit, setSubmit] = React.useState(false);
+  const [success, setSuccess] = React.useState(false);
 
-type MakeFormValues = {
-  shop: Shop | null;
-  orders: string[];
-}
+  const handleClear = () => {
+    setClear(true);
+  };
 
-export const MakeForm = (props: MakeFormProps) => {
+  const handleUnclear = () => {
+    setClear(false);
+  };
+
+  const handleSubmit = () => {
+    setSubmit(true);
+  };
+
+  const handleUnsubmit = () => {
+    setSubmit(false);
+  };
+
+  const handleUnsuccess = () => {
+    setSuccess(false);
+  };
+
   const [orderField, setOrderField] = React.useState({
     value: '',
-    helper: '',
     error: false,
+    helperText: '',
   });
 
-  const [popoverAnchor, setPopoverAnchor] = React.useState<HTMLElement | null>(null);
-  const formDivRef = React.useRef<HTMLDivElement | null>(null);
-
-  const submitCallback = async ({ shop, orders }: MakeFormValues) => {
-    if (!shop) return;
-
-    setOrderField({
-      ...orderField,
-      error: false,
-      helper: '',
-    });
-
-    const orderObj = {
-      shop: shop.id,
-      orders,
-      from: props.user.username,
-    } as Omit<Order, 'id'>;
-
-    await fetch('api/prisma?collection=orders&method=create', {
-      method: 'POST',
-      body: JSON.stringify({
-        data: orderObj,
-      }),
-    });
-  };
+  // const sessionValues = window.localStorage.getItem('makeform');
+  const initialValues = { orders: [], deliverBy: DateTime.now() };
 
   return (
     <Formik<MakeFormValues>
-      initialValues={{
-        shop: null,
-        orders: [],
-      }}
-      onSubmit={submitCallback}
-    >
-      {({ values, ...formik }) => {
-        let submitMessage: string;
+      initialValues={initialValues}
+      onSubmit={async ({ orders, deliverBy }, { resetForm }) => {
+        try {
+          await fetchApiThrowOnError('orders/create', {
+            orders,
+            shopId: shop!.id,
+            deliverBy: deliverBy.toJSDate(),
+          });
 
-        if (values.orders.length === 0) {
-          submitMessage = 'Add some orders first!';
-        } else if (values.shop === null) {
-          submitMessage = 'Select a community and store!';
-        } else {
-          submitMessage = 'Place this order';
+          setOrderField({
+            value: '',
+            error: false,
+            helperText: 'Placed order!',
+          });
+          resetForm({
+            values: {
+              deliverBy: DateTime.now(),
+              orders: [],
+            },
+          });
+          setSuccess(true);
+        } catch (error: any) {
+          // TODO submit error handling
+          setOrderField({
+            value: orderField.value,
+            error: true,
+            helperText: error.toString(),
+          });
         }
-
-        return (
-          <div
-            ref={formDivRef}
-          >
-            <Popover
-              open={Boolean(popoverAnchor)}
-              anchorOrigin={{
-                horizontal: 'center',
-                vertical: 'center',
-              }}
-              transformOrigin={{
-                horizontal: 'center',
-                vertical: 'center',
-              }}
-            >
-              <h3>Confirm Your Order from {values.shop?.name}</h3>
-              <ol>
-                {values.orders.map((order, i) => <li key={i}>{order}</li>)}
-              </ol>
-              <div>
-                <Button
-                  type="submit"
-                  variant="contained"
-                  color="success"
-                >Confirm
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  onClick={() => setPopoverAnchor(null)}
-                >Go Back
-                </Button>
-              </div>
-            </Popover>
-            <Form>
-              <ShopSelector
-                communities={props.communities}
-                onChange={(newValue) => formik.setFieldValue('shop', newValue)}
-                value={values.shop}
-              />
-              {values.shop ? (<h3>Ordering from {values.shop.name}</h3>) : undefined}
-              <FieldArray name="orders">
-                {(arrayHelpers) => {
-                  const addItem = (value: string) => {
-                    if (values.orders.length < MAX_ORDERS) {
-                      arrayHelpers.push(value);
-                      setOrderField({
-                        value,
-                        helper: `Added ${value}`,
-                        error: false,
-                      });
-                    } else {
-                      setOrderField({
-                        ...orderField,
-                        error: true,
-                        helper: 'Maximum number of orders reached!',
-                      });
-                    }
-                  };
-
-                  return (
-                    <>
-                      <div>
-                        <TextField
-                          error={orderField.error}
-                          disabled={formik.isSubmitting}
-                          placeholder="Order"
-                          onChange={(event) => setOrderField({
-                            value: event.target.value,
-                            helper: '',
-                            error: false,
-                          })}
-                          value={orderField.value}
-                          type="text"
-                          onSubmit={() => addItem(orderField.value)}
-                          onFocus={() => setOrderField({
-                            ...orderField,
-                            helper: '',
-                            error: false,
-                          })}
-                          helperText={orderField.helper}
-                          InputProps={{
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <TooltipButton
-                                  tooltip={`Add ${orderField.value} to list`}
-                                  disabled={orderField.value === '' || formik.isSubmitting}
-                                  onClick={() => addItem(orderField.value)}
-                                >
-                                  <AddIcon />
-                                </TooltipButton>
-                              </InputAdornment>
-                            ),
-                          }}
-                        />
-                        {values.orders.length}/{MAX_ORDERS} Orders
-                      </div>
-                      <List>
-                        {values.orders.map((order, i) => (
-                          <OrderListItem
-                            order={order}
-                            key={i}
-                            onRemove={() => {
-                              arrayHelpers.remove(i);
-                              setOrderField({
-                                ...orderField,
-                                error: false,
-                                helper: `Removed ${order}`,
-                              });
-                            }}
-                            onDuplicate={() => addItem(order)}
-                            onChange={(newValue) => {
-                              arrayHelpers.replace(i, newValue);
-                              setOrderField({
-                                ...orderField,
-                                error: false,
-                                helper: '',
-                              });
-                            }}
-                          />
-                        ))}
-                      </List>
-                    </>
-                  );
-                } }
-              </FieldArray>
-            </Form>
-            <div>
-              <Button
-                disabled={values.orders.length === 0}
-                onClick={() => {
-                  formik.setFieldValue('orders', [], false);
+      }}
+      validationSchema={yup.object({
+        orders: yup.array().of(yup.string().required('Order cannot be empty!')),
+        deliverBy: yup.date().min(DateTime.now(), 'Invalid deliver by time!'),
+      })}
+    >
+      {({
+        values: { orders }, errors, isSubmitting, setFieldValue, submitForm,
+      }) => (
+        <Form>
+          <Persister />
+          <FieldArray name="orders">
+            {(ordersHelpers) => {
+              const addOrder = (order: string, index?: number) => {
+                if (orders.length >= MAX_ORDERS) {
                   setOrderField({
                     ...orderField,
-                    error: false,
-                    helper: '',
+                    helperText: 'Maximum number of orders reached!',
+                    error: true,
                   });
+                  return;
+                }
+
+                if (index) {
+                  ordersHelpers.insert(index, order);
+                } else {
+                  ordersHelpers.push(order);
+                }
+                setOrderField({
+                  ...orderField,
+                  helperText: `Added ${order}`,
+                  error: false,
+                });
+              };
+
+              return (
+                <Box style={{
+                  backgroundColor: 'rgba(255, 217, 217, 0.9)', height: '450px', overflow: 'hidden', overflowY: 'scroll', width: '100%',
                 }}
-              >Clear Orders
-              </Button>
-              <TooltipButton
-                disabled={values.orders.length === 0
-                  || values.orders.find((order) => order === '') !== undefined
-                  || values.shop === null
-                  || formik.isSubmitting}
-                tooltip={submitMessage}
-                tooltipOnDisabled
-                onClick={() => setPopoverAnchor(formDivRef.current)}
-              >
-                Place Orders
-              </TooltipButton>
-            </div>
-          </div>
-        );
-      } }
+                >
+                  <Stack direction="column">
+                    <h2 style={{ color: '#47b16a', textAlign: 'center', paddingBottom: '15px' }}>Make an Order!</h2>
+                    <Stack direction="row" spacing={1}>
+                      <TextField
+                        {...orderField}
+                        disabled={shop === null}
+                        variant="standard"
+                        placeholder="Enter your order here"
+                        onKeyUp={(event) => {
+                          if (event.key === 'Escape') {
+                            if (orderField.value === '') {
+                              (event.target as any).blur();
+                            } else {
+                              setOrderField({
+                                value: '',
+                                error: false,
+                                helperText: '',
+                              });
+                            }
+
+                            event.preventDefault();
+                          } else if (event.key === 'Enter' && orderField.value !== '') {
+                            addOrder(orderField.value);
+                            event.preventDefault();
+                          }
+                        }}
+                        onChange={(event) => setOrderField({
+                          ...orderField,
+                          value: event.target.value,
+                        })}
+                        onSubmit={() => {
+                          if (orderField.value) {
+                            addOrder(orderField.value);
+                            setOrderField({
+                              value: '',
+                              error: false,
+                              helperText: '',
+                            });
+                          }
+                        }}
+                        InputProps={{
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <TooltipButton
+                                onClick={() => {
+                                  if (orderField.value) {
+                                    addOrder(orderField.value);
+                                    setOrderField({
+                                      value: '',
+                                      error: false,
+                                      helperText: '',
+                                    });
+                                  }
+                                }}
+                                tooltip={`Add ${orderField.value}`}
+                                disabled={!orderField.value || !shop}
+                              >
+                                <AddIcon />
+                              </TooltipButton>
+                            </InputAdornment>
+                          ),
+                        }}
+                      />
+                      <LocalizationProvider dateAdapter={AdapterLuxon}>
+                        <Field
+                          name="deliverBy"
+                        >
+                          {({ field: { value, ...field }, meta }: FieldProps<MakeFormValues>) => (
+                            <DateTimePicker
+                              {...field}
+                              value={value}
+                              onChange={(v) => {
+                                setOrderField({
+                                  value: orderField.value,
+                                  error: false,
+                                  helperText: '',
+                                });
+                                setFieldValue('deliverBy', v, true);
+                              }}
+                              disabled={!shop}
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                              renderInput={({ error, ...params }) => (
+                                <TextField
+                                  placeholder="Deliver By Time"
+                                  variant="standard"
+                                  error={!!meta.error && meta.touched}
+                                  helperText={meta.error}
+                                  {...params}
+                                />
+                              )}
+                            />
+                          )}
+                        </Field>
+                      </LocalizationProvider>
+                    </Stack>
+                    <Box style={{ backgroundColor: 'rgba(255, 217, 217, 0.9)' }}>
+                      {orders.length === 0 ? (
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <p style={{
+                            color: '#7c807d',
+                          }}
+                          >Add some orders to begin!
+                          </p>
+                        </div>
+                      ) : (
+                        <Stack>
+                          {orders.map((order, i) => (
+                            <Stack direction="row" key={i}>
+                              <TooltipButton
+                                tooltip={`Remove ${order}`}
+                                onClick={() => {
+                                  ordersHelpers.remove(i);
+                                  setOrderField({
+                                    ...orderField,
+                                    error: false,
+                                    helperText: `Removed ${order}`,
+                                  });
+                                }}
+                              >
+                                <RemoveIcon />
+                              </TooltipButton>
+                              <TooltipButton
+                                tooltip={`Duplicate ${order}`}
+                                onClick={() => addOrder(order, i)}
+                              >
+                                <ContentCopyIcon />
+                              </TooltipButton>
+                              <Field name={`orders.${i}`}>
+                                {({ field, meta }: FieldProps<MakeFormValues>) => (
+                                  <TextField
+                                    variant="standard"
+                                    {...field}
+                                    error={meta.touched && !!meta.error}
+                                    helperText={meta.error}
+                                  />
+                                )}
+                              </Field>
+                            </Stack>
+                          ))}
+                        </Stack>
+                      )}
+                    </Box>
+                    <div style={{
+                      display: 'inline',
+                    }}
+                    >
+                      {/* clear orders */}
+                      <Dialog
+                        open={clear}
+                        onClose={handleUnclear}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                      >
+                        <DialogTitle id="alert-dialog-title">
+                          Clear Orders
+                        </DialogTitle>
+                        <DialogContent>
+                          <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to clear all orders?
+                          </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleUnclear} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+                          <Button
+                            onClick={() => {
+                              submitForm();
+                              setOrderField({
+                                value: '',
+                                error: false,
+                                helperText: '',
+                              });
+                              setClear(false);
+                            }}
+                            autoFocus
+                            style={{ color: '#50C878' }}
+                          >Confirm
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                      {/* submit orders */}
+                      <TooltipButton
+                        style={{
+                          paddingLeft: '10px',
+                        }}
+                        disabled={orders.length === 0}
+                        tooltip="Remove all orders"
+                        onClick={handleClear}
+                        startIcon={<DeleteIcon />}
+                      >
+                        Clear Orders
+                      </TooltipButton>
+                      <Dialog
+                        open={submit}
+                        onClose={handleUnsubmit}
+                        aria-labelledby="alert-dialog-title"
+                        aria-describedby="alert-dialog-description"
+                      >
+                        <DialogTitle id="alert-dialog-title">
+                          Confirm the following order from {shop?.name}
+                        </DialogTitle>
+                        <DialogContent>
+                          <DialogContentText id="alert-dialog-description">
+                            <ol>
+                              {orders.map((order, i) => (<li key={i}>{order}</li>))}
+                            </ol>
+                          </DialogContentText>
+                        </DialogContent>
+                        <DialogActions>
+                          <Button onClick={handleUnclear} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+                          <Button
+                            onClick={() => {
+                              submitForm();
+                              setOrderField({
+                                value: '',
+                                error: false,
+                                helperText: '',
+                              });
+                              setSubmit(false);
+                              setSuccess(true);
+                            }}
+                            autoFocus
+                            style={{ color: '#50C878' }}
+                          >Confirm
+                          </Button>
+                        </DialogActions>
+                      </Dialog>
+                      <TooltipButton
+                        disabled={
+                        orders.length === 0
+                        || isSubmitting
+                        || !shop
+                        || Object.values(errors).length > 0
+                      }
+                        tooltip="Submit this order!"
+                        onClick={handleSubmit}
+                        endIcon={(
+                          <Badge color="primary" badgeContent={orders.length}>
+                            <ShoppingCartCheckoutIcon />
+                          </Badge>
+                      )}
+                      >
+                        Submit Orders
+                      </TooltipButton>
+                      <p style={{ float: 'right', paddingRight: '20px' }}>{orders.length}/{MAX_ORDERS} Orders</p>
+                    </div>
+                    {/* order succeeded */}
+                    <Dialog
+                      open={success}
+                      onClose={handleUnsuccess}
+                      aria-labelledby="alert-dialog-title"
+                      aria-describedby="alert-dialog-description"
+                    >
+                      <DialogTitle id="alert-dialog-title">
+                        Success
+                      </DialogTitle>
+                      <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                          Successfully placed your order! <br />
+                          The app will automatically lead you to the payment page once someone has offered to fulfill your order.
+                        </DialogContentText>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button
+                          onClick={handleUnsuccess}
+                          autoFocus
+                          style={{ color: '#50C878' }}
+                        >Close
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
+                  </Stack>
+                </Box>
+              );
+            }}
+          </FieldArray>
+          {/* <ConfirmPopover
+            name="makeFormClear"
+            confirmAction={() => {
+              setFieldValue('orders', []);
+              setOrderField({
+                ...orderField,
+                error: false,
+                helperText: 'Orders cleared',
+              });
+            }}
+          >
+            <h3 style={{ fontFamily: 'Raleway', padding: '20px' }}>Are you sure you want to clear all orders?</h3>
+          </ConfirmPopover>
+          <ConfirmPopover
+            name="makeFormConfirm"
+            confirmAction={() => {
+              submitForm();
+              setOrderField({
+                value: '',
+                error: false,
+                helperText: '',
+              });
+            }}
+          >
+            <Stack direction="column">
+              <h3 style={{ fontFamily: 'Raleway', padding: '20px' }}>Confirm the following order from {shop?.name}</h3>
+              <ol>
+                {orders.map((order, i) => (<li key={i}>{order}</li>))}
+              </ol>
+            </Stack>
+          </ConfirmPopover>
+          <LinkedClickAwayPopover name="makeSuccess">
+            <Stack direction="column">
+              <CheckCircleIcon />
+              Successfully placed your order!
+            </Stack>
+          </LinkedClickAwayPopover> */}
+        </Form>
+      )}
     </Formik>
   );
-};
+}

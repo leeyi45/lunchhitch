@@ -1,144 +1,156 @@
 import React from 'react';
-import * as yup from 'yup';
+import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Link from 'next/link';
 import {
-  Field,
-  FieldProps,
-  Form, Formik,
+  Field, FieldProps, Form, Formik,
 } from 'formik';
+import Head from 'next/head';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Button, InputAdornment, TextField } from '@mui/material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import * as yup from 'yup';
+
 import { signIn } from '../../auth';
-import { RedirectOnAuth } from '../../common/auth_wrappers';
+import { useSession } from '../../auth/auth_provider';
+import Box from '../../common/components/Box';
+import NavBar from '../../common/components/navbar';
+import TextField from '../../common/components/textfield';
+import PasswordField from '../../common/formik_wrapper/password_field';
 import { firebaseErrorHandler } from '../../firebase';
 
+type LoginFormValues = {
+  username: string;
+  password: string;
+}
+
+/**
+ * Login page for users. If a callback URL is specified in the params, then
+ * the user will be redirected to that page when the login is complete. Else
+ * the user will automatically be directed to `/profile`
+ */
 export default function LoginPage() {
   const router = useRouter();
+  const { status } = useSession();
+
+  React.useEffect(() => {
+    if (status === 'authenticated') {
+      const redirectUrl = router.query.callback;
+      if (redirectUrl === undefined) router.push('/profile');
+      else if (typeof redirectUrl === 'string') router.push(redirectUrl);
+      else router.push(redirectUrl[0]);
+    }
+  }, [status]);
 
   const [loginError, setLoginError] = React.useState<string | null>(null);
-  const [showPassword, setShowPassword] = React.useState(false);
 
   return (
-    <RedirectOnAuth redirect="/profile">
-      <div style={{
-        flexDirection: 'column',
-        alignContent: 'center',
-      }}
-      >
-        <div style={{ background: '#50C878' }}>
-          <Typography
-            variant="h6"
-            component="div"
-            style={{
-              flexGrow: 1,
-              textAlign: 'left',
-              fontFamily: 'Raleway',
-              color: 'white',
-            }}
-          >
-            Log In to Lunch Hitch
-          </Typography>
-        </div>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: '100%',
+    <div style={{
+      flexDirection: 'column',
+      alignContent: 'center',
+    }}
+    >
+      <Head>
+        <title>Login to LunchHitch</title>
+      </Head>
+      <NavBar />
+      <Stack
+        style={{
+          width: '30%',
+          left: '35%',
+          height: '90%',
           alignItems: 'center',
           justifyContent: 'center',
           position: 'absolute',
           paddingBottom: '100px',
-          border: '5px solid #50C878',
+          paddingTop: '5%',
         }}
-        >
-          <Formik
+        spacing={2}
+      >
+        <Box style={{ paddingInline: '30px', paddingTop: '30px' }}>
+          <div style={{
+            width: '100%',
+          }}
+          >
+            <Typography
+              variant="h4"
+              component="div"
+              style={{
+                flexGrow: 1,
+                textAlign: 'center',
+                fontFamily: 'Raleway',
+                color: '#50C878',
+                fontWeight: 'bold',
+              }}
+            >
+              Log In to Lunch Hitch
+            </Typography>
+          </div>
+          <Formik<LoginFormValues>
             initialValues={{
               username: '',
               password: '',
             }}
-            validateOnChange
-            validateOnBlur
             validateOnMount={false}
+            validateOnBlur={false}
+            validateOnChange={false}
             validationSchema={yup.object({
               username: yup.string().required('Username is required!'),
               password: yup.string().required('Password is required!'),
             })}
-            onSubmit={async (values, actions) => {
+            onSubmit={async (values, { setFieldValue }) => {
               try {
-                const result = await signIn(values);
-
-                if (!result.ok) throw result.error;
-
-                // router.push('/profile');
+                await signIn(values);
               } catch (error: any) {
-                actions.setFieldValue('password', '');
                 setLoginError(firebaseErrorHandler(error, {
                   'user-not-found': 'Incorrect username or password',
                   'wrong-password': 'Incorrect username or password',
                   'too-many-requests': 'Too many failed login attempts, please try again later',
                 }));
               }
+              setFieldValue('password', '', false);
             }}
           >
-            {({ values, errors, ...formik }) => (
+            {({ errors, isSubmitting, submitForm }) => (
               <Form>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
+                <Stack
+                  direction="column"
+                  spacing={1.5}
                 >
-                  {loginError || Object.values(errors).at(0)}<br />
-                  Username
-                  <TextField
-                    type="text"
-                    value={values.username}
-                    variant="standard"
-                    onChange={(event) => formik.setFieldValue('username', event.target.value)}
-                    onBlur={formik.handleBlur}
-                    error={errors.username !== null}
-                  />
-                  Password
-                  <Field
-                    name="password"
-                  >
-                    {({ field }: FieldProps) => (
+                  <p>{loginError || Object.values(errors).at(0)}</p>
+                  <Field name="username">
+                    {({ field, meta }: FieldProps<LoginFormValues>) => (
                       <TextField
+                        {...field}
+                        type="text"
+                        label="Username"
                         variant="standard"
-                        type={showPassword ? 'text' : 'password'}
-                        value={field.value}
-                        onChange={(event) => formik.setFieldValue('password', event.target.value)}
-                        onBlur={field.onBlur}
-                        error={errors.password !== null}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <Button
-                                onClick={() => setShowPassword(!showPassword)}
-                              >
-                                {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
-                              </Button>
-                            </InputAdornment>),
-                        }}
+                        onEscape={(event) => (event.target as any).blur()}
+                        onEnter={submitForm}
+                        error={meta.touched && !!meta.error}
                       />
                     )}
                   </Field>
+                  <PasswordField
+                    variant="standard"
+                    label="Password"
+                    name="password"
+                  />
                   <Button
                     type="submit"
-                    disabled={formik.isSubmitting || errors.password !== undefined || errors.username !== undefined}
+                    disabled={isSubmitting}
                   >Sign In
                   </Button>
-                </div>
+                </Stack>
               </Form>
             )}
           </Formik>
-          <Link href="/auth/signup">Sign Up</Link>
-          <Link href="/auth/reset">Forgot your password?</Link>
-        </div>
-      </div>
-    </RedirectOnAuth>
+          <div style={{ fontFamily: 'Raleway', textAlign: 'center', padding: '30px' }}>
+            <Link href="/auth/signup">Sign Up</Link>
+            <p />
+            <Link href="/auth/reset">Forgot your password?</Link>
+          </div>
+        </Box>
+      </Stack>
+    </div>
   );
 }

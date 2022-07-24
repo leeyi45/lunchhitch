@@ -1,113 +1,180 @@
 import React from 'react';
-import { Community, Order, Shop } from '@prisma/client';
-import { Formik } from 'formik';
-import { CircularProgress, List, ListItem } from '@mui/material';
-import { LunchHitchUser } from '../../auth';
-import ShopSelector from './shop_selector';
-import useAsync from '../../common/async';
+import { AsyncConstructor } from 'react-async';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import Button from '@mui/material/Button';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Stack from '@mui/material/Stack';
+import { Shop } from '@prisma/client';
+import { useFormik } from 'formik';
+import { DateTime } from 'luxon';
+
+import { fetchApi } from '../../api_helpers';
+import Box from '../../common/components/Box';
+// import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
+import TooltipButton from '../../common/components/tooltip_button';
+import type { LunchHitchOrder } from '../../prisma/types';
+
+import OrdersDisplay, { AsyncWrapper, OrderEnumerator } from './orders_display';
 
 type Props = {
-  communities: Community[];
-  user: LunchHitchUser;
+  shop: Shop | null;
+  Async: AsyncConstructor<LunchHitchOrder[]>;
+  run: (shop: Shop) => void;
 };
 
-async function getOrders(shop: Shop): Promise<Order[]> {
-  const result = await fetch('api/prisma?collection=order&method=findMany', {
-    method: 'POST',
-    body: JSON.stringify({
-      where: {
-        shop: shop.id,
-      },
-    }),
+type OrderItemProps = {
+  order: LunchHitchOrder;
+};
+
+/**
+ * Component to display a single order
+ */
+const OrderListItem = ({ order }: OrderItemProps) => (
+  <div>
+    <h3>From {order.from.displayName}</h3>
+    {// There's some issue here where prisma seems to think this field is a Date object
+    }
+    <p>Delivery by {DateTime.fromISO(order.deliverBy as unknown as string).toLocaleString({
+      ...DateTime.DATETIME_SHORT,
+      weekday: 'short',
+    })}
+    </p>
+  </div>
+);
+
+type FulfillFormValues = {
+  order: null | LunchHitchOrder;
+}
+
+const FulFillForm = ({ Async, run, shop }: Props) => {
+  // const { setPopover } = usePopoverContext();
+  const [accept, setAccept] = React.useState(false);
+
+  const handleUnaccept = () => {
+    setAccept(false);
+  };
+
+  const {
+    values: { order }, isSubmitting, submitForm, setFieldValue,
+  } = useFormik<FulfillFormValues>({
+    initialValues: {
+      order: null,
+    },
+    onSubmit: async ({ order: selectedOrder }) => {
+      try {
+        await fetchApi('orders/fulfill', { id: selectedOrder!.id });
+        // setPopover('fulfillSuccess', true);
+      } catch (error) {
+        // TODO fulfill error handling
+      }
+    },
   });
 
-  return result.json();
-}
-
-export default function FulFillForm(props: Props) {
-  const [shop, setShop] = React.useState<Shop | null>(null);
-  const orders = useAsync(getOrders);
-
-  const submitCallback = () => {};
-
-  React.useEffect(() => orders.cancel, []);
+  React.useEffect(() => {
+    if (shop) {
+      run(shop);
+      setFieldValue('order', null);
+    }
+  }, [run, shop]);
 
   return (
-    <Formik
-      initialValues={{
-        order: null,
-      }}
-      onSubmit={submitCallback}
+    <Box style={{
+      backgroundColor: 'rgba(255, 219, 184, 0.9)', height: '450px', overflow: 'hidden', overflowY: 'scroll',
+    }}
     >
-      {(formik) => {
-        let selectorElement;
-
-        switch (orders.state) {
-          case 'waiting': {
-            selectorElement = 'Select a shop and community to begin!';
-            break;
-          }
-          case 'loading': {
-            selectorElement = (
-              <div>
-                <CircularProgress />
-              </div>
-            );
-            break;
-          }
-          case 'errored': {
-            selectorElement = (
-              <div>
-                An unknown error occurred, please refresh the page and try again
-              </div>
-            );
-            break;
-          }
-          default: {
-            if (orders.result.length === 0) {
-              selectorElement = (
-                <>
-                  No Orders
-                </>
-              );
-            } else {
-              selectorElement = (
-                <List>
-                  {orders.result.map((order, i) => (
-                    <ListItem
-                      key={i}
-                      onClick={() => formik.setFieldValue('order', order)}
-                    >
-                      <h3>From {order.from}</h3>
-                      <ol>
-                        {order.orders.map((each, j) => <li key={j}>{each}</li>)}
-                      </ol>
-                    </ListItem>
-                  ))}
-                </List>
-              );
-            }
-            break;
-          }
-        }
-
-        return (
-          <div>
-            <ShopSelector
-              communities={props.communities}
-              onChange={(newValue) => {
-                setShop(newValue);
-
-                // Cancel already running operations
-                orders.cancel();
-                if (newValue) orders.call(newValue);
+      <form>
+        {/*
+        <ConfirmPopover
+          name="fulfillPopover"
+          confirmButton="Accept Order"
+          confirmAction={() => {
+            if (!isSubmitting) submitForm();
+          }}
+        >
+          <h3>Accept the following order?</h3>
+          {order && <OrderEnumerator order={order} />}
+        </ConfirmPopover>
+        <ConfirmPopover
+          confirmButton="Close"
+          cancelButton={false}
+          name="fulfillSuccess"
+        >
+          Accepted the order!
+        </ConfirmPopover>
+        */}
+        <Dialog
+          open={accept}
+          onClose={handleUnaccept}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            Accept the following order?
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText id="alert-dialog-description">
+              {order && <OrderEnumerator order={order} />}
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleUnaccept} autoFocus style={{ color: '#faa7a7' }}>Cancel</Button>
+            <Button
+              onClick={() => {
+                if (!isSubmitting) submitForm();
+                setAccept(false);
               }}
-              value={shop}
+              href="/payments/fulfiller"
+              autoFocus
+              style={{ color: '#50C878' }}
+            >Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <AsyncWrapper<LunchHitchOrder[]>
+          initial={<p>Select a community and shop to view orders</p>}
+          Async={Async}
+        >
+          {(orders) => (
+            <OrdersDisplay
+              orders={orders}
+              empty={(<p>No Orders</p>)}
+              header={(
+                <Stack direction="column">
+                  <h2 style={{ color: '#47b16a', textAlign: 'center' }}>Fulfill an Order!</h2>
+                  <Stack direction="row" spacing={1}>
+                    <p>Displaying orders from {shop?.name}</p>
+                    <TooltipButton
+                      style={{
+                        float: 'right',
+                      }}
+                      tooltip="Refresh orders"
+                      onClick={() => {
+                        run(shop!);
+                        setFieldValue('order', null);
+                      }}
+                      disabled={shop === null}
+                    >
+                      <RefreshIcon />
+                    </TooltipButton>
+                  </Stack>
+                </Stack>
+                  )}
+              OrderHeader={OrderListItem}
+              onSelect={(selected) => {
+                setFieldValue('order', selected);
+                // setPopover('fulfillPopover', true);
+                setAccept(true);
+              }}
             />
-            {selectorElement}
-          </div>
-        );
-      }}
-    </Formik>
+          )}
+        </AsyncWrapper>
+      </form>
+    </Box>
   );
-}
+};
+
+export default FulFillForm;

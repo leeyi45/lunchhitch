@@ -1,55 +1,173 @@
-import Button from '@mui/material/Button';
-import { Community } from '@prisma/client';
+/* eslint-disable no-empty-pattern */
 import React from 'react';
+import { createInstance } from 'react-async';
+import CheckIcon from '@mui/icons-material/Check';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import Alert from '@mui/material/Alert';
+import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
+import Stack from '@mui/material/Stack';
+import { Shop } from '@prisma/client';
+import { memoize } from 'lodash';
+import { useRouter } from 'next/router';
+
+import { APIResult, fetchApiThrowOnError, wrapApiResult } from '../../api_helpers';
+import SSRAuthHandler from '../../api_helpers/server_props';
+import { useNullableState } from '../../common';
+import NavBar from '../../common/components/navbar';
+import { LinkedPopover, PopoverContainer } from '../../common/components/popovers';
+import Tabs from '../../common/components/tabs';
 import prisma from '../../prisma';
+import type { LunchHitchCommunity, LunchHitchOrder, SessionUser } from '../../prisma/types';
+
 import FulFillForm from './fulfill_form';
-import { MakeForm } from './make_form';
+import FulfilledDisplay from './fulfilled_display';
+import MadeDisplay from './made_display';
+import MakeForm from './make_form';
+import ShopSelector from './shop_selector';
+
+import styles from './orders.module.css';
 
 type Props = {
-  communities: Community[];
+  communities: APIResult<LunchHitchCommunity[]>;
+  user: SessionUser;
 }
 
-function FulfilOrder() {
-  return (<p>yeet</p>);
-}
+const FulfillerAsync = createInstance<LunchHitchOrder[]>({
+  deferFn: memoize(([shop], { user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
+    where: {
+      AND: [{ NOT: { fromId: user.username } },
+        // TODO fix this filter
+        // { fulfillerId: null } ,
+        { shopId: shop.id },
+      ],
+    },
+  })),
+});
 
-export default function OrdersPage(props: Props) {
-  const [makingOrder, setMakingOrder] = React.useState(false);
-  const [fulfillingOrder, setFulfillingOrder] = React.useState(false);
+const MadeAsync = createInstance<LunchHitchOrder[]>({
+  promiseFn: memoize(({ user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
+    where: {
+      fromId: user.username,
+    },
+  })),
+});
+
+const FulfilledAsync = createInstance<LunchHitchOrder[]>({
+  promiseFn: memoize(({ user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
+    where: {
+      fulfillerId: user.username,
+    },
+  })),
+});
+
+const OrdersPage = ({ communities, user }: Props) => {
+  const router = useRouter();
+  const [shop, setShop] = useNullableState<Shop>();
 
   return (
-    <div>
-      <div>
-        <Button onClick={() => {
-          setMakingOrder(true);
-          setFulfillingOrder(false);
+    <div className={styles.orders}>
+      <NavBar user={user} />
+      <PopoverContainer
+        popovers={{
+          errorPopover: communities.result === 'error',
+          fulfillPopover: false,
+          fulfillSuccess: false,
+          makeFormClear: false,
+          makeFormConfirm: false,
+          makeSuccess: false,
+          madeRemove: false,
         }}
-        >Make Order
-        </Button>
-        {makingOrder ? (
-          <MakeForm communities={props.communities} />
-        ) : undefined}
-      </div>
-      <Button onClick={() => {
-        setMakingOrder(false);
-        setFulfillingOrder(true);
-      }}
-      >Fulfil Order
-      </Button>
-      {fulfillingOrder ? (<FulFillForm communities={props.communities} />) : undefined}
+      >
+        <LinkedPopover
+          name="errorPopover"
+        >
+          <Stack direction="column">
+            <p style={{
+              textAlign: 'center',
+            }}
+            >
+              An error occurred<br />
+              Reload the page to try again<br />
+              {communities.result === 'error' && communities.value}<br />
+            </p>
+            <Button onClick={() => router.replace(router.pathname)}>
+              <RefreshIcon />
+            </Button>
+          </Stack>
+        </LinkedPopover>
+        <Tabs
+          tabs={{
+            'Make New Orders': (
+              <Stack direction="column" sx={{ paddingBottom: '16vh' }}>
+                <h1 style={{ color: '#50C878', textAlign: 'center', paddingTop: '8%' }}>Choose your community and shop to start!</h1>
+                <div style={{
+                  paddingLeft: '20px',
+                  paddingRight: '20px',
+                  marginBlock: '50px',
+                  height: '50vh',
+                }}
+                >
+                  <ShopSelector
+                    communities={communities.result === 'success' ? communities.value : []}
+                    value={shop}
+                    onChange={setShop}
+                  />
+                  <Collapse in={!!shop} sx={{ width: '11%', paddingTop: '20px', marginInline: '44.5%' }}>
+                    <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
+                      Scroll down!
+                    </Alert>
+                  </Collapse>
+                </div>
+                <Stack direction="row">
+                  <div style={{ width: '50%', marginLeft: '20px' }}>
+                    <FulfillerAsync user={user}>
+                      {({ run }) => (<FulFillForm run={run} Async={FulfillerAsync} shop={shop} />)}
+                    </FulfillerAsync>
+                  </div>
+                  <div style={{ width: '50%', paddingRight: '40px' }}>
+                    <MakeForm shop={shop} />
+                  </div>
+                </Stack>
+              </Stack>
+            ),
+            'My Orders': (
+              <Stack key={1} direction="row">
+                <MadeAsync user={user}>
+                  <MadeDisplay Async={MadeAsync} />
+                </MadeAsync>
+                <FulfilledAsync user={user}>
+                  <FulfilledDisplay Async={FulfilledAsync} />
+                </FulfilledAsync>
+              </Stack>
+            ),
+          }}
+        />
+      </PopoverContainer>
     </div>
   );
-}
+};
 
-export async function getServerSideProps() {
-  // TODO:
-  // Honestly not sure if we should fetch ALL communities server side
-  // or load communities as the user types
-  const communities = await prisma.community.findMany();
+export default OrdersPage;
 
-  return {
-    props: {
-      communities,
+export const getServerSideProps = SSRAuthHandler()(async ({ username }) => {
+  const communities = await wrapApiResult(() => prisma.community.findMany({
+    include: {
+      shops: true,
     },
-  };
-}
+  }));
+
+  const user = await prisma.userInfo.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      username: true,
+      displayName: true,
+    },
+  });
+  return ({
+    communities,
+    user,
+  });
+});

@@ -1,34 +1,28 @@
 import React from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
-import { useSession } from '../auth';
-import Navbar from '../common/navbar';
-import NoUserHomePage from '../common/components/noUser/NoUserHomePage';
-import UserHomePage from '../common/components/user/UserHomePage';
 
+import type { LunchHitchUser } from '../auth/types';
+import AuthSelector from '../common/auth_selector';
+import Navbar from '../common/components/navbar';
 
+import NoUserHomePage from './profile/noUser';
+import UserHomePage from './profile/user';
 
 export default function IndexPage() {
-  const { user, status } = useSession();
-
-  switch (status) {
-    case 'unauthenticated': return (
-      <>
-        <Navbar />
-        <NoUserHomePage />
-      </>
-      );
-    case 'loading': return (
-      <>
-        <Navbar />
-        <CircularProgress />
-      </>
-      );
-    case 'authenticated': return (
-      <>
-        <Navbar />
-        <UserHomePage user={user}/>
-      </>
-      );
-    default: throw new Error('Should not get here');
-  }
+  return (
+    <AuthSelector
+      unauthenticated={(
+        <>
+          <Navbar user={null} />
+          <NoUserHomePage />
+        </>
+      )}
+    >
+      {(user) => (
+        <>
+          <Navbar user={user as LunchHitchUser} />
+          <UserHomePage />
+        </>
+      )}
+    </AuthSelector>
+  );
 }

@@ -1,0 +1,7 @@
+.Suggestions {
+    background: url('../common/media/traditional-food-around-the-world-Travlinmad.jpg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    overflow-y: auto;
+}

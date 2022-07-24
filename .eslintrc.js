@@ -7,7 +7,6 @@ module.exports = {
     es2021: true,
   },
   extends: [
-    // 'eslint-config-prettier',
     'airbnb',
     'plugin:@next/next/recommended',
     'plugin:react/recommended',
@@ -19,15 +18,15 @@ module.exports = {
     },
     ecmaVersion: 'latest',
     sourceType: 'module',
+    project: 'tsconfig.json',
   },
   plugins: [
     'react',
     'eslint-plugin-import',
-    'eslint-plugin-prettier',
+    'simple-import-sort',
     '@typescript-eslint',
   ],
   rules: {
-    'linebreak-style': 0,
     'import/extensions': [
       'error',
       'ignorePackages',
@@ -39,22 +38,43 @@ module.exports = {
       },
     ],
     'jsx-a11y/label-has-associated-control': [
-      'error', {
+      'error',
+      {
         required: {
           some: ['nesting', 'id '],
         },
       },
     ],
+    'linebreak-style': 0,
+    'max-len': [0, { code: 100 }],
     'no-else-return': 0,
+    'no-unused-vars': 0,
     'react/destructuring-assignment': 0,
     'react/function-component-definition': 0,
     'react/jsx-filename-extension': 0,
     'react/jsx-one-expression-per-line': 0,
     'react/jsx-props-no-spreading': 0,
     'react/no-array-index-key': 0,
+    'simple-import-sort/imports': [
+      'error',
+      {
+        groups: [
+          // Packages `react` related packages come first.
+          ['^react', '^@?\\w'],
+          // Internal packages.
+          ['^(@|components)(/.*|$)'],
+          // Side effect imports.
+          ['^\\u0000'],
+          // Parent imports. Put `..` last.
+          ['^\\.\\.(?!/?$)', '^\\.\\./?$'],
+          // Other relative imports. Put same-folder imports and `.` last.
+          ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'],
+          // Style imports.
+          ['^.+\\.?(css)$'],
+        ],
+      },
+    ],
     '@typescript-eslint/no-unused-vars': 'error',
-    'max-len': [0, { code: 100 }],
-    'no-unused-vars': 0,
   },
   settings: {
     'import/resolver': {
