@@ -3,12 +3,18 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  const eusoff = await prisma.community.findFirst({
-    include: {
-      shops: true,
+  const niqqis = await prisma.shop.findFirst({});
+
+  const result = await prisma.order.findMany({
+    where: {
+      shopId: niqqis!.id,
+      fulfillerId: {
+        not: null,
+      },
     },
   });
-  console.log(eusoff);
+
+  result.map(console.log);
 }
 
 main().catch(console.error);

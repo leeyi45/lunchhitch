@@ -23,6 +23,7 @@
     "next.config.mjs",
     "testing/**/*.ts",
     "testing/**/*.js",
+    "scripts/**.js",
     "src/**/*.ts",
     "src/**/*.tsx"
   ],

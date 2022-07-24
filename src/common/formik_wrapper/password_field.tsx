@@ -3,22 +3,24 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { useField } from 'formik';
 
-type Props = Omit<TextFieldProps, 'type' | 'InputProps'> & { name: string; };
+import TextField, { TextFieldProps } from '../components/textfield';
 
-export default function PasswordField(props: Props) {
+type Props = Omit<TextFieldProps, 'type' | 'InputProps'> & { name: string, showError?: boolean };
+
+export default function PasswordField({ name, showError, ...props }: Props) {
   const [showPassword, setShowPassword] = React.useState(false);
-  const [field, meta, helpers] = useField(props.name);
+  const [field, meta] = useField(name);
 
   return (
     <TextField
       {...props}
-      onChange={(event) => helpers.setValue(event.target.value)}
-      onBlur={field.onBlur}
+      {...field}
+      onEscape={(event) => (event.target as any).blur()}
       error={meta.touched && !!meta.error}
       type={showPassword ? 'text' : 'password'}
+      helperText={showError ? meta.error : undefined}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
@@ -32,3 +34,7 @@ export default function PasswordField(props: Props) {
     />
   );
 }
+
+PasswordField.defaultProps = {
+  showError: false,
+};

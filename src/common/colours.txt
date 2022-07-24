@@ -1,5 +1,20 @@
 emerald: #50C878
+rgb(80, 200, 120)
 light: #8BE796
+superlight: #abebb3
+rgb(139, 231, 150)
 dark: #25532a
 super dark: #1f4423
 slightly dark: #47b16a
+peach: rgba(255, 204, 204, 0.5)
+#ffcccc
+#fad9d9 rgba(255, 217, 217, 0.9)
+light orange: rgba(255, 204, 153, 0.5)
+#ffdbb8 rgba(255, 219, 184, 0.9)
+lavender: rgba(230, 230, 250, 0.5)
+#c2c2fc
+pretty blue: rgba(105, 135, 245, 0.5)
+#88a0f7
+197, 211, 252
+mint: rgba(152, 255, 152, 0.3)
+cancel: #faa7a7

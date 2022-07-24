@@ -1,98 +1,116 @@
 import React from 'react';
 import {
-  EmailAuthProvider,
-  reauthenticateWithCredential, sendPasswordResetEmail, updatePassword,
+  EmailAuthProvider, reauthenticateWithCredential, updatePassword,
 } from '@firebase/auth';
 import Button from '@mui/material/Button';
-import { Form, Formik } from 'formik';
+import Stack from '@mui/material/Stack';
+import TextField from '@mui/material/TextField';
+import { UserInfo } from '@prisma/client';
+import {
+  Field, FieldProps, Form, Formik,
+} from 'formik';
+import type { GetServerSideProps } from 'next';
+import Head from 'next/head';
 import Link from 'next/link';
 import * as yup from 'yup';
 
-import { LunchHitchUser } from '../../../auth';
-import AuthSelector from '../../../common/auth_selector';
+import { fetchApi } from '../../../api_helpers';
+import Box from '../../../common/components/Box';
 import NavBar from '../../../common/components/navbar';
-import FormikWrapper from '../../../common/formik_wrapper/formik_wrapper';
 import PasswordField from '../../../common/formik_wrapper/password_field';
 import { FIREBASE_AUTH, firebaseErrorHandler } from '../../../firebase';
+import { getSession } from '../../../firebase/admin';
+import prisma from '../../../prisma';
 
 import style from './ResetPage.module.css';
 
 function NoUserResetPage() {
   const [emailSent, setEmailSent] = React.useState(false);
-  const [resetError, setResetError] = React.useState<string | null>(null);
 
-  const emailCallback = async ({ email }: { email: string }) => {
-    try {
-      const userResult = await fetch('/api/prisma?collection=userInfo&method=findFirst', {
-        method: 'POST',
-        body: JSON.stringify({
-          where: {
-            email,
-          },
-        }),
-      });
-
-      if (userResult) await sendPasswordResetEmail(FIREBASE_AUTH, email);
-      setEmailSent(true);
-    } catch (error: any) {
-      if (error.code !== 'auth/user-not-found') setResetError(`Unknown error occurred: ${error.code}`);
-    }
-  };
-
-  return emailSent ? (
-    <>
-      <p style={{ fontSize: '30px' }}>A reset email has been sent to the provided email if there is an account associated with it</p>
-      <Link href="./auth/login">Back to Login</Link>
-    </>
-  )
-    : (
-      <>
-        {resetError}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          width: '100%',
-          height: '100%',
-          alignItems: 'center',
-          justifyContent: 'center',
-          position: 'absolute',
-          paddingBottom: '100px',
-          border: '5px solid #50C878',
-        }}
+  return (
+    <div>
+      <Box style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: '35%',
+        height: '30%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'absolute',
+        left: '32.5%',
+        top: '30%',
+      }}
+      >
+        <p
+          style={{
+            color: '#50C878',
+            fontSize: '21px',
+            textAlign: 'center',
+          }}
+        >{emailSent
+          ? 'A reset email has been sent to the provided email if there is an account associated with it'
+          : 'Enter your email and we\'ll send you a link to reset your password.'}
+        </p>
+        <Formik
+          initialValues={{
+            email: '',
+          }}
+          onSubmit={async ({ email }, { resetForm }) => {
+            try {
+              await fetchApi<void>('auth/reset', { email });
+            } catch (error) {
+              // TODO Error handling
+            }
+            setEmailSent(true);
+            resetForm();
+          }}
         >
-          <p style={{ color: '#50C878', fontSize: '20px' }}>Enter your email and we&apos;ll send you a link to reset your password.</p>
-          <FormikWrapper
-            fields={{
-              email: {
-                type: 'text', labelText: 'Email', required: true, initialValue: '',
-              },
-            }}
-            onSubmit={emailCallback}
-            submitButtonText="Send Reset Email"
-          />
-          <Link href="/auth/login">Back to Login</Link>
-        </div>
-      </>
-    );
+          {({ resetForm }) => (
+            <Form>
+              <Field name="email">
+                {({ field, meta }: FieldProps<{ email: string }>) => (
+                  <TextField
+                    placeholder="Email"
+                    variant="standard"
+                    error={meta.touched && !!meta.error}
+                    style={{
+                      width: '100%',
+                    }}
+                    {...field}
+                  />
+                )}
+              </Field>
+              <Stack direction="row">
+                <Button type="submit">Send Reset Email</Button>
+                <Button onClick={() => resetForm()}>Clear</Button>
+              </Stack>
+            </Form>
+          )}
+        </Formik>
+        <br />
+        <Link href="/auth/login">Back to Login</Link>
+      </Box>
+    </div>
+  );
 }
 
 type UserResetFormValues = {
-    oldPass: string;
-    newPass: string;
-    repeatPass: string;
+  oldPass: string;
+  newPass: string;
+  repeatPass: string;
 };
 
 /**
  * Password reset page displayed to logged in users
  */
-function UserResetPage({ user }: { user: LunchHitchUser }) {
+function UserResetPage({ user }: { user: UserInfo }) {
   const [resetDone, setResetDone] = React.useState(false);
   const [resetError, setResetError] = React.useState<string | null>(null);
 
   const submitCallback = async ({ oldPass, newPass }: UserResetFormValues) => {
     try {
       const currentUser = FIREBASE_AUTH.currentUser!;
-      await reauthenticateWithCredential(currentUser, EmailAuthProvider.credential(user.email!, oldPass));
+      await reauthenticateWithCredential(currentUser, EmailAuthProvider.credential(user.email, oldPass));
       await updatePassword(currentUser, newPass);
       setResetDone(true);
     } catch (error: any) {
@@ -124,7 +142,7 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
           validateOnChange={false}
           validateOnBlur={false}
         >
-          {({ values, errors, ...formik }) => (
+          {({ values: { oldPass, newPass, repeatPass }, errors, resetForm }) => (
             <>
               <p
                 style={{
@@ -146,30 +164,24 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
                       marginTop: '15px',
                     }}
                     label="Current Password"
-                    value={values.oldPass}
-                    onChange={(event) => formik.setFieldValue('oldPass', event.target.value)}
-                    error={Boolean(errors.oldPass)}
+                    value={oldPass}
                     name="oldPass"
                   />
                   <PasswordField
                     className={style.PasswordField}
                     label="New Password"
-                    value={values.newPass}
-                    onChange={(event) => formik.setFieldValue('newPass', event.target.value)}
-                    error={Boolean(errors.newPass)}
+                    value={newPass}
                     name="newPass"
                   />
                   <PasswordField
                     className={style.PasswordField}
                     label="Repeat New Password"
-                    value={values.repeatPass}
-                    onChange={(event) => formik.setFieldValue('repeatPass', event.target.value)}
-                    error={Boolean(errors.repeatPass)}
+                    value={repeatPass}
                     name="repeatPass"
                   />
                   <div>
                     <Button
-                      onClick={() => formik.resetForm()}
+                      onClick={() => resetForm()}
                     >Clear
                     </Button>
                     <Button type="submit">
@@ -185,25 +197,45 @@ function UserResetPage({ user }: { user: LunchHitchUser }) {
     );
 }
 
+type PageProps = {
+  user: UserInfo | null;
+}
+
 /**
  * Password reset page
  */
-export default function ResetPage() {
+export default function ResetPage({ user }: PageProps) {
   return (
-    <AuthSelector
-      unauthenticated={(
-        <div>
-          <NavBar />
-          <NoUserResetPage />
-        </div>
-      )}
-    >
-      {(user) => (
-        <>
-          <NavBar user={user} />
-          <UserResetPage user={user} />
-        </>
-      )}
-    </AuthSelector>
+    <Stack>
+      <Head>
+        <title>Reset Password</title>
+      </Head>
+      <NavBar user={user} />
+      {user ? <UserResetPage user={user} /> : <NoUserResetPage />}
+    </Stack>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<PageProps> = async (ctx) => {
+  const username = await getSession(ctx.req.cookies.token);
+
+  if (!username) {
+    return {
+      props: {
+        user: null,
+      },
+    };
+  } else {
+    const user = await prisma.userInfo.findFirst({
+      where: {
+        username,
+      },
+    });
+
+    return {
+      props: {
+        user,
+      },
+    };
+  }
+};

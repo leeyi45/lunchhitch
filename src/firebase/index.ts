@@ -20,14 +20,19 @@ if (firebase.getApps().length === 0) {
 }
 
 export const FIREBASE_APP = firebase.getApps()[0];
-export const FIREBASE_AUTH = firebaseAuth.initializeAuth(FIREBASE_APP);
+const FIREBASE_AUTH = firebaseAuth.initializeAuth(FIREBASE_APP);
+firebaseAuth.setPersistence(FIREBASE_AUTH, firebaseAuth.browserLocalPersistence);
+export { FIREBASE_AUTH };
 
-export function firebaseErrorHandler(error: string | firebase.FirebaseError, codes: { [code: string]: string }) {
-  // NextAuth wants to be stupid and return errors as strings
-  // So we need to use regex and extract the Firebase error code from the string
-  const errorCode = (typeof error === 'string' ? error : error.code).match(/\(auth\/(.+)\)/);
+export function firebaseErrorHandler(error: firebase.FirebaseError, codes: { [code: string]: string }) {
+  const errorCode = error.code.match(/auth\/(.+)/);
+
+  // eslint-disable-next-line no-param-reassign
+  codes = {
+    ...codes,
+    'network-request-failed': 'Unable to reach Firebase servers!',
+  };
 
   if (errorCode && codes[errorCode[1]]) return codes[errorCode[1]];
-
   return `Unexpected error: '${errorCode}'`;
 }

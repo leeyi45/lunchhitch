@@ -22,18 +22,30 @@ model Community {
   shops   Shop[]
 }
 
+enum OrderState {
+  ORDERING
+  DELIVERING
+  UNKNOWN
+}
+
 model Order {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  from      UserInfo @relation(fields: [fromId], references: [id])
-  fromId    String
-  orders    String[]
-  shop      Shop     @relation(fields: [shopId], references: [id])
-  shopId    String   @db.ObjectId
-  deliverBy DateTime
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  from        UserInfo   @relation(name: "orderer", fields: [fromId], references: [username])
+  fromId      String
+  orders      String[]
+  state       OrderState @default(UNKNOWN)
+  shop        Shop       @relation(fields: [shopId], references: [id])
+  shopId      String     @db.ObjectId
+  deliverBy   DateTime
+  fulfiller   UserInfo?  @relation(name: "fulfiller", fields: [fulfillerId], references: [username])
+  fulfillerId String?
 }
 
 model UserInfo {
-  id    String  @id @map("_id")
-  email String
-  Order Order[]
+  username    String  @id @map("_id")
+  email       String
+  displayName String
+  phoneNumber String
+  Orderer     Order[] @relation("orderer")
+  Fulfiller   Order[] @relation("fulfiller")
 }

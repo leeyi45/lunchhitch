@@ -1,0 +1,23 @@
+.orders {
+    background: url('../../media/tacos5.png') no-repeat;
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.eusoff {
+    background: url('../../media/eusoff.jpg');
+    background-position: center;
+    background-size: cover;
+}
+
+.niqqis {
+    background: url('../../media/niqqis.jpg');
+}
+
+.comingSoon {
+    background: url('../../media/coming.gif');
+    background-position: center;
+    background-size: cover;
+}

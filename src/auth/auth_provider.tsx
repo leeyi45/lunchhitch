@@ -2,21 +2,27 @@
 import React from 'react';
 import nookies from 'nookies';
 
+import { SessionUser } from '../common';
 import { FIREBASE_AUTH } from '../firebase';
 
-import { LunchHitchUser } from '.';
-
 export type Session = {
-  user: LunchHitchUser;
+  user: SessionUser;
   status: 'authenticated';
+  error: null;
 } | {
   user: null;
   status: 'loading' | 'unauthenticated';
+  error: null;
+} | {
+  user: null;
+  status: 'errored';
+  error: any;
 };
 
 const AuthContext = React.createContext<Session>({
   user: null,
   status: 'unauthenticated',
+  error: null,
 });
 
 /**
@@ -24,63 +30,48 @@ const AuthContext = React.createContext<Session>({
  * components
  */
 export function AuthProvider({ children }: any) {
-  const [contextObj, setContextObj] = React.useState<Session>({
+  const [contextObj, setContext] = React.useState<Session>({
     user: null,
     status: 'unauthenticated',
+    error: null,
   });
+
+  const setContextObj = (value: Session) => {
+    setContext(value);
+  };
+
+  React.useEffect(() => console.log('Current Auth User:', FIREBASE_AUTH.currentUser));
+
+  React.useEffect(() => FIREBASE_AUTH.onAuthStateChanged((user) => {
+    if (!user) {
+      setContextObj({
+        status: 'unauthenticated',
+        user: null,
+        error: null,
+      });
+    } else {
+      const usernameMatch = user.email!.match(
+        /(.+)@lunchhitch.firebaseapp.com/,
+      );
+
+      if (!usernameMatch) throw new Error(`Failed to match username: ${user.email}`);
+
+      setContextObj({
+        status: 'authenticated',
+        user: {
+          username: usernameMatch[1],
+          displayName: user.displayName!,
+        },
+        error: null,
+      });
+    }
+  }), []);
 
   React.useEffect(
     () => FIREBASE_AUTH.onIdTokenChanged(async (user) => {
-      if (!user) {
-        setContextObj({
-          user: null,
-          status: 'unauthenticated',
-        });
-        nookies.set(undefined, 'token', '', { path: '/' });
-      } else {
-        setContextObj({
-          user: null,
-          status: 'loading',
-        });
-
-        nookies.set(undefined, 'token', await user.getIdToken(), {
-          path: '/',
-        });
-        const usernameMatch = user.email?.match(
-          /(.+)@lunchhitch.firebaseapp.com/,
-        );
-
-        if (!usernameMatch) throw new Error(); // TODO Error handling
-        const username = usernameMatch[1];
-
-        const emailResp = await fetch(
-          '/api/prisma?collection=userInfo&method=findFirst',
-          {
-            method: 'POST',
-            body: JSON.stringify({
-              where: {
-                id: username,
-              },
-            }),
-          },
-        );
-
-        const emailResult = await emailResp.json();
-
-        if (!emailResult) {
-        // TODO error handling
-          throw new Error('Prisma did not return an email for this account');
-        }
-
-        setContextObj({
-          user: {
-            username,
-            displayName: user.displayName!,
-            email: emailResult.email,
-          },
-          status: 'authenticated',
-        });
-      }
+      nookies.set(undefined, 'token', user ? await user.getIdToken() : '', {
+        path: '/',
+      });
     }),
     [],
   );

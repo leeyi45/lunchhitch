@@ -1,5 +1,5 @@
 .NoUserHomePage {
-    background: url('../../../common/media/final.jpg') no-repeat;
+    background: url('../../../common/media/Asian-Food-1.jpg') no-repeat;
     background-size: cover;
     background-position: center;
     color: #50C878 ;
@@ -7,5 +7,6 @@
     height: calc(100vh - 64px);
     font-family: 'raleway';
     overflow: hidden;
-    padding: 15%;
+    padding: 17%;
+    text-shadow: 2px 8px 6px rgba(0,0,0,0.4), 0px -5px 35px rgba(255,255,255,0.4);
 }

@@ -1,6 +1,6 @@
 import React from 'react';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import AppBar from '@mui/material/AppBar';
+import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Menu from '@mui/material/Menu';
@@ -11,11 +11,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 
-import { LunchHitchUser, signOut } from '../../../auth';
+import { signOut } from '../../../auth';
+import { SessionUser } from '../..';
 import Logo from '../../media/logo.png';
+import LunchHitch from '../../media/lunchhitch2.png';
 
 export type NavbarProps = {
-  user?: LunchHitchUser | null;
+  user?: SessionUser | null;
 };
 
 /**
@@ -23,12 +25,7 @@ export type NavbarProps = {
  */
 export default function NavBar({ user }: NavbarProps) {
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [usernameText, setUsernameText] = React.useState('Login');
   const router = useRouter();
-
-  React.useEffect(() => {
-    setUsernameText(user ? user.displayName : 'Login');
-  }, [user]);
 
   const handleClose = () => {
     setAnchorEl(null);
@@ -43,41 +40,52 @@ export default function NavBar({ user }: NavbarProps) {
       <Toolbar>
         { user
           ? (
-            <>
+            <Typography
+              variant="h5"
+              component="div"
+              style={{
+                flexGrow: 1, textAlign: 'left', paddingLeft: '10px',
+              }}
+            >
               <Image
                 src={Logo}
                 alt="logo"
-                width={60}
-                height={50}
+                width="50px"
+                height="30px"
               />
-              <Typography
-                variant="h5"
-                component="div"
-                style={{
-                  flexGrow: 1, textAlign: 'left', paddingLeft: '10px', paddingRight: '20px',
-                }}
-              >
-                Lunch Hitch
-                <Button style={{ color: 'white', paddingInline: '30px' }}><Link href="/">Home</Link></Button>
-                <Button style={{ color: 'white' }}><Link href="/orders">New Orders</Link></Button>
-              </Typography>
-            </>
+              {'   '}
+              <Image
+                src={LunchHitch}
+                alt="Lunch Hitch"
+                height="30px"
+                width="225px"
+                style={{ paddingRight: '20px' }}
+              />
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/">Home</Link></Button>
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/orders">Order</Link></Button>
+              <Button style={{ color: 'white', paddingInline: '20px' }}><Link href="/suggestions">Suggestions</Link></Button>
+            </Typography>
           ) : (
-            <>
+            <Typography
+              variant="h5"
+              component="div"
+              style={{ flexGrow: 1, justifyContent: 'left', paddingLeft: '10px' }}
+            >
               <Image
                 src={Logo}
                 alt="logo"
-                width={60}
-                height={50}
+                width="50px"
+                height="30px"
               />
-              <Typography
-                variant="h5"
-                component="div"
-                style={{ flexGrow: 1, textAlign: 'left', paddingLeft: '10px' }}
-              >
-                Lunch Hitch
-              </Typography>
-            </>
+              {'   '}
+              <Image
+                src={LunchHitch}
+                alt="Lunch Hitch"
+                height="30px"
+                width="225px"
+                style={{ paddingRight: '20px' }}
+              />
+            </Typography>
           )}
         <div>
           <IconButton
@@ -88,12 +96,13 @@ export default function NavBar({ user }: NavbarProps) {
             onClick={handleMenu}
             color="inherit"
           >
-            <AccountCircle />
+            <Avatar sx={{ bgcolor: '#c2c2fc' }}>{user?.displayName[0]}</Avatar>
             <text style={{
               paddingLeft: '5px',
+              fontFamily: 'raleway',
             }}
             >
-              {usernameText}
+              {user?.displayName ?? 'Login'}
             </text>
           </IconButton>
           <Menu
@@ -112,31 +121,33 @@ export default function NavBar({ user }: NavbarProps) {
             onClose={handleClose}
           >
             { user
-              ? (
-                <>
-                  <MenuItem onClick={handleClose}>
-                    <Button><Link href="/profile">Profile</Link></Button>
-                  </MenuItem>
-                  <MenuItem>
-                    <Button onClick={() => {
-                      signOut();
-                      router.push('/');
-                    }}
-                    >Log out
-                    </Button>
-                  </MenuItem>
-                </>
-              )
-              : (
-                <>
-                  <MenuItem>
-                    <Button href={`./auth/login?callback=${router.pathname}`}>Log In</Button>
-                  </MenuItem>
-                  <MenuItem>
-                    <Button href="/auth/signup">Sign Up</Button>
-                  </MenuItem>
-                </>
-              )}
+              ? [(
+                <MenuItem key={0} onClick={handleClose}>
+                  <Link href="/profile"><Button>Profile</Button></Link>
+                </MenuItem>),
+              (
+                <MenuItem key={1}>
+                  <Link href="https://teamby.notion.site/User-s-Guide-a9070e41ead948418c3a983ba37d0049"><Button>User Guide</Button></Link>
+                </MenuItem>),
+              (
+                <MenuItem key={2}>
+                  <Button onClick={() => {
+                    signOut();
+                    router.push('/');
+                  }}
+                  >Log out
+                  </Button>
+                </MenuItem>
+              )]
+              : [(
+                <MenuItem key={0}>
+                  <Link href={`/auth/login?callback=${encodeURIComponent(router.pathname)}`}><Button>Log In</Button></Link>
+                </MenuItem>
+              ), (
+                <MenuItem key={1}>
+                  <Link href="/auth/signup"><Button>Sign Up</Button></Link>
+                </MenuItem>
+              )]}
           </Menu>
         </div>
       </Toolbar>
