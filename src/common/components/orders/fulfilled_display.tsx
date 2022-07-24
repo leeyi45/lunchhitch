@@ -4,9 +4,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Stack from '@mui/material/Stack';
 
-import Box from '../../common/components/Box';
-import TooltipButton from '../../common/components/tooltip_button';
-import { LunchHitchOrder } from '../../prisma/types';
+import { LunchHitchOrder } from '../../../prisma/types';
+import Box from '../Box';
+import TooltipButton from '../tooltip_button';
 
 import OrdersDisplay, { AsyncWrapper } from './orders_display';
 

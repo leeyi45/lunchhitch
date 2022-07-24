@@ -12,11 +12,11 @@ import { Shop } from '@prisma/client';
 import { useFormik } from 'formik';
 import { DateTime } from 'luxon';
 
-import { fetchApi } from '../../api_helpers';
-import Box from '../../common/components/Box';
+import { fetchApi } from '../../../api_helpers';
+import type { LunchHitchOrder } from '../../../prisma/types';
+import Box from '../Box';
 // import { ConfirmPopover, usePopoverContext } from '../../common/components/popovers';
-import TooltipButton from '../../common/components/tooltip_button';
-import type { LunchHitchOrder } from '../../prisma/types';
+import TooltipButton from '../tooltip_button';
 
 import OrdersDisplay, { AsyncWrapper, OrderEnumerator } from './orders_display';
 
@@ -50,7 +50,7 @@ type FulfillFormValues = {
   order: null | LunchHitchOrder;
 }
 
-const FulFillForm = ({ Async, run, shop }: Props) => {
+const FulfillForm = ({ Async, run, shop }: Props) => {
   // const { setPopover } = usePopoverContext();
   const [accept, setAccept] = React.useState(false);
 
@@ -177,4 +177,4 @@ const FulFillForm = ({ Async, run, shop }: Props) => {
   );
 };
 
-export default FulFillForm;
+export default FulfillForm;

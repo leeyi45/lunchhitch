@@ -39,8 +39,15 @@ export const usePopover = (name: string) => {
   return {
     state: ctx.popovers[name],
     setState: (state: any) => ctx.setPopover(name, state),
+    close: () => ctx.setPopover(name, false),
   };
 };
+
+export type PopoverHelpers = {
+  state: any;
+  setState: (state: any) => void;
+  close: () => void;
+}
 
 export type PopoverContainerProps = {
   popovers: Values;
@@ -117,7 +124,7 @@ export function withPopover<OuterProps>(
 
 type PopoverWrapperProps = {
   name: string;
-  children: React.ReactNode | ((args: { state: any, setState: (newValue: any) => void }) => React.ReactNode);
+  children: React.ReactNode | ((args: PopoverHelpers) => React.ReactNode);
 };
 
 type RequiredPopoverProps = {
@@ -129,16 +136,20 @@ type RequiredPopoverProps = {
  * Component to wrap Popover components and connect them to a PopoverContext
  */
 export function connectPopover<P extends RequiredPopoverProps>(Component: React.ComponentType<P>, displayName?: string) {
-  const newComp = React.forwardRef<HTMLDivElement, Omit<P, KeysOfType<RequiredPopoverProps>> & PopoverWrapperProps>(({ name, children, ...props }, ref) => {
-    const { state, setState } = usePopover(name);
+  type NewProps = Omit<P, KeysOfType<RequiredPopoverProps>> & PopoverWrapperProps;
+  const newComp = React.forwardRef<HTMLDivElement, NewProps>(({
+    name, children, ...props
+  }, ref) => {
+    const { state, setState, close } = usePopover(name);
     const newProps = {
       ...props,
       open: Boolean(state),
+      onClose: (props as any).onClose !== undefined ? (() => close()) : undefined,
     } as unknown as P;
 
     return (
       <Component ref={ref} {...newProps}>
-        {typeof children === 'function' ? children({ state, setState }) : children}
+        {typeof children === 'function' ? children({ state, setState, close }) : children}
       </Component>
     );
   });
@@ -154,7 +165,7 @@ export const LinkedClickAwayPopover = React.forwardRef<HTMLDivElement, LinkedPop
   name, children, onClickAway, ...props
 }, ref) => (
   <LinkedPopover name={name} {...props}>
-    {({ state, setState }) => (
+    {({ state, setState, close }) => (
       <ClickAwayListener
         onClickAway={() => {
           setState(false);
@@ -162,7 +173,7 @@ export const LinkedClickAwayPopover = React.forwardRef<HTMLDivElement, LinkedPop
         }}
       >
         <div ref={ref}>
-          {typeof children === 'function' ? children({ state, setState }) : children}
+          {typeof children === 'function' ? children({ state, setState, close }) : children}
         </div>
       </ClickAwayListener>
     )}
@@ -186,14 +197,14 @@ export const ConfirmPopover = React.forwardRef<HTMLDivElement, ConfirmPopoverPro
   children, confirmButton, confirmAction, cancelButton, cancelAction, name, ...props
 }, ref) => (
   <LinkedClickAwayPopover name={name} {...props}>
-    {({ state, setState }) => {
+    {({ state, setState, close }) => {
       const confirmProps: ButtonProps = {
         ...(typeof confirmButton === 'object' ? confirmButton as ButtonProps : { children: typeof confirmButton === 'string' ? confirmButton : 'Confirm' }),
         onClick: () => {
           try {
             if (confirmAction) confirmAction();
           } finally {
-            setState(false);
+            close();
           }
         },
         color: 'success',
@@ -205,7 +216,7 @@ export const ConfirmPopover = React.forwardRef<HTMLDivElement, ConfirmPopoverPro
           try {
             if (cancelAction) cancelAction();
           } finally {
-            setState(false);
+            close();
           }
         },
         color: 'error',
@@ -213,7 +224,7 @@ export const ConfirmPopover = React.forwardRef<HTMLDivElement, ConfirmPopoverPro
 
       return (
         <Stack direction="column" ref={ref}>
-          {typeof children === 'function' ? children({ state, setState }) : children}
+          {typeof children === 'function' ? children({ state, setState, close }) : children}
           {confirmButton || cancelButton ? (
             <Stack direction="row">
               {confirmButton ? <Button {...confirmProps} /> : undefined}

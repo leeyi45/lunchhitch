@@ -10,9 +10,9 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
-import ErrorScreen from '../../common/auth_selector/error_screen';
-import Box from '../../common/components/Box';
-import type { LunchHitchOrder } from '../../prisma/types';
+import type { LunchHitchOrder } from '../../../prisma/types';
+import ErrorScreen from '../../auth_selector/error_screen';
+import Box from '../Box';
 
 export const OrderEnumerator = ({ order }: { order: LunchHitchOrder}) => (
   <ol>

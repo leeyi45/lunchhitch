@@ -9,8 +9,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { Shop } from '@prisma/client';
 
-import { useNullableState } from '../../common';
-import type { LunchHitchCommunity } from '../../prisma/types';
+import type { LunchHitchCommunity } from '../../../prisma/types';
+import { useNullableState } from '../..';
 
 import styles from './orders.module.css';
 

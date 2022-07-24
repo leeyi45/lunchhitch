@@ -10,11 +10,11 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
 
-import { fetchApiThrowOnError } from '../../api_helpers';
-import Box from '../../common/components/Box';
-import { LinkedClickAwayPopover, usePopover } from '../../common/components/popovers';
-import TooltipButton from '../../common/components/tooltip_button';
-import type { LunchHitchOrder } from '../../prisma/types';
+import { fetchApiThrowOnError } from '../../../api_helpers';
+import { LunchHitchOrder } from '../../../prisma/types';
+import Box from '../Box';
+import { LinkedClickAwayPopover, usePopover } from '../popovers';
+import TooltipButton from '../tooltip_button';
 
 import OrdersDisplay, { AsyncWrapper } from './orders_display';
 
