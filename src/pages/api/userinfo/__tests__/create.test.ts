@@ -2,22 +2,9 @@ import { createMocks, RequestMethod } from 'node-mocks-http';
 
 import testUser from '../../../../auth/test_user';
 import type { APIRequest, APIResponse } from '../../../../testing/api_mocker';
-// import { prismaMock } from '../../../../testing/singleton';
 import handler from '../create';
 
-jest.mock('../../../../firebase/admin', () => ({
-  FIREBASE_ADMIN: {
-    auth: () => ({
-      verifyIdToken: (token: string) => Promise.resolve(token === 'test'),
-    }),
-    apps: [null],
-  },
-  getSession: (token: string) => Promise.resolve(token !== 'authorized' ? null : 'TestUser'),
-}));
-
-// jest.mock('../../../../prisma', () => ({
-//   prisma: prismaMock,
-// }))
+jest.mock('../../../../firebase/admin');
 
 const mockReq = (token: 'authorized' | 'unauthorized', method: RequestMethod = 'POST') => createMocks<APIRequest, APIResponse>({
   method,
@@ -28,7 +15,7 @@ const mockReq = (token: 'authorized' | 'unauthorized', method: RequestMethod = '
 });
 
 describe('Testing userinfo/create API route handler', () => {
-  it('Creates a userinfo entry no issue', async () => {
+  it('creates a userinfo entry no issue', async () => {
     const { req, res } = mockReq('authorized');
 
     await handler(req, res);

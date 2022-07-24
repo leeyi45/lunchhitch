@@ -58,17 +58,19 @@ export const wrapWithQuery = <T, U>({
           data: req.body as U, req, res, params: queryParams,
         }));
 
-        console.log(`API route ${req.url} received a request`);
+        // console.log(`API route ${req.url} received a request`);
         if (result !== undefined) res.status(200).json(result);
       } catch (error) {
         if (errorHandler) errorHandler(error, res);
         else {
           res.status(500).json({ result: 'error', value: error } as APIResult<T>);
-          console.log(error);
+          // console.log(error);
         }
       }
     }
   };
+
+export const UNAUTHORIZED_MSG = 'Must be logged in';
 
 /**
  * Wrap an API route handler to require authentication. The API route will return a 401 if the user is unauthorized
@@ -77,7 +79,7 @@ export const wrapWithAuth = <T, U>({ handlers: apiHandlers, ...apiParams }: APIP
   const username = (req.query.force === '' && process.env.NODE_ENV !== 'production') ? testUser.username : await getSession(req.cookies.token);
 
   if (!username) {
-    res.status(401).json({ result: 'error', value: 'Must be logged in' });
+    res.status(401).json({ result: 'error', value: UNAUTHORIZED_MSG });
     return undefined as never;
   }
 
