@@ -12,7 +12,6 @@ import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box/Box';
 import NavBar from '../../common/components/navbar';
 import { getSession } from '../../firebase/admin';
-// import { getSession } from '../../firebase/admin';
 import prisma, { LunchHitchCommunity } from '../../prisma';
 
 import FulFillForm from './fulfill_form';

@@ -15,8 +15,16 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts", 
+    ".eslintrc.js",
+    "next.config.mjs",
+    "testing/**/*.ts",
+    "testing/**/*.js",
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
   "exclude": ["node_modules"]
 }
