@@ -66,10 +66,12 @@
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-react-hooks": "^4.3.0",
     "eslint-plugin-simple-import-sort": "^7.0.0",
+    "firebase-tools": "^11.3.0",
     "jest": "^28.1.3",
     "jest-environment-jsdom": "^28.1.3",
     "jest-environment-node": "^28.1.3",
     "jest-mock-extended": "^2.0.7",
+    "jest-mock-fetch": "^2.0.5",
     "node-mocks-http": "^1.11.0",
     "ts-node": "^10.8.1",
     "typescript": "4.6.4"

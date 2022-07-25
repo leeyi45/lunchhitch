@@ -14,8 +14,8 @@ import { signIn } from '../../auth';
 import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
-import TextField from '../../common/components/textfield';
 import PasswordField from '../../common/components/password_field';
+import TextField from '../../common/components/textfield';
 import { firebaseErrorHandler } from '../../firebase';
 
 type LoginFormValues = {

@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "next-env.d.ts", 
+    ".eslintrc.js",
+    "*.config.*.ts",
+    "*.config.*.js",
+    "testing/**/*.ts",
+    "testing/**/*.js",
+    "scripts/**.js",
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "./jest.*.ts", 
+    "**/__tests__/*.ts",
+    "**/__mocks__/*.ts",
+    "src/testing/**.ts"
+  ]
+}
