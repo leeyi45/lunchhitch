@@ -42,10 +42,20 @@ model Order {
 }
 
 model UserInfo {
-  username    String  @id @map("_id")
+  username    String       @id @map("_id")
   email       String
   displayName String
   phoneNumber String
-  Orderer     Order[] @relation("orderer")
-  Fulfiller   Order[] @relation("fulfiller")
+  Orderer     Order[]      @relation("orderer")
+  Fulfiller   Order[]      @relation("fulfiller")
+  Suggestion  Suggestion[]
+}
+
+model Suggestion {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  madeBy      UserInfo @relation(fields: [madeById], references: [username])
+  madeById    String
+  suggestion  String
+  description String
+  createdTime DateTime
 }

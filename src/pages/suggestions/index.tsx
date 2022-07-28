@@ -11,6 +11,7 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Head from 'next/head';
 
+import { fetchApiThrowOnError } from '../../api_helpers';
 import AuthSelector from '../../common/auth_selector';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
@@ -98,7 +99,16 @@ export default function Suggestions() {
                     />
                   </Stack>
                   <div>
-                    <Button onClick={handleClickOpen} style={{ padding: '20px', color: '#50C878' }} endIcon={(<SendIcon />)}>
+                    <Button
+                      onClick={() => {
+                        handleClickOpen();
+                        fetchApiThrowOnError(`suggestions?shopName=${shopName}`, {
+                          description: desc,
+                        });
+                      }}
+                      style={{ padding: '20px', color: '#50C878' }}
+                      endIcon={(<SendIcon />)}
+                    >
                       Submit suggestion
                     </Button>
                     <Dialog
