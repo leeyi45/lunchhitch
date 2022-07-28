@@ -8,7 +8,6 @@ import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import Stack from '@mui/material/Stack';
 import type { Shop } from '@prisma/client';
-import memoize from 'lodash/memoize';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
@@ -32,7 +31,7 @@ type Props = {
 }
 
 const FulfillerAsync = createInstance<LunchHitchOrder[]>({
-  deferFn: memoize(([shop], { user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
+  deferFn: ([shop], { user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
     where: {
       AND: [{ NOT: { fromId: user.username } },
         // TODO fix this filter
@@ -40,23 +39,23 @@ const FulfillerAsync = createInstance<LunchHitchOrder[]>({
         { shopId: shop.id },
       ],
     },
-  })),
+  }),
 });
 
 const MadeAsync = createInstance<LunchHitchOrder[]>({
-  promiseFn: memoize(({ user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
+  promiseFn: ({ user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
     where: {
       fromId: user.username,
     },
-  })),
+  }),
 });
 
 const FulfilledAsync = createInstance<LunchHitchOrder[]>({
-  promiseFn: memoize(({ user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
+  promiseFn: ({ user }) => fetchApiThrowOnError<LunchHitchOrder[]>('orders', {
     where: {
       fulfillerId: user.username,
     },
-  })),
+  }),
 });
 
 const OrdersPage = ({ communities, user }: Props) => {
