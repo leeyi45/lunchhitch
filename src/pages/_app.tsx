@@ -1,6 +1,6 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
-import { AppProps } from 'next/app';
+import type { AppProps } from 'next/app';
 
 import { AuthProvider } from '../auth/auth_provider';
 

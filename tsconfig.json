@@ -18,14 +18,10 @@
     "incremental": true,
   },
   "include": [
-    "next-env.d.ts", 
-    ".eslintrc.js",
-    "next.config.mjs",
-    "testing/**/*.ts",
-    "testing/**/*.js",
-    "scripts/**.js",
-    "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/**.ts",
+    "src/**/**.tsx",
+    "__mocks__/**/*.ts",
+    "./.eslintrc*.js", "src/.eslintrc.js",
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
 }

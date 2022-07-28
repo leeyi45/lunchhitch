@@ -12,13 +12,13 @@ import * as yup from 'yup';
 
 import { signUp } from '../../auth';
 import { useSession } from '../../auth/auth_provider';
-import LoadingScreen from '../../common/auth_selector/loading_screen';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
+import PasswordField from '../../common/components/password_field';
 import {
   ConfirmPopover, PopoverContainer, usePopover,
 } from '../../common/components/popovers';
-import PasswordField from '../../common/formik_wrapper/password_field';
+import LoadingScreen from '../../common/loading_screen';
 
 type SignupFieldProps = {
   name: string;

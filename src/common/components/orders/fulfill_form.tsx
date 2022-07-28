@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncConstructor } from 'react-async';
+import type { AsyncConstructor } from 'react-async';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
@@ -8,7 +8,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Stack from '@mui/material/Stack';
-import { Shop } from '@prisma/client';
+import type { Shop } from '@prisma/client';
 import { useFormik } from 'formik';
 import { DateTime } from 'luxon';
 

@@ -7,7 +7,7 @@ import Stack from '@mui/material/Stack';
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { Shop } from '@prisma/client';
+import type { Shop } from '@prisma/client';
 
 import type { LunchHitchCommunity } from '../../../prisma/types';
 import { useNullableState } from '../..';

@@ -5,8 +5,10 @@
 import React from 'react';
 import type { AsyncConstructor, FulfilledChildren } from 'react-async';
 import SearchIcon from '@mui/icons-material/Search';
-import { CircularProgress, List, ListItem } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import InputAdornment from '@mui/material/InputAdornment';
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 

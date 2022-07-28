@@ -17,7 +17,7 @@ import * as yup from 'yup';
 import { fetchApi } from '../../../api_helpers';
 import Box from '../../../common/components/Box';
 import NavBar from '../../../common/components/navbar';
-import PasswordField from '../../../common/formik_wrapper/password_field';
+import PasswordField from '../../../common/components/password_field';
 import { FIREBASE_AUTH, firebaseErrorHandler } from '../../../firebase';
 import { getSession } from '../../../firebase/admin';
 import prisma from '../../../prisma';

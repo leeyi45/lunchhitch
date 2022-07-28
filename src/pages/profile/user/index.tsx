@@ -1,5 +1,6 @@
 import React from 'react';
-import { Stack, Typography } from '@mui/material';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
 
 import SwipeableEdgeDrawer from '../../../common/components/SwipeableEdgeDrawer';
 

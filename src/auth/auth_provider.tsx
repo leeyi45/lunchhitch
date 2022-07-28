@@ -2,7 +2,7 @@
 import React from 'react';
 import nookies from 'nookies';
 
-import { SessionUser } from '../common';
+import type { SessionUser } from '../common';
 import { FIREBASE_AUTH } from '../firebase';
 
 export type Session = {
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: any) {
     setContext(value);
   };
 
-  React.useEffect(() => console.log('Current Auth User:', FIREBASE_AUTH.currentUser));
+  // React.useEffect(() => console.log('Current Auth User:', FIREBASE_AUTH.currentUser));
 
   React.useEffect(() => FIREBASE_AUTH.onAuthStateChanged((user) => {
     if (!user) {

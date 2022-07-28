@@ -6,7 +6,7 @@ import * as firebase from 'firebase/app';
 import * as firebaseAuth from 'firebase/auth';
 
 const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: 'lunchhitch.firebaseapp.com',
   projectId: 'lunchhitch',
   storageBucket: 'lunchhitch.appspot.com',

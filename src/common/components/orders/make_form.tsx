@@ -17,7 +17,7 @@ import TextField from '@mui/material/TextField';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { Shop } from '@prisma/client';
+import type { Shop } from '@prisma/client';
 import {
   Field, FieldArray, FieldProps, Form, Formik, FormikContext, FormikContextType,
 } from 'formik';

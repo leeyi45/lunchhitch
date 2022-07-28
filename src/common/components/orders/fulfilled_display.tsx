@@ -1,10 +1,10 @@
 import React from 'react';
-import { AsyncConstructor } from 'react-async';
+import type { AsyncConstructor } from 'react-async';
 import DeleteIcon from '@mui/icons-material/Delete';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import Stack from '@mui/material/Stack';
 
-import { LunchHitchOrder } from '../../../prisma/types';
+import type { LunchHitchOrder } from '../../../prisma/types';
 import Box from '../Box';
 import TooltipButton from '../tooltip_button';
 

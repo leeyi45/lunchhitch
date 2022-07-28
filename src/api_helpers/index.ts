@@ -30,6 +30,13 @@ export const fetchApi = async <T>(url: string, data?: any): Promise<APIResult<T>
   });
   const result = await resp.json() as APIResult<T>;
 
+  // if (result.result === 'error') {
+  //   return {
+  //     result: 'error',
+  //     value: JSON.parse(result.value),
+  //   };
+  // }
+
   return result;
 };
 
