@@ -32,9 +32,8 @@ describe('Testing userinfo/create API route handler', () => {
   const mockReq = (token: 'authorized' | 'unauthorized', method: RequestMethod = 'POST') => simReq(createHandler, token, method, testUser);
 
   it('creates a userinfo entry no issue', async () => {
-    const res = await mockReq('authorized');
-
     prismaMock.userInfo.create.mockResolvedValue(testUser);
+    const res = await mockReq('authorized');
 
     expect(prismaMock.userInfo.create).toBeCalledWith({
       data: testUser,
@@ -61,9 +60,9 @@ describe('Testing userinfo/create API route handler', () => {
   });
 
   it('should return 500 if the handler errors', async () => {
+    prismaMock.userInfo.create.mockRejectedValue(new Error('Error Message'));
     const res = await mockReq('authorized', 'POST');
 
-    prismaMock.userInfo.create.mockRejectedValue(new Error('Error Message'));
     expect(res.statusCode).toBe(500);
     expect(res._getJSONData()).toHaveProperty('result', 'error');
     expect(res._getJSONData()).toHaveProperty('value.message', 'Error Message');
@@ -74,8 +73,8 @@ describe('Testing userinfo/index API route handler', () => {
   const mockReq = (token: 'authorized' | 'unauthorized', method: RequestMethod = 'GET') => simReq(getHandler, token, method);
 
   it('retrieves only the info of the logged in user', async () => {
-    const res = await mockReq('authorized');
     prismaMock.userInfo.findFirst.mockResolvedValue(testUser);
+    const res = await mockReq('authorized');
 
     expect(prismaMock.userInfo.findFirst).toBeCalledWith({
       where: {
