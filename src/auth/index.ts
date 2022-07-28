@@ -2,10 +2,10 @@
  * auth.ts
  * Functions for managing users
  */
+import type { UserInfo } from '@prisma/client';
 import {
   createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut as firebaseSignOut, updateProfile,
-} from '@firebase/auth';
-import type { UserInfo } from '@prisma/client';
+} from 'firebase/auth';
 
 import { fetchApiThrowOnError } from '../api_helpers';
 import { FIREBASE_AUTH } from '../firebase';

@@ -9,8 +9,9 @@ module.exports = {
   ],
   files: [
     'src/testing/**.ts',
-    '**/__tests__/**.ts',
-    'src/**/__mocks__/**.ts',
+    '**/__tests__/**/*.ts',
+    '**/__tests__/**/*.tsx',
+    '**/__mocks__/**/*.ts',
     './jest.*.ts',
   ],
   env: {

@@ -3,8 +3,13 @@ import { createMocks, RequestMethod } from 'node-mocks-http';
 
 import testUser from '../../auth/test_user';
 import type { APIRequest, APIResponse } from '../../testing/api_mocker';
-import { UNAUTHORIZED_MSG, wrapWithAuth, wrapWithQuery } from '../api_wrappers';
+import { prismaMock } from '../../testing/singleton';
+import {
+  prismaHandler, UNAUTHORIZED_MSG, wrapWithAuth, wrapWithQuery,
+} from '../api_wrappers';
 import type { APIResult, Handler } from '../types';
+
+jest.mock('../../firebase/admin');
 
 const mockReq = (method: RequestMethod = 'POST') => createMocks<APIRequest, APIResponse>({
   method,
@@ -168,7 +173,8 @@ describe('Test wrapWithQuery', () => {
       url: '/test_api',
     });
     await wrapped(req, res);
-    expectApiResult(500, { result: 'error', value: 'Test Error Message' })(res);
+    expect(res.statusCode).toBe(500);
+    expect(res._getJSONData()).toHaveProperty('value.message', 'Test Error Message');
   });
 });
 
@@ -201,5 +207,23 @@ describe('Test wrapWithAuth', () => {
       await wrapped(req, res);
       expectApiResult(401, { result: 'error', value: UNAUTHORIZED_MSG });
     });
+  });
+});
+
+describe('Test prismaHandler', () => {
+  const handler = prismaHandler(() => prismaMock.userInfo.findFirst({}));
+
+  it('should return an error if prisma returns nothing', async () => {
+    const { req, res } = createMocks<APIRequest, APIResponse>();
+    prismaMock.userInfo.findFirst.mockResolvedValue(null);
+
+    const result = await handler({
+      data: {},
+      req,
+      res,
+      params: {},
+    });
+
+    expect(result).toEqual({ result: 'error', value: 'No document matched the given criteria!' });
   });
 });

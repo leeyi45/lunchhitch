@@ -60,10 +60,11 @@ export const wrapWithQuery = <T, U>({
 
         // console.log(`API route ${req.url} received a request`);
         if (result !== undefined) res.status(200).json(result);
-      } catch (error) {
+      } catch (error: any) {
         if (errorHandler) errorHandler(error, res);
         else {
-          res.status(500).json({ result: 'error', value: error } as APIResult<T>);
+          const obj = Object.getOwnPropertyNames(error).reduce((err, prop) => ({ ...err, [prop]: error[prop] }), {});
+          res.status(500).json({ result: 'error', value: obj } as APIResult<T>);
           // console.log(error);
         }
       }
