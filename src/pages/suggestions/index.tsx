@@ -11,9 +11,9 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Head from 'next/head';
 
-import AuthSelector from '../common/auth_selector';
-import Box from '../common/components/Box';
-import NavBar from '../common/components/navbar';
+import AuthSelector from '../../common/auth_selector';
+import Box from '../../common/components/Box';
+import NavBar from '../../common/components/navbar';
 
 import styles from './styles.module.css';
 
