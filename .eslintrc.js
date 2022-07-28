@@ -84,42 +84,4 @@ module.exports = {
       },
     },
   },
-  overrides: [
-    {
-      extends: [
-        'airbnb',
-        'plugin:jest/recommended',
-      ],
-      files: ['src/testing/**.ts', '**/__tests__/**.ts'],
-      env: {
-        jest: true,
-      },
-      plugins: [
-        'eslint-plugin-import',
-        'jest',
-      ],
-      settings: {
-        'import/resolver': {
-          node: {
-            extensions: ['.js', '.jsx', '.ts', '.tsx'],
-          },
-        },
-      },
-      rules: {
-        'import/extensions': [
-          'error',
-          'ignorePackages',
-          {
-            js: 'never',
-            jsx: 'never',
-            ts: 'never',
-            tsx: 'never',
-          },
-        ],
-        'linebreak-style': 0,
-        'max-len': [0, { code: 100 }],
-        'no-underscore-dangle': 0,
-      },
-    },
-  ],
 };

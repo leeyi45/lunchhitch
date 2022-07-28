@@ -21,7 +21,7 @@
     "src/**/**.ts",
     "src/**/**.tsx",
     "__mocks__/**/*.ts",
-    "./.eslintrc*.js",
+    "./.eslintrc*.js", "src/.eslintrc.js",
   ],
   "exclude": ["node_modules"],
 }

@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "../tsconfig.json",
   "exclude": [
     "next-env.d.ts", 
     ".eslintrc*.js",
@@ -14,10 +14,10 @@
   ],
   "include": [
     "./jest.*.ts", 
-    ".eslintrc.testing.js",
+    ".eslintrc.js",
     "**/__tests__/**/*.ts",
     "**/__tests__/**/*.tsx",
     "**/__mocks__/**/*.ts",
-    "src/testing/**.ts"
+    "./testing/**.ts"
   ]
 }
