@@ -10,9 +10,16 @@ import Typography from '@mui/material/Typography';
 import type { Shop } from '@prisma/client';
 
 import type { LunchHitchCommunity } from '../../../prisma/types';
-import { useNullableState } from '../..';
 
 import styles from './orders.module.css';
+
+export type SelectorState = {
+  /**
+   * Value of the selected community and shop
+   */
+    community: LunchHitchCommunity | null;
+    shop: Shop | null;
+}
 
 type Props = {
   /**
@@ -21,14 +28,10 @@ type Props = {
   communities: LunchHitchCommunity[];
 
   /**
-   * Event fired when the value of the selected shop changes
+   * Event fired when the value of the selected community or shop changes
    */
-  onChange: (newValue: Shop | null) => void;
-
-  /**
-   * Value of the selected shop
-   */
-  value: Shop | null;
+  onChange: (newValue: SelectorState) => void;
+  value: SelectorState;
 };
 
 // background images
@@ -109,9 +112,7 @@ const ImageMarked = styled('span')(({ theme }) => ({
 /**
  * Autocomplete selectors to select a community and shop
  */
-export default function ShopSelector({ communities, onChange, value }: Props) {
-  const [community, setCommunity] = useNullableState<LunchHitchCommunity>();
-
+export default function ShopSelector({ communities, onChange, value: { community, shop } }: Props) {
   return (
     <Stack
       direction="row"
@@ -121,7 +122,10 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         options={communities}
-        onChange={(_event, value) => setCommunity(value)}
+        onChange={(_event, value) => onChange({
+          community: value,
+          shop: null,
+        })}
         style={{ width: '45%', marginLeft: '2%' }}
         renderInput={(params) => (<TextField {...params} label="Community" />)}
         renderOption={(liProps, option) => (
@@ -196,7 +200,10 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
         getOptionLabel={(option) => option.name}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         onChange={(_event, value) => {
-          onChange(value);
+          onChange({
+            community,
+            shop: value,
+          });
         }}
         style={{ width: '45%', marginRight: '2%' }}
         options={community?.shops ?? []}
@@ -265,7 +272,7 @@ export default function ShopSelector({ communities, onChange, value }: Props) {
             </ListItem>
           </Stack>
         )}
-        value={value}
+        value={shop}
       />
     </Stack>
   );

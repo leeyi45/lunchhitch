@@ -7,17 +7,15 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import Stack from '@mui/material/Stack';
-import type { Shop } from '@prisma/client';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import { APIResult, fetchApiThrowOnError, wrapApiResult } from '../api_helpers';
 import SSRAuthHandler from '../api_helpers/server_props';
-import { useNullableState } from '../common';
 import NavBar from '../common/components/navbar';
 import { FulfilledDisplay, MadeDisplay, MakeForm } from '../common/components/orders';
 import FulFillForm from '../common/components/orders/fulfill_form';
-import ShopSelector from '../common/components/orders/shop_selector';
+import ShopSelector, { SelectorState } from '../common/components/orders/shop_selector';
 import { LinkedPopover, PopoverContainer } from '../common/components/popovers';
 import Tabs from '../common/components/tabs';
 import prisma from '../prisma';
@@ -60,7 +58,10 @@ const FulfilledAsync = createInstance<LunchHitchOrder[]>({
 
 const OrdersPage = ({ communities, user }: Props) => {
   const router = useRouter();
-  const [shop, setShop] = useNullableState<Shop>();
+  const [shopSelector, setShopSelector] = React.useState<SelectorState>({
+    shop: null,
+    community: null,
+  });
 
   return (
     <>
@@ -111,10 +112,10 @@ const OrdersPage = ({ communities, user }: Props) => {
                   >
                     <ShopSelector
                       communities={communities.result === 'success' ? communities.value : []}
-                      value={shop}
-                      onChange={setShop}
+                      value={shopSelector}
+                      onChange={setShopSelector}
                     />
-                    <Collapse in={!!shop} sx={{ width: '11%', paddingTop: '20px', marginInline: '44.5%' }}>
+                    <Collapse in={!!shopSelector.shop} sx={{ width: '11%', paddingTop: '20px', marginInline: '44.5%' }}>
                       <Alert icon={<CheckIcon fontSize="inherit" />} severity="success">
                         Scroll down!
                       </Alert>
@@ -123,11 +124,11 @@ const OrdersPage = ({ communities, user }: Props) => {
                   <Stack direction="row">
                     <div style={{ width: '50%', marginLeft: '20px' }}>
                       <FulfillerAsync user={user}>
-                        {({ run }) => (<FulFillForm run={run} Async={FulfillerAsync} shop={shop} />)}
+                        {({ run }) => (<FulFillForm run={run} Async={FulfillerAsync} shop={shopSelector.shop} />)}
                       </FulfillerAsync>
                     </div>
                     <div style={{ width: '50%', paddingRight: '40px' }}>
-                      <MakeForm shop={shop} />
+                      <MakeForm shop={shopSelector.shop} />
                     </div>
                   </Stack>
                 </Stack>

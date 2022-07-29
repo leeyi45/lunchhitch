@@ -59,7 +59,7 @@ export default function AuthSelector(props: Props) {
     }
   }, [status, props]);
 
-  if (props.force) {
+  if (process.env.NODE_ENV !== 'production' && props.force) {
     if (props.authenticated) {
       if (!(props.authenticated instanceof URL)) props.authenticated();
       return null as never;

@@ -95,7 +95,6 @@ export default function Suggestions() {
                               <TextField
                                 {...field}
                                 id="standard-textarea"
-                                multiline
                                 variant="standard"
                                 style={{ width: '40%' }}
                                 onEscape={() => setFieldValue('shopName', '')}
