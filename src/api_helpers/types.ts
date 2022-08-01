@@ -11,6 +11,9 @@ export type APIResult<Result> = {
   value: any;
 }
 
+/**
+ * Handler type returned by wrapWithAuth or wrapWithQuery.
+ */
 export type Handler<TResult, TReq> = (args: {
   data: TReq,
   req: NextApiRequest,

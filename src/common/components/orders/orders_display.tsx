@@ -13,7 +13,7 @@ import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 
 import type { LunchHitchOrder } from '../../../prisma/types';
-import ErrorScreen from '../../auth_selector/error_screen';
+import ErrorScreen from '../../error_screen';
 import Box from '../Box';
 
 export const OrderEnumerator = ({ order }: { order: LunchHitchOrder}) => (

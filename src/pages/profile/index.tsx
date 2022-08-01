@@ -10,7 +10,7 @@ import type { GetServerSideProps } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import ErrorScreen from '../../common/auth_selector/error_screen';
+import ErrorScreen from '../../common/error_screen';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
 import Logo from '../../common/media/logoo.png';

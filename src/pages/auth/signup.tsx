@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { FirebaseError } from 'firebase/app';
-import { Form, Formik, useField } from 'formik';
+import { Form, useField } from 'formik';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import * as yup from 'yup';
@@ -15,10 +15,10 @@ import { useSession } from '../../auth/auth_provider';
 import Box from '../../common/components/Box';
 import NavBar from '../../common/components/navbar';
 import PasswordField from '../../common/components/password_field';
-import {
-  ConfirmPopover, PopoverContainer, usePopover,
-} from '../../common/components/popovers';
 import LoadingScreen from '../../common/loading_screen';
+import { DialogFormik } from '../../common/components/formik';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText/DialogContentText';
 
 type SignupFieldProps = {
   name: string;
@@ -52,11 +52,11 @@ const SignUpField = ({
  * The actual signup form
  */
 const SignUpForm = () => {
+  const router = useRouter();
   const [signUpError, setSignUpError] = React.useState<string | null>(null);
-  const { setState: setPopover } = usePopover('signupSuccess');
 
   return (
-    <Formik
+    <DialogFormik
       initialValues={{
         displayName: '',
         email: '',
@@ -71,7 +71,6 @@ const SignUpForm = () => {
       }, { setFieldError }) => {
         try {
           await signUp(values);
-          setPopover(true);
         } catch (error: any) {
           if (error instanceof FirebaseError) {
             switch ((error as FirebaseError).code) {
@@ -101,6 +100,7 @@ const SignUpForm = () => {
       })}
       validateOnBlur={false}
       validateOnChange={false}
+      onSubmitError={setSignUpError}
     >
       {({ resetForm, isSubmitting, errors }) => (
         <Form>
@@ -190,10 +190,21 @@ const SignUpForm = () => {
                 </Button>
               </Stack>
             </Box>
+            <DialogFormik.Success
+              onClose={() => router.push('/auth/login')}
+            >
+              <DialogContent>
+                <DoneIcon />
+                <DialogContentText>
+                  <p>Sign up successful!</p>
+                  <p>Close this dialog to be redirected to the login screen</p>
+                </DialogContentText>
+              </DialogContent>
+            </DialogFormik.Success>
           </Stack>
         </Form>
       )}
-    </Formik>
+    </DialogFormik>
   );
 };
 
@@ -208,27 +219,14 @@ export default function SignUpPage() {
   else if (status === 'loading') return <LoadingScreen />;
 
   return (
-    <PopoverContainer
-      popovers={{
-        signupSuccess: false,
-      }}
-    >
-      <Head>
-        <title>Sign up for a LunchHitch account!</title>
-      </Head>
-      <ConfirmPopover
-        name="signupSuccess"
-        confirmButton={false}
-        cancelButton="Close"
-        onClickAway={() => router.push('/auth/login')}
-      >
-        <DoneIcon />
-        <p>Successfully signed up!</p>
-      </ConfirmPopover>
-      <Stack>
-        <NavBar />
-        <SignUpForm />
-      </Stack>
-    </PopoverContainer>
+      <>
+        <Head>
+          <title>Sign up for a LunchHitch account!</title>
+        </Head>
+        <Stack>
+          <NavBar />
+          <SignUpForm />
+        </Stack>
+      </>
   );
 }
